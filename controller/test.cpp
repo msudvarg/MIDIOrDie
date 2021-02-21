@@ -10,6 +10,7 @@
 #include "common.h"
 
 sig_atomic_t quit = 0;
+double finalOutputBuffer[ROLLING_WINDOW_SIZE];
 
 void sigint_handler(int signum) {
     quit = 1;

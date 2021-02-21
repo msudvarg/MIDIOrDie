@@ -18,7 +18,7 @@ private:
     const mode_t mode = S_IRUSR | S_IWUSR; //User can read and write
 
 public:
-    Shared_Memory(const char * _name, bool _owner = true);
+    Shared_Memory(const char * _name, bool _owner = false);
     ~Shared_Memory();
 
     T & operator*(void) const {

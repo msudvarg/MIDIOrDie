@@ -1,3 +1,4 @@
+#pragma once
 
 #include <complex>
 #include <cmath>
@@ -46,7 +47,6 @@ uint_fast8_t log2ceil (uint32_t value)
 #define WINDOW_LATENCY_MS   30      
 constexpr int SAMPLE_WINDOW_SIZE = 1 << log2floor(SAMPLE_RATE * WINDOW_LATENCY_MS / 1000); // Number of samples that fit into latency window, rounded down to power of 2
 constexpr int ROLLING_WINDOW_SIZE = 1 << log2ceil(SAMPLE_RATE / DELTA_HZ);     // Number of samples required to discern differences of delta_hz, rounded up to power of 2
-double finalOutputBuffer[ROLLING_WINDOW_SIZE];
 
 struct Shared_Buffer {
     int lock_sequence;

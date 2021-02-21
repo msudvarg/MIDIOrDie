@@ -8,7 +8,9 @@
 #include "Shared_Memory.h"
 
 //Open shared memory for visualization
-static Shared_Memory<Shared_Buffer> sharedBuffer {"finalOutputBuffer", false}; 
+static Shared_Memory<Shared_Buffer> sharedBuffer {"finalOutputBuffer"}; 
+
+double finalOutputBuffer[ROLLING_WINDOW_SIZE];
 
 static PyObject *
 fft_histogram_histogram(PyObject *self, PyObject *args) {
