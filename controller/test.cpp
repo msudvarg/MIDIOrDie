@@ -5,6 +5,7 @@
 #include <iostream>
 #include <signal.h>
 #include <random>
+#include <chrono>
 #include "Shared_Memory.h"
 #include "common.h"
 
@@ -30,8 +31,11 @@ int main(int argc, char * argv[]) {
     memset(sharedBuffer->finalOutputBuffer, 0, sizeof(finalOutputBuffer));
 
     std::default_random_engine g;
+    using std::chrono::duration_cast;
+    using std::chrono::milliseconds;
+    using std::chrono::system_clock;
+    g.seed(duration_cast<milliseconds>(system_clock::now().time_since_epoch()).count());
     std::uniform_real_distribution<double> d;
-
 
     while(!quit) {
 
@@ -39,12 +43,11 @@ int main(int argc, char * argv[]) {
             finalOutputBuffer[i] = d(g);
         }
         
+        
         // TODO: Dump finalOutputBuffer here for visualization
         sharedBuffer->lock_sequence++;
         memcpy(sharedBuffer->finalOutputBuffer, finalOutputBuffer, sizeof(finalOutputBuffer));
         sharedBuffer->lock_sequence++;
-
-        sleep(1);
     }
     
     return 0;

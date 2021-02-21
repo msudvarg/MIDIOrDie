@@ -75,6 +75,8 @@ Shared_Memory<T>::Shared_Memory(const char * _name, bool _owner) :
     if(shm == MAP_FAILED) {
         throw Error_Map{};
     }
+    
+    std::cout << "Made it!" << std::endl;
 }
 
 template <typename T>

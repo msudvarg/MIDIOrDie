@@ -3,24 +3,21 @@
 
 #include <iostream>
 #include <string.h>
-#include <random>
 
 #include "common.h"
 #include "Shared_Memory.h"
 
+//Open shared memory for visualization
+static Shared_Memory<Shared_Buffer> sharedBuffer {"finalOutputBuffer", false}; 
+
 static PyObject *
 fft_histogram_histogram(PyObject *self, PyObject *args) {
-    std::default_random_engine g;
-    std::uniform_real_distribution<double> d;
-
-    //Open shared memory for visualization
-    Shared_Memory<Shared_Buffer> sharedBuffer {"finalOutputBuffer", false}; 
     
     {
         int lock_before, lock_after;
         do {
             lock_before = sharedBuffer->lock_sequence;
-            memcpy(sharedBuffer->finalOutputBuffer, finalOutputBuffer, sizeof(finalOutputBuffer));        
+            memcpy(finalOutputBuffer, sharedBuffer->finalOutputBuffer, sizeof(finalOutputBuffer));        
             lock_after = sharedBuffer->lock_sequence;
         }
         while(lock_before != lock_after);
@@ -29,15 +26,11 @@ fft_histogram_histogram(PyObject *self, PyObject *args) {
     PyObject * pylist = PyList_New(ROLLING_WINDOW_SIZE);
 
     for(int i = 0; i < ROLLING_WINDOW_SIZE; ++i) {
-        PyObject * pydouble = Py_BuildValue("d",d(g));//finalOutputBuffer[i]);
+        PyObject * pydouble = Py_BuildValue("d",finalOutputBuffer[i]);
         PyList_SetItem(pylist, i, pydouble);
     }
     
-
-
     return pylist;
-
-
 }
 
 static PyMethodDef FFT_HistogramMethods[] = {
