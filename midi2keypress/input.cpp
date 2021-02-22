@@ -28,7 +28,7 @@ void KeyEventSender::Connect() {
 					   &uidev);
 
   if (err != 0) {
-    throw "Could not create a new device.";
+    throw "Could not create a new device. (Do you need \"sudo\"?)";
   }
     
   sleep(1); // HACK system needs time for device enrollment
