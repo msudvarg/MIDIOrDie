@@ -5,6 +5,7 @@ import matplotlib.pyplot as plt
 scale = int(20) #Only plot 1 out of every scale datapoints
 
 plt.show()
+plt.ion()
 
 while 1:
     y_full = fft_histogram.histogram()
@@ -17,5 +18,5 @@ while 1:
         y = y_full
     plt.cla()
     plt.plot(x,y)
-    plt.draw()
-    plt.pause(0.1)
+    plt.gcf().canvas.draw_idle()
+    plt.gcf().canvas.start_event_loop(0.1)

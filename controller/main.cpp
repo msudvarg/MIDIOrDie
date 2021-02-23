@@ -86,7 +86,20 @@ static int patestCallback( const void *inputBuffer, void *outputBuffer,
     return 0;
 }
 
-int main(int argc, char** argv) {    
+int main(int argc, char** argv) {
+
+    int opt;
+    bool forever = false;
+
+    while((opt = getopt(argc, argv, "f")) != -1) {
+	switch(opt) {
+	case 'f':
+	    forever = true;
+	    break;
+	default:
+	    std::cerr << "Usage: " << argv[0] << " [-f]\n" << std::endl;
+	}
+    }
     
     //Create shared memory for visualization
     Shared_Memory<Shared_Buffer> sharedBuffer {"finalOutputBuffer"}; 
@@ -140,8 +153,8 @@ int main(int argc, char** argv) {
     /* Sleep for a bit to collect data */
     Pa_Sleep(1000);
 
-    // TODO: Program here
-    for(int i = 0; i < 1000; i++) {
+    // TODO: Program here (What program?)
+    for(int i = 0; i < 1000; forever ? i : i++) {
         while(!dataAvailable);
 
         // Copy latest sample into rolling window
@@ -185,7 +198,6 @@ int main(int argc, char** argv) {
               << "2nd largest frequency: " << bucket_size * (max1_ind+1) << "Hz" << std::endl
               << "3rd largest frequency: " << bucket_size * (max2_ind+1) << "Hz" << std::endl << std::endl;
 
-        // TODO: Dump finalOutputBuffer here for visualization
         sharedBuffer->lock_sequence++;
         memcpy(sharedBuffer->finalOutputBuffer, finalOutputBuffer, sizeof(finalOutputBuffer));
         sharedBuffer->lock_sequence++;
