@@ -7,7 +7,6 @@ scale = int(20) #Only plot 1 out of every scale datapoints
 plt.show()
 plt.ion()
 
-
 while 1:
     y_full = fft_histogram.histogram()
     x = range(int(len(y_full)/scale))

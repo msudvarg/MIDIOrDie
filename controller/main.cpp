@@ -140,7 +140,7 @@ int main(int argc, char** argv) {
     /* Sleep for a bit to collect data */
     Pa_Sleep(1000);
 
-    // TODO: Program here
+    // TODO: Program here (What program?)
     for(int i = 0; i < 1000; i++) {
         while(!dataAvailable);
 
@@ -185,7 +185,6 @@ int main(int argc, char** argv) {
               << "2nd largest frequency: " << bucket_size * (max1_ind+1) << "Hz" << std::endl
               << "3rd largest frequency: " << bucket_size * (max2_ind+1) << "Hz" << std::endl << std::endl;
 
-        // TODO: Dump finalOutputBuffer here for visualization
         sharedBuffer->lock_sequence++;
         memcpy(sharedBuffer->finalOutputBuffer, finalOutputBuffer, sizeof(finalOutputBuffer));
         sharedBuffer->lock_sequence++;
