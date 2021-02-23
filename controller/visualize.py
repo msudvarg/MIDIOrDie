@@ -19,6 +19,5 @@ while 1:
         y = y_full
     plt.cla()
     plt.plot(x,y)
-    plt.draw()
     plt.gcf().canvas.draw_idle()
     plt.gcf().canvas.start_event_loop(0.1)
