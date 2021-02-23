@@ -2,6 +2,7 @@
 
 #include <complex>
 #include <cmath>
+#include <string.h>
 
 static inline constexpr
 uint_fast8_t log2floor (uint32_t value)
@@ -51,5 +52,26 @@ constexpr int ROLLING_WINDOW_SIZE = 1 << log2ceil(SAMPLE_RATE / DELTA_HZ);     /
 struct Shared_Buffer {
     int lock_sequence;
     double finalOutputBuffer[ROLLING_WINDOW_SIZE];
+    
+    double *Read() {
+	/*
+	  This is a sequence lock:
+	  We assume a single writer. It supports multiple readers.
+	  The writer increments the sequence variable before writing,
+	  so if it's odd we must restart the read.
+	  Additionally, if the sequence variable is different before and after the read,
+	  we must restart.
+	*/
+	double *data = new double[ROLLING_WINDOW_SIZE];
+	int lock_before, lock_after;
+        do {
+            lock_before = lock_sequence;
+            if (lock_before % 2) continue; //Odd indicates we are in a write stage
+            memcpy(data, finalOutputBuffer, ROLLING_WINDOW_SIZE * sizeof(double));
+            lock_after = lock_sequence;
+        }
+        while(lock_before != lock_after);
+	return data;
+    }
 };
 

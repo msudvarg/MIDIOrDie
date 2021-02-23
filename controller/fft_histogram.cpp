@@ -2,7 +2,6 @@
 #include "Python.h"
 
 #include <iostream>
-#include <string.h>
 
 #include "common.h"
 #include "Shared_Memory.h"
@@ -10,29 +9,10 @@
 //Open shared memory for visualization
 static Shared_Memory<Shared_Buffer> sharedBuffer {"finalOutputBuffer"}; 
 
-double finalOutputBuffer[ROLLING_WINDOW_SIZE];
-
 static PyObject *
 fft_histogram_histogram(PyObject *self, PyObject *args) {
     
-    /*
-    This is a sequence lock:
-    We assume a single writer. It supports multiple readers.
-    The writer increments the sequence variable before writing,
-    so if it's odd we must restart the read.
-    Additionally, if the sequence variable is different before and after the read,
-    we must restart.
-    */
-    {
-        int lock_before, lock_after;
-        do {
-            lock_before = sharedBuffer->lock_sequence;
-            if (lock_before % 2) continue; //Odd indicates we are in a write stage
-            memcpy(finalOutputBuffer, sharedBuffer->finalOutputBuffer, sizeof(finalOutputBuffer));        
-            lock_after = sharedBuffer->lock_sequence;
-        }
-        while(lock_before != lock_after);
-    }
+    double *finalOutputBuffer = sharedBuffer->Read();
 
     PyObject * pylist = PyList_New(ROLLING_WINDOW_SIZE);
 
@@ -40,6 +20,8 @@ fft_histogram_histogram(PyObject *self, PyObject *args) {
         PyObject * pydouble = Py_BuildValue("d",finalOutputBuffer[i]);
         PyList_SetItem(pylist, i, pydouble);
     }
+
+    delete[] finalOutputBuffer;
     
     return pylist;
 }
