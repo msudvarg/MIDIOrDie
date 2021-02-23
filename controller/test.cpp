@@ -29,7 +29,7 @@ int main(int argc, char * argv[]) {
     
     sharedBuffer->lock_sequence = 0;
 
-    memset(sharedBuffer->finalOutputBuffer, 0, sizeof(finalOutputBuffer));
+    memset(sharedBuffer->fftData, 0, sizeof(finalOutputBuffer));
 
     std::default_random_engine g;
     using std::chrono::duration_cast;
@@ -47,7 +47,7 @@ int main(int argc, char * argv[]) {
         
         // TODO: Dump finalOutputBuffer here for visualization
         sharedBuffer->lock_sequence++;
-        memcpy(sharedBuffer->finalOutputBuffer, finalOutputBuffer, sizeof(finalOutputBuffer));
+        memcpy(sharedBuffer->fftData, finalOutputBuffer, sizeof(finalOutputBuffer));
         sharedBuffer->lock_sequence++;
     }
     

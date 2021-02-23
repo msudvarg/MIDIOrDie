@@ -7,28 +7,44 @@
 #include "Shared_Memory.h"
 
 //Open shared memory for visualization
-static Shared_Memory<Shared_Buffer> sharedBuffer {"finalOutputBuffer"}; 
+static Shared_Memory<Shared_Buffer> sharedBuffer {"fftData"}; 
 
 static PyObject *
 fft_histogram_histogram(PyObject *self, PyObject *args) {
     
-    double *finalOutputBuffer = sharedBuffer->Read();
+    double *fftData = sharedBuffer->Read();
 
-    PyObject * pylist = PyList_New(ROLLING_WINDOW_SIZE);
+    PyObject * pylist = PyList_New(OUTPUT_FFT_SIZE);
 
-    for(int i = 0; i < ROLLING_WINDOW_SIZE; ++i) {
-        PyObject * pydouble = Py_BuildValue("d",finalOutputBuffer[i]);
+    for(int i = 0; i < OUTPUT_FFT_SIZE; ++i) {
+        PyObject * pydouble = Py_BuildValue("d",fftData[i]);
         PyList_SetItem(pylist, i, pydouble);
     }
 
-    delete[] finalOutputBuffer;
+    delete[] fftData;
     
     return pylist;
+}
+
+static PyObject *
+fft_histogram_bin_count(PyObject *self, PyObject *args) {
+    PyObject * val = PyLong_FromLong(OUTPUT_FFT_SIZE);
+    return val;
+}
+
+static PyObject *
+fft_histogram_max_hz(PyObject *self, PyObject *args) {
+    PyObject * val = PyLong_FromLong(OUTPUT_FFT_MAX_HZ);
+    return val;
 }
 
 static PyMethodDef FFT_HistogramMethods[] = {
     {"histogram",  fft_histogram_histogram, METH_VARARGS,
      "Execute a shell command."},
+    {"bin_count", fft_histogram_bin_count, METH_VARARGS,
+     "Get size of incoming array"},
+    {"max_hz", fft_histogram_max_hz, METH_VARARGS,
+     "Get Hz value of last bucket"},
     {NULL, NULL, 0, NULL}        /* Sentinel */
 };
 

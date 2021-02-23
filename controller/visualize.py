@@ -1,6 +1,9 @@
 import fft_histogram
 import matplotlib
 import matplotlib.pyplot as plt
+import numpy as np
+import sys
+
 
 scale = int(20) #Only plot 1 out of every scale datapoints
 
@@ -9,14 +12,14 @@ plt.ion()
 
 while 1:
     y_full = fft_histogram.histogram()
-    x = range(int(len(y_full)/scale))
+
+    x = np.linspace(0, fft_histogram.max_hz(), fft_histogram.bin_count())
+    x = [int(v) for v in x]
+        
     y = []
-    if scale > 1:
-        for i in x:
-            y.append(y_full[i*scale])
-    else:
-        y = y_full
+    y = y_full
     plt.cla()
+    plt.ylim(0, 1500)
     plt.plot(x,y)
     plt.gcf().canvas.draw_idle()
     plt.gcf().canvas.start_event_loop(0.1)

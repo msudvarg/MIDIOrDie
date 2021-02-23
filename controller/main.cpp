@@ -102,10 +102,10 @@ int main(int argc, char** argv) {
     }
     
     //Create shared memory for visualization
-    Shared_Memory<Shared_Buffer> sharedBuffer {"finalOutputBuffer"}; 
+    Shared_Memory<Shared_Buffer> sharedBuffer {"fftData"}; 
     std::cout << "Shared memory size: " << sizeof(Shared_Buffer) << std::endl;
     sharedBuffer->lock_sequence = 0;
-    memset(sharedBuffer->finalOutputBuffer, 0, sizeof(finalOutputBuffer));
+    memset(sharedBuffer->fftData, 0, sizeof(sharedBuffer->fftData));     // TODO: Pass max_hz and bucket_hz as well
 
     std::cout << "Sample rate: " << SAMPLE_RATE << "Hz" << std::endl
         << "Precision: " << DELTA_HZ << "Hz" << std::endl
@@ -199,7 +199,7 @@ int main(int argc, char** argv) {
               << "3rd largest frequency: " << bucket_size * (max2_ind+1) << "Hz" << std::endl << std::endl;
 
         sharedBuffer->lock_sequence++;
-        memcpy(sharedBuffer->finalOutputBuffer, finalOutputBuffer, sizeof(finalOutputBuffer));
+        memcpy(sharedBuffer->fftData, finalOutputBuffer, sizeof(sharedBuffer->fftData));        // Copy half of fft data into shared memory
         sharedBuffer->lock_sequence++;
     }
     std::cout << "Number of callbacks: " << count << std::endl;
