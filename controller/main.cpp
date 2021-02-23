@@ -86,7 +86,20 @@ static int patestCallback( const void *inputBuffer, void *outputBuffer,
     return 0;
 }
 
-int main(int argc, char** argv) {    
+int main(int argc, char** argv) {
+
+    int opt;
+    bool forever = false;
+
+    while((opt = getopt(argc, argv, "f")) != -1) {
+	switch(opt) {
+	case 'f':
+	    forever = true;
+	    break;
+	default:
+	    std::cerr << "Usage: " << argv[0] << " [-f]\n" << std::endl;
+	}
+    }
     
     //Create shared memory for visualization
     Shared_Memory<Shared_Buffer> sharedBuffer {"finalOutputBuffer"}; 
@@ -141,7 +154,7 @@ int main(int argc, char** argv) {
     Pa_Sleep(1000);
 
     // TODO: Program here (What program?)
-    for(int i = 0; i < 1000; i++) {
+    for(int i = 0; i < 1000; forever ? i : i++) {
         while(!dataAvailable);
 
         // Copy latest sample into rolling window
