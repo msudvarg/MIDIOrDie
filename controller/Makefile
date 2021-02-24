@@ -13,4 +13,3 @@ tone.o: tone.cpp
 controller.py wrap_controller.o: controller.i
 	$(SWIG) -o wrap_controller.cpp -c++ -python $<
 	$(CXX) $(CPPFLAGS) -fPIC -c wrap_controller.cpp
-	rm wrap_controller.cpp

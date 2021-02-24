@@ -6,10 +6,12 @@
     #include "common.h"
     #include "Shared_Memory.h"
     #include "tone.h"
-    static Shared_Memory<Shared_Buffer> sharedBuffer {"finalOutputBuffer"};
+    static Shared_Memory<Shared_Buffer> sharedBuffer {"fftData"};
 %}
 
 %include "tone.h"
+
+%newobject ToneFromSharedMemory;
 
 %inline %{
     Tone *ToneFromSharedMemory() {

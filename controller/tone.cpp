@@ -5,7 +5,7 @@ Tone::Tone() {}
 
 Tone::Tone(double *interval) {
     this->interval = interval;
-    this->threshold = 0.5; // Maybe, IDK what a good default for this is yet
+    this->threshold = 100.0; // Maybe, IDK what a good default for this is yet
 }
 
 Tone::Tone(double *interval, double threshold) {
@@ -18,9 +18,9 @@ bool Tone::HasPitch(int frequency) {
 }
 
 double Tone::GetPitchStrength(int frequency) {
-    int bucket_size = SAMPLE_RATE / ROLLING_WINDOW_SIZE;
+    int bucket_size = OUTPUT_FFT_MAX_HZ / OUTPUT_FFT_SIZE;
     int index = (int) (frequency / bucket_size);
-    if (index > ROLLING_WINDOW_SIZE) {
+    if (index > OUTPUT_FFT_SIZE) {
 	throw "Frequency is outside of sampling range";
     }
     return interval[index];
