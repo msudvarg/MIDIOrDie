@@ -15,6 +15,7 @@ while 1:
 
     x = np.linspace(0, fft_histogram.max_hz(), fft_histogram.bin_count())
     x = [int(v) for v in x]
+    bucket_size = fft_histogram.max_hz() / fft_histogram.bin_count()
         
     y = []
     y = y_full

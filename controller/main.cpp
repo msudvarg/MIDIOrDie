@@ -79,7 +79,7 @@ static int patestCallback( const void *inputBuffer, void *outputBuffer,
 
     count++;
 
-    memcpy(userData, inputBuffer, framesPerBuffer);
+    memcpy(userData, inputBuffer, framesPerBuffer * sizeof(float));
 
     dataAvailable = true;
 
@@ -176,7 +176,7 @@ int main(int argc, char** argv) {
         double max0=0, max1=0, max2=0;
         int max0_ind=0, max1_ind=0, max2_ind=0;
         for(int i = 0; i < ROLLING_WINDOW_SIZE/2; i++) {
-            if(finalOutputBuffer[i + ROLLING_WINDOW_SIZE/2] > max0) {
+            if(finalOutputBuffer[i] > max0) {
                 max2 = max1;
                 max2_ind = max1_ind;
                 max1 = max0;
@@ -193,7 +193,7 @@ int main(int argc, char** argv) {
                 max2_ind = i;
             }
         }
-        int bucket_size = SAMPLE_RATE / ROLLING_WINDOW_SIZE;
+        float bucket_size = (float)SAMPLE_RATE / ROLLING_WINDOW_SIZE;
         std::cout << "Largest frequency: " << bucket_size * (max0_ind+1) << "Hz" << std::endl
               << "2nd largest frequency: " << bucket_size * (max1_ind+1) << "Hz" << std::endl
               << "3rd largest frequency: " << bucket_size * (max2_ind+1) << "Hz" << std::endl << std::endl;
