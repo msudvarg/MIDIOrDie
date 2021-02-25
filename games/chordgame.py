@@ -1,4 +1,5 @@
-import controller
+from controller import Tone
+from localcontroller.localcontroller import LocalController
 from tkinter import *
 
 class ChordGame(Frame):
@@ -6,6 +7,7 @@ class ChordGame(Frame):
   def __init__(self, master=None):
     super().__init__(master)
     self.master = master
+    self.localcontroller = LocalController()
     self.samplefreq = StringVar()
     self.samplestrength = StringVar()
     self.pack()
@@ -16,7 +18,7 @@ class ChordGame(Frame):
     self.strength_label = Label(self, textvariable=self.samplestrength)
     self.strength_label.pack()
   def read_shared_memory(self):
-    tone = controller.ToneFromSharedMemory();
+    tone = Tone(self.localcontroller.GetData())
     self.samplestrength.set(str(tone.GetPitchStrength(int(self.samplefreq.get()))))
     self.after(self.delaytime, self.read_shared_memory)
     
