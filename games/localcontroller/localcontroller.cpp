@@ -53,19 +53,18 @@ int LocalController::callback (const void* input,
   fftw_execute(controller->p);
   for (int i = 0; i < N; i++) {
     controller->data[i] = (float) sqrt(controller->out[i][0] * controller->out[i][0] + controller->out[i][1] * controller->out[i][1]);
-    controller->data[i] *= 1.0 / log2f(controller->data[i]);
-    if (controller->data[i] < 0.0f) {
-      controller->data[i] = -1 * controller->data[i];
-    }
+    controller->data[i] = 20 * log10f(controller->data[i]);
   }
   controller->mtx.unlock();
   return 0;
 }
 
-float *LocalController::GetData() {
-  float *buf = new float[N];
+double *LocalController::GetData() {
+  double *buf = new double[N];
   mtx.lock();
-  memcpy(buf, data, N);
+  for (int i = 0; i < N; i++) {
+    buf[i] = (double) data[i];
+  }
   mtx.unlock();
   return buf;
 }

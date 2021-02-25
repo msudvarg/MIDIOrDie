@@ -28,11 +28,12 @@ int main(int argc, char **argv) {
   for (;;) { // Forever
     Pa_Sleep(10);
     std::ofstream fout { "plot.data" };
-    float *data = controller.GetData();
+    double *data = controller.GetData();
     fout << "#\tX\tY" << std::endl;
-    for (int i = 0; i < 200; i++) {
+    for (int i = 0; i < 300 * N / SAMPLE_RATE; i++) {
       fout << i * SAMPLE_RATE / N << "\t" << data[i] << std::endl;
     }
     std::cout << "plot 'plot.data' with lines" << std::endl;
+    delete [] data;
   }
 }

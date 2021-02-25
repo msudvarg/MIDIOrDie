@@ -5,13 +5,13 @@
 #include <portaudio.h>
 #include <mutex>
 
-#define N 16384
+#define N 1024
 #define SAMPLE_RATE 11025
 
 class LocalController {
 public:
   LocalController();
-  float *GetData();
+  double *GetData();
   ~LocalController();
 private:
   float data[N];
