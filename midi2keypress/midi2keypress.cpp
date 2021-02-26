@@ -19,15 +19,15 @@ int main() {
       int newkey;
       int peakfreq = tone.GetPeakFrequency();
       int newvolume = tone.GetPitchStrength(peakfreq);
-      if (peakfreq >= 160 and peakfreq < 180) {
+      if (peakfreq >= 160 and peakfreq < 175) {
 	newkey = KEY_F1;
-      } else if (peakfreq >= 180 and peakfreq < 190) {
+      } else if (peakfreq >= 175 and peakfreq < 180) {
 	newkey = KEY_F2;
-      } else if (peakfreq >= 190 and peakfreq < 200) {
+      } else if (peakfreq >= 180 and peakfreq < 190) {
 	newkey = KEY_F3;
-      } else if (peakfreq >= 200 and peakfreq < 210) {
+      } else if (peakfreq >= 190 and peakfreq < 200) {
 	newkey = KEY_F4;
-      } else if (peakfreq >= 210 and peakfreq < 225) {
+      } else if (peakfreq >= 200 and peakfreq < 225) {
 	newkey = KEY_F5;
       } else {
 	newkey = -1;
