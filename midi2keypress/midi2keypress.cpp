@@ -15,7 +15,8 @@ int main() {
   try {
     kes.Connect();
     while (!done) {
-      Tone tone(lc.GetData());
+      Tone tone;
+      lc.GetData(tone.interval, tone.raw_audio);
       int newkey;
       int peakfreq = tone.GetPeakFrequency();
       int volume = tone.GetPitchStrength(peakfreq);
@@ -43,7 +44,7 @@ int main() {
       }
 
       // Watch the attack
-      if (volume > 5.0) {
+      if (volume > 20.0) {
 	kes.Buffer(KEY_ENTER, 0);
 	kes.Buffer(KEY_ENTER, 1);
       } else {

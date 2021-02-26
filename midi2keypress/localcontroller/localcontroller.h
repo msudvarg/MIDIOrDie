@@ -11,10 +11,12 @@
 class LocalController {
 public:
   LocalController();
-  double *GetData();
+  void GetData(double *fft_data_out, float *raw_audio_out);
   ~LocalController();
 private:
-  float data[N];
+  float window[N];
+  float fft_data[N];
+  float raw_audio[N];
   PaStream *stream;
   fftw_complex *in, *out;
   fftw_plan p;

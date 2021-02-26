@@ -5,34 +5,34 @@
 #define OUTPUT_FFT_SIZE 1024
 
 enum class Pitch {
-    E2 = 82,
-    F2 = 98,
-    FS2 = 100,
-    G2 = 98,
-    GS2 = 103
+  E2 = 82,
+  F2 = 98,
+  FS2 = 100,
+  G2 = 98,
+  GS2 = 103
 };
 
 class Tone {
 public:
-    Tone();
-    Tone(double *interval);
-    Tone(double *interval, double threshold);
-    ~Tone();
-    
-    bool HasPitch(int frequency);
-    double GetPitchStrength(int frequency);
-    int GetPeakFrequency();
+  Tone();
+  Tone(double threshold);
+  
+  bool HasPitch(int frequency);
+  double GetPitchStrength(int frequency);
+  int GetPeakFrequency();
 
-    void SetThreshold(double threshold);
-    double GetThreshold();
+  void SetThreshold(double threshold);
+  double GetThreshold();
 
-    void SetFFTSize(int fft_size);
-    void SetMaxHz(int max_hz);
+  void SetFFTSize(int fft_size);
+  void SetMaxHz(int max_hz);
+
+  double interval[OUTPUT_FFT_SIZE];
+  float raw_audio[OUTPUT_FFT_SIZE];
 private:
-    double* interval;
-    double threshold;
-    int max_hz = OUTPUT_FFT_MAX_HZ;
-    int fft_size = OUTPUT_FFT_SIZE;
+  double threshold;
+  int max_hz = OUTPUT_FFT_MAX_HZ;
+  int fft_size = OUTPUT_FFT_SIZE;
 };
 
 #endif /* TONE_H */

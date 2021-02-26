@@ -10,6 +10,8 @@ void hamming(int length, float *buffer) {
 }
 
 LocalController::LocalController() {
+  hamming(N, window);
+  
   in = (fftw_complex*) fftw_malloc(sizeof(fftw_complex) * N);
   out = (fftw_complex*) fftw_malloc(sizeof(fftw_complex) * N);
   p = fftw_plan_dft_1d(N, in, out, FFTW_FORWARD, FFTW_MEASURE);
@@ -45,28 +47,27 @@ int LocalController::callback (const void* input,
   float *outputBuffer = (float *) output;
   memcpy(outputBuffer, inputBuffer, N * sizeof(float));
   controller->mtx.lock();
-  hamming(N, controller->data);
+  memcpy(controller->raw_audio, inputBuffer, N * sizeof(float));
   for (int i = 0; i < N; i++) {
-    controller->in[i][0] = (double)inputBuffer[i] * controller->data[i];
+    controller->in[i][0] = (double)inputBuffer[i] * controller->window[i];
     controller->in[i][1] = 0.0;
   }
   fftw_execute(controller->p);
   for (int i = 0; i < N; i++) {
-    controller->data[i] = (float) sqrt(controller->out[i][0] * controller->out[i][0] + controller->out[i][1] * controller->out[i][1]);
-    controller->data[i] = 20 * log10f(controller->data[i]);
+    controller->fft_data[i] = (float) sqrt(controller->out[i][0] * controller->out[i][0] + controller->out[i][1] * controller->out[i][1]);
+    controller->fft_data[i] = 20 * log10f(controller->fft_data[i]);
   }
   controller->mtx.unlock();
   return 0;
 }
 
-double *LocalController::GetData() {
-  double *buf = new double[N];
+void LocalController::GetData(double *fft_data_out, float *raw_audio_out) {
   mtx.lock();
   for (int i = 0; i < N; i++) {
-    buf[i] = (double) data[i];
+    fft_data_out[i] = (double) fft_data[i];
   }
+  memcpy(raw_audio_out, raw_audio, N * sizeof(float));
   mtx.unlock();
-  return buf;
 }
 
 LocalController::~LocalController() {

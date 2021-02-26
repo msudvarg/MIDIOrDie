@@ -1,14 +1,11 @@
 #include "tone.h"
 
-Tone::Tone() {}
 
-Tone::Tone(double *interval) {
-    this->interval = interval;
-    this->threshold = 3.0; // Maybe, IDK whabt a good default for this is yet
+Tone::Tone() {
+    this->threshold = 20.0; // Maybe, IDK what a good default for this is yet
 }
 
-Tone::Tone(double *interval, double threshold) {
-    this->interval = interval;
+Tone::Tone(double threshold) {
     this->threshold = threshold;
 }
 
@@ -42,12 +39,6 @@ void Tone::SetFFTSize(int fft_size) {
 
 void Tone::SetMaxHz(int max_hz) {
     this->max_hz = max_hz;
-}
-    
-Tone::~Tone() {
-    if (interval) {
-	delete[] interval;
-    }
 }
 
 void Tone::SetThreshold(double threshold) {
