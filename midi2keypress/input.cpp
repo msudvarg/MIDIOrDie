@@ -29,7 +29,7 @@ void KeyEventSender::Connect() {
 					   &uidev);
 
   if (err != 0) {
-    throw "Could not create a new device. (Do you need \"sudo\"?)";
+    throw "Could not create a new device. (Do you need \"modprobe uinput\"?)";
   }
     
   sleep(1); // HACK system needs time for device enrollment
