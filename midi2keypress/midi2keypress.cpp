@@ -1,8 +1,5 @@
 #include <iostream>
 
-#define OUTPUT_FFT_MAX_HZ 10025
-#define OUTPUT_FFT_SIZE 1024
-
 #include "input.h"
 #include "localcontroller.h"
 #include "tone.h"

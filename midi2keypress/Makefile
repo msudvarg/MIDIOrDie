@@ -1,8 +1,9 @@
-CXXFLAGS = -g -I/usr/include/libevdev-1.0 -I../controller -I../games/localcontroller
-LDFLAGS = -levdev -L../controller -L../games/localcontroller -llc
+CXXFLAGS = -g -I/usr/include/libevdev-1.0 -Ilocalcontroller
+LDFLAGS = -levdev -Llocalcontroller -llc -Wl,-R,localcontroller
 OBJS = midi2keypress.o input.o tone.o
 
 all: midi2keypress
-midi2keypress: $(OBJS)
-	$(CXX) $(LDFLAGS) -o $@ $^
-
+midi2keypress: $(OBJS) localcontroller/liblc.so
+	$(CXX) $(LDFLAGS) -o $@ $(OBJS)
+localcontroller/liblc.so:
+	$(MAKE) -C localcontroller liblc.so

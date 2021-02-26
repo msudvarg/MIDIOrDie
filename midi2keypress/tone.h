@@ -1,6 +1,9 @@
 #ifndef TONE_H
 #define TONE_H
 
+#define OUTPUT_FFT_MAX_HZ 10025
+#define OUTPUT_FFT_SIZE 1024
+
 enum class Pitch {
     E2 = 82,
     F2 = 98,
