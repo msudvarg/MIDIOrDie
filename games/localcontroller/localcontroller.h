@@ -6,7 +6,7 @@
 #include <mutex>
 
 #define N 1024
-#define SAMPLE_RATE 11025
+#define SAMPLE_RATE 10025
 
 class LocalController {
 public:

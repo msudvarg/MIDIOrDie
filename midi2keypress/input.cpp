@@ -17,6 +17,7 @@ void KeyEventSender::Connect() {
   dev = libevdev_new();
   libevdev_set_name(dev, name);
   libevdev_enable_event_type(dev, EV_KEY);
+  libevdev_enable_event_code(dev, EV_KEY, KEY_ENTER, NULL);
   libevdev_enable_event_code(dev, EV_KEY, KEY_F1, NULL);
   libevdev_enable_event_code(dev, EV_KEY, KEY_F2, NULL);
   libevdev_enable_event_code(dev, EV_KEY, KEY_F3, NULL);
@@ -34,8 +35,8 @@ void KeyEventSender::Connect() {
   sleep(1); // HACK system needs time for device enrollment
 }
 
-void KeyEventSender::Buffer(int key) {
-  libevdev_uinput_write_event(uidev, EV_KEY, key, -1);
+void KeyEventSender::Buffer(int key, char code) {
+  libevdev_uinput_write_event(uidev, EV_KEY, key, code);
 }
 
 void KeyEventSender::Send() {

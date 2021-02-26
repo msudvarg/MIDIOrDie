@@ -9,7 +9,7 @@ public:
   KeyEventSender();
   KeyEventSender(const char *name);
   void Connect();
-  void Buffer(int keys);
+  void Buffer(int keys, char code);
   void Send();
   void Disconnect();
 private:
