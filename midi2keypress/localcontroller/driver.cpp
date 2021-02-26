@@ -26,7 +26,7 @@ int main(int argc, char **argv) {
     close(p[1]);
   }
   std::cout << "set xrange[150:400];" << std::endl;
-  std::cout << "set yrange[-10:40];" << std::endl;
+  std::cout << "set yrange[-100:40];" << std::endl;
   for (;;) { // Forever
     Pa_Sleep(10);
     std::ofstream fout { "plot.data" };

@@ -1,4 +1,5 @@
 #include <iostream>
+#include <unistd.h>
 
 #include "input.h"
 #include "localcontroller.h"
@@ -10,15 +11,14 @@ KeyEventSender kes;
 int main() {
   LocalController lc;
   int oldkey = -1;
-  double oldvolume = -100.0;
-
+  
   try {
     kes.Connect();
     while (!done) {
       Tone tone(lc.GetData());
       int newkey;
       int peakfreq = tone.GetPeakFrequency();
-      int newvolume = tone.GetPitchStrength(peakfreq);
+      int volume = tone.GetPitchStrength(peakfreq);
       if (peakfreq >= 160 and peakfreq < 175) {
 	newkey = KEY_F1;
       } else if (peakfreq >= 175 and peakfreq < 180) {
@@ -32,24 +32,27 @@ int main() {
       } else {
 	newkey = -1;
       }
+      // Change the key
       if (newkey != oldkey) {
 	if (oldkey != -1) {
 	  kes.Buffer(oldkey, 0);
 	}
 	if (newkey != -1) {
 	  kes.Buffer(newkey, 1);
-	  kes.Buffer(KEY_ENTER, 1);
-	}
-      } else {
-	if (newvolume > oldvolume + 1.0 and newvolume > 1.0) {
-	  kes.Buffer(KEY_ENTER, 1);
-	} else {
-	  kes.Buffer(KEY_ENTER, 0);
 	}
       }
+
+      // Watch the attack
+      if (volume > 5.0) {
+	kes.Buffer(KEY_ENTER, 0);
+	kes.Buffer(KEY_ENTER, 1);
+      } else {
+	kes.Buffer(KEY_ENTER, 0);
+      }
+      
       kes.Send();
       oldkey = newkey;
-      oldvolume = newvolume;
+      usleep(100);
     }
     kes.Disconnect();
   } catch (const char *err) {
