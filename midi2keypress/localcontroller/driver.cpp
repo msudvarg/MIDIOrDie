@@ -25,15 +25,17 @@ int main(int argc, char **argv) {
     close(p[0]);
     close(p[1]);
   }
+  std::cout << "set xrange[150:220];" << std::endl;
+  std::cout << "set yrange[-10:40];" << std::endl;
   for (;;) { // Forever
     Pa_Sleep(10);
     std::ofstream fout { "plot.data" };
     double *data = controller.GetData();
     fout << "#\tX\tY" << std::endl;
-    for (int i = 0; i < 300 * N / SAMPLE_RATE; i++) {
+    for (int i = 0; i < N / 2 + 1; i++) {
       fout << i * SAMPLE_RATE / N << "\t" << data[i] << std::endl;
     }
-    std::cout << "plot 'plot.data' with lines" << std::endl;
+    std::cout << "plot 'plot.data' with lines;" << std::endl;
     delete [] data;
   }
 }
