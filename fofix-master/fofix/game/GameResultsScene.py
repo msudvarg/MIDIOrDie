@@ -188,7 +188,8 @@ class GameResultsScene(Scene):
 
         self.fullView = self.engine.view.geometry[2:4]
 
-        self.congratphrase = self.engine.config.get("game", "congrats")#blazingamer
+        #self.congratphrase = self.engine.config.get("game", "congrats")#blazingamer
+        self.congratphrase = False # Shut this motherfucker up
         self.keepCount     = self.engine.config.get("game", "keep_play_count")
 
         self.showHandicap  = self.engine.config.get("handicap", "detailed_handicap")
