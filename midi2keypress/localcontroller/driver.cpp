@@ -25,7 +25,7 @@ int main(int argc, char **argv) {
     close(p[0]);
     close(p[1]);
   }
-  std::cout << "set xrange[150:220];" << std::endl;
+  std::cout << "set xrange[150:400];" << std::endl;
   std::cout << "set yrange[-10:40];" << std::endl;
   for (;;) { // Forever
     Pa_Sleep(10);

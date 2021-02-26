@@ -33,7 +33,7 @@ int Tone::GetPeakFrequency() {
 	    idx = i;
 	}
     }
-    return idx * max_hz * 2 / fft_size;
+    return idx * max_hz / fft_size;
 }
 
 void Tone::SetFFTSize(int fft_size) {
