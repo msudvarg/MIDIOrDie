@@ -5,13 +5,14 @@
 #include <netinet/ip.h>
 #include <arpa/inet.h>
 #include <unistd.h>
-#include <thread>
+#include "scoped_thread.h"
 
 class Socket_Client {
 
     int sfd;
 	struct sockaddr_in addr;
-    std::thread t;
+    scoped_thread st;
+    void (*f)(Socket_Client*);
 
 public:
 
@@ -24,8 +25,10 @@ public:
     ~Socket_Client();
 };
 
-Socket_Client::Socket_Client(const char * ipaddr, const int portno) {
-    
+Socket_Client::Socket_Client(const char * ipaddr, const int portno, void (*f_)(Socket_Client*)) :
+    f {f_}
+{
+
 	sfd = socket(AF_INET, SOCK_STREAM, 0);
 	if (sfd == -1) {
 		throw No_Socket{};
@@ -42,10 +45,11 @@ Socket_Client::Socket_Client(const char * ipaddr, const int portno) {
 		throw Connection_Error{};
 	}
 
+    std::thread t(f, this);
+    st {t};
+
 }
 
 Socket_Client::~Socket_Client() {
-    if(t.joinable()) t.join();
     close(sfd);
-
 }

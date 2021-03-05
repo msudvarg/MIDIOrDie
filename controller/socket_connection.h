@@ -9,9 +9,9 @@
 
 class Socket_Connection {
 
-    int sfd;
-	struct sockaddr_in addr;
-    scoped_thread t;
+    int cfd;
+    scoped_thread st;
+    void (*f)(Socket_Connection*);
 
 public:
 
@@ -20,7 +20,19 @@ public:
     class Invalid_IP {};
     class Connection_Error {};
 
-    Socket_Connection(const char * ipaddr, const int portno);
+    Socket_Connection(const int cfd_, void (*f_)(Socket_Connection*));
     ~Socket_Connection();
 };
 
+Socket_Connection::Socket_Connection(const int cfd_, void (*f_)(Socket_Connection*)) :
+    cfd {cfd_},
+    f {f_}
+{
+
+    std::thread t(f,this);
+    st {t};
+}
+
+Socket_Connection::~Socket_Connection() {
+    close(cfd);
+}

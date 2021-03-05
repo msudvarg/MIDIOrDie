@@ -29,23 +29,23 @@ private:
 public:
 
     //Read using the mutex for synchronization
-    array_t read(void);
+    array_t read();
 
     //Read using the sequence lock for synchronization
-    array_t read_sequence(void);
+    array_t read_sequence();
 
     void write(array_t input);
     void write(T input[N]);
 };
 
 template <typename T, unsigned N>
-Shared_Array<T,N>::array_t Shared_Array<T,N>::read(void) {
+Shared_Array<T,N>::array_t Shared_Array<T,N>::read() {
     std::scoped_lock lk {m};
     return buffer;
 }
 
 template <typename T, unsigned N>
-Shared_Array<T,N>::array_t Shared_Array<T,N>::read_sequence(void) {
+Shared_Array<T,N>::array_t Shared_Array<T,N>::read_sequence() {
     array_t temp;
     int lock_before, lock_after;
         do {

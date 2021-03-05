@@ -4,17 +4,16 @@
 #include "socket_connection.h"
 #include "socket_manifest.h"
 
-
-
-
-
 class Socket_Server {
 
     const int max_clients;
     int sfd;
 	struct sockaddr_in addr;
     std::vector<Socket_Connection> clients; 
-    scoped_thread t;
+    scoped_thread st;
+    bool running;
+    void (*f)(Socket_Connection*);
+    void accept_clients();
 
 public:
 
@@ -24,12 +23,14 @@ public:
     class Bind_Error {};
     class Listen_Error {};
 
-    Socket_Server(const char * ipaddr, const int portno, const int max_clients_);
+    Socket_Server(const char * ipaddr, const int portno, void (*f_)(Socket_Connection*), const int max_clients_ = 0);
     ~Socket_Server();
 };
 
-Socket_Server::Socket_Server(const char * ipaddr, const int portno, const int max_clients_):
-    max_clients {max_clients_}
+Socket_Server::Socket_Server(const char * ipaddr, const int portno, void (*f_)(Socket_Connection*), const int max_clients_):
+    max_clients {max_clients_},
+    running {true},
+    f {f_}
 {
     if(max_clients > 0) clients.reserve(max_clients);
 
@@ -53,8 +54,26 @@ Socket_Server::Socket_Server(const char * ipaddr, const int portno, const int ma
 	if (listen(sfd, backlog) == -1) {
 		throw Listen_Error{};
 	}
+
+    std::thread t(accept,this);
+    st {t};
 }
 
+
+
 Socket_Server::~Socket_Server() {
+    running = false;
     close(sfd);
+}
+
+void Socket_Server::accept_clients() {
+    
+    while(running) {
+        int cfd = accept(sfd, NULL, NULL);
+		if (cfd == -1) {
+            running = false;
+            return;
+        }
+        clients.emplace_back(cfd, f);
+    }
 }
