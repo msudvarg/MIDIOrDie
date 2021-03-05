@@ -12,9 +12,6 @@ Socket_Server::Socket_Server(
     running {true}
 {
 
-    //Preset vector size
-    if(max_clients > 0) clients.reserve(max_clients);
-
     //Open socket
 	sfd = socket(AF_INET, SOCK_STREAM, 0);
 	if (sfd == -1) {
@@ -44,6 +41,22 @@ Socket_Server::Socket_Server(
     t = std::thread { [this] {this->accept_clients();} };
 }
 
+//Move constructor
+Socket_Connection::Socket_Connection(Socket_Connection && other) noexcept :
+    cfd {other.cfd},
+    t {std::move(other.t)},
+    running {other.running},
+    f {other.f}
+{}
+
+//Move assignment operator
+Socket_Connection & Socket_Connection::operator=(Socket_Connection && other) noexcept {
+    cfd = other.cfd;
+    t = std::move(other.t);
+    running = other.running;
+    f = other.f;
+    return *this;
+}
 
 //Destructor: close socket, stop and join thread
 Socket_Server::~Socket_Server() {
@@ -65,4 +78,5 @@ void Socket_Server::accept_clients() {
         }
         clients.emplace_back(cfd, f);
     }
+
 }

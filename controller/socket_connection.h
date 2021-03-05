@@ -32,6 +32,14 @@ public:
         const int cfd_,
         void (*f_)(Socket_Connection*));
 
+    //Copy construction and assignment not supported
+	Socket_Connection(Socket_Connection const &) = delete;
+	Socket_Connection & operator=(Socket_Connection const &) = delete;
+
+    //Move construction and assignment
+	Socket_Connection(Socket_Connection && other) noexcept;
+	Socket_Connection & operator=(Socket_Connection && other) noexcept;
+
     //Destructor
     ~Socket_Connection();
 };
