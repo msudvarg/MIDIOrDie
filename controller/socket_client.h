@@ -9,10 +9,17 @@
 
 class Socket_Client {
 
+private:
+
+    //Socket information
     int sfd;
 	struct sockaddr_in addr;
-    scoped_thread st;
-    void (*f)(Socket_Client*);
+
+    std::thread t; //Active object thread   
+    bool running; //Socket state    
+    void (*f)(Socket_Client*); //Registered function to interract with socket
+
+    void run(); //Thread function to continually run registered function
 
 public:
 
@@ -21,35 +28,15 @@ public:
     class Invalid_IP {};
     class Connection_Error {};
 
-    Socket_Client(const char * ipaddr, const int portno, void (*f_)(Socket_Client*));
+    //Send Data
+    void send(void * buf, size_t count);
+
+    //Constructor
+    Socket_Client(
+        const char * ipaddr,
+        const int portno,
+        void (*f_)(Socket_Client*));
+
+    //Destructor
     ~Socket_Client();
 };
-
-Socket_Client::Socket_Client(const char * ipaddr, const int portno, void (*f_)(Socket_Client*)) :
-    f {f_}
-{
-
-	sfd = socket(AF_INET, SOCK_STREAM, 0);
-	if (sfd == -1) {
-		throw No_Socket{};
-	}
-
-	memset(&addr, 0, sizeof(struct sockaddr_in));
-	addr.sin_family = AF_INET;
-	addr.sin_port = htons(portno);
-	if(inet_aton(ipaddr, &addr.sin_addr) <= 0) {
-		throw Invalid_IP{};
-	}
-
-	if (connect(sfd, (struct sockaddr*) &addr, sizeof(struct sockaddr_in)) == -1) {
-		throw Connection_Error{};
-	}
-
-    std::thread t(f, this);
-    st {t};
-
-}
-
-Socket_Client::~Socket_Client() {
-    close(sfd);
-}

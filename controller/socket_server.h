@@ -1,19 +1,32 @@
 #pragma once
 
+#include <sys/un.h>
+#include <sys/socket.h>
+#include <netinet/ip.h>
+#include <arpa/inet.h>
+#include <unistd.h>
+#include <thread>
 #include <vector>
 #include "socket_connection.h"
 #include "socket_manifest.h"
 
 class Socket_Server {
 
-    const int max_clients;
+private: 
+
+    //Socket information
     int sfd;
 	struct sockaddr_in addr;
+
+    //Connected clients
+    const int max_clients;
     std::vector<Socket_Connection> clients; 
-    scoped_thread st;
-    bool running;
-    void (*f)(Socket_Connection*);
-    void accept_clients();
+
+    std::thread t; //Active object thread   
+    bool running; //Socket state    
+    void (*f)(Socket_Connection*); //Registered function to interract with socket
+
+    void accept_clients(); //Thread function to listen on socket and accept new clients
 
 public:
 
@@ -23,57 +36,12 @@ public:
     class Bind_Error {};
     class Listen_Error {};
 
-    Socket_Server(const char * ipaddr, const int portno, void (*f_)(Socket_Connection*), const int max_clients_ = 0);
+    //Constructor
+    Socket_Server(const char * ipaddr,
+        const int portno,
+        void (*f_)(Socket_Connection*),
+        const int max_clients_ = 0);
+
+    //Destructor
     ~Socket_Server();
 };
-
-Socket_Server::Socket_Server(const char * ipaddr, const int portno, void (*f_)(Socket_Connection*), const int max_clients_):
-    max_clients {max_clients_},
-    running {true},
-    f {f_}
-{
-    if(max_clients > 0) clients.reserve(max_clients);
-
-	sfd = socket(AF_INET, SOCK_STREAM, 0);
-	if (sfd == -1) {
-		throw No_Socket{};
-	}
-
-	memset(&addr, 0, sizeof(struct sockaddr_in));
-	addr.sin_family = AF_INET;
-	addr.sin_port = htons(portno);
-	if(inet_aton(ipaddr, &addr.sin_addr) <= 0) {
-		throw Invalid_IP{};
-	}
-
-	if (bind(sfd, (struct sockaddr*) &addr, sizeof(struct sockaddr_in)) == -1) {
-		throw Bind_Error{};
-	}
-
-    int backlog = max_clients > 0 ? max_clients : BACKLOG;
-	if (listen(sfd, backlog) == -1) {
-		throw Listen_Error{};
-	}
-
-    std::thread t(accept,this);
-    st {t};
-}
-
-
-
-Socket_Server::~Socket_Server() {
-    running = false;
-    close(sfd);
-}
-
-void Socket_Server::accept_clients() {
-    
-    while(running) {
-        int cfd = accept(sfd, NULL, NULL);
-		if (cfd == -1) {
-            running = false;
-            return;
-        }
-        clients.emplace_back(cfd, f);
-    }
-}

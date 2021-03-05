@@ -5,13 +5,18 @@
 #include <netinet/ip.h>
 #include <arpa/inet.h>
 #include <unistd.h>
-#include "scoped_thread.h"
+#include <thread>
 
 class Socket_Connection {
 
+private:
+
+    //Connection information
     int cfd;
-    scoped_thread st;
-    void (*f)(Socket_Connection*);
+
+    std::thread t; //Active object thread   
+    bool running; //Socket state    
+    void (*f)(Socket_Connection*); //Registered function to interract with socket
 
 public:
 
@@ -20,19 +25,11 @@ public:
     class Invalid_IP {};
     class Connection_Error {};
 
-    Socket_Connection(const int cfd_, void (*f_)(Socket_Connection*));
+    //Constructor
+    Socket_Connection(
+        const int cfd_,
+        void (*f_)(Socket_Connection*));
+
+    //Destructor
     ~Socket_Connection();
 };
-
-Socket_Connection::Socket_Connection(const int cfd_, void (*f_)(Socket_Connection*)) :
-    cfd {cfd_},
-    f {f_}
-{
-
-    std::thread t(f,this);
-    st {t};
-}
-
-Socket_Connection::~Socket_Connection() {
-    close(cfd);
-}

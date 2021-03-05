@@ -26,6 +26,7 @@ public:
 	scoped_thread(scoped_thread && other) noexcept : t(std::move(other.t)) {}
 	scoped_thread & operator=(scoped_thread && other) noexcept {
 		t = std::move(other.t);
+		return *this;
 	}
 
 };

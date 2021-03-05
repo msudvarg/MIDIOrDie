@@ -2,14 +2,16 @@
 
 #include <array>
 #include <mutex>
+
 template <typename T, unsigned N>
 class Shared_Array {
 
 public:
-    using typename array_t = std::array<T, N>;
+    using array_type = std::array<T, N>;
+    using value_type = T;
 
 private:
-    array_t buffer;
+    array_type buffer;
     std::mutex m;
     
 	/*
@@ -28,25 +30,27 @@ private:
 
 public:
 
+    static constexpr size_t size = N;
+
     //Read using the mutex for synchronization
-    array_t read();
+    array_type read();
 
     //Read using the sequence lock for synchronization
-    array_t read_sequence();
+    array_type read_sequence();
 
-    void write(array_t input);
+    void write(array_type input);
     void write(T input[N]);
 };
 
 template <typename T, unsigned N>
-Shared_Array<T,N>::array_t Shared_Array<T,N>::read() {
+typename Shared_Array<T,N>::array_type Shared_Array<T,N>::read() {
     std::scoped_lock lk {m};
     return buffer;
 }
 
 template <typename T, unsigned N>
-Shared_Array<T,N>::array_t Shared_Array<T,N>::read_sequence() {
-    array_t temp;
+typename Shared_Array<T,N>::array_type Shared_Array<T,N>::read_sequence() {
+    array_type temp;
     int lock_before, lock_after;
         do {
             lock_before = lock_sequence;
@@ -59,7 +63,7 @@ Shared_Array<T,N>::array_t Shared_Array<T,N>::read_sequence() {
 }
 
 template <typename T, unsigned N>
-void Shared_Array<T,N>::write(Shared_Array<T,N>::array_t input) {
+void Shared_Array<T,N>::write(Shared_Array<T,N>::array_type input) {
     std::scoped_lock lk {m};
     lock_sequence++;
     buffer = input;

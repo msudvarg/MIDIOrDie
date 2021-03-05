@@ -11,6 +11,9 @@
 #include "socket_client.h"
 #include "socket_manifest.h"
 #include "socket_send.h"
+#include "shared_buffer.h"
+
+Shared_Array<double,ROLLING_WINDOW_SIZE> sharedArray;
 
 sig_atomic_t quit = 0;
 double finalOutputBuffer[ROLLING_WINDOW_SIZE];
