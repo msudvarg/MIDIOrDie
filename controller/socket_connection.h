@@ -18,6 +18,8 @@ private:
     bool running; //Socket state    
     void (*f)(Socket_Connection*); //Registered function to interract with socket
 
+    void run(); //Thread function to continually run registered function
+
 public:
 
     //Exceptions

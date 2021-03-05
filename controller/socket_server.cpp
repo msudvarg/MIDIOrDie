@@ -40,6 +40,7 @@ Socket_Server::Socket_Server(
 		throw Listen_Error{};
 	}
 
+    //Run thread
     t = std::thread { [this] {this->accept_clients();} };
 }
 
