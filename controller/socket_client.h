@@ -21,7 +21,7 @@ public:
     class Invalid_IP {};
     class Connection_Error {};
 
-    Socket_Client(const char * ipaddr, const int portno);
+    Socket_Client(const char * ipaddr, const int portno, void (*f_)(Socket_Client*));
     ~Socket_Client();
 };
 

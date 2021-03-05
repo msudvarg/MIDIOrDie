@@ -6,8 +6,11 @@
 #include <signal.h>
 #include <random>
 #include <chrono>
-#include "Shared_Memory.h"
 #include "common.h"
+#include "Shared_Memory.h"
+#include "socket_client.h"
+#include "socket_manifest.h"
+#include "socket_send.h"
 
 sig_atomic_t quit = 0;
 double finalOutputBuffer[ROLLING_WINDOW_SIZE];
@@ -22,6 +25,9 @@ int main(int argc, char * argv[]) {
     struct sigaction sa;
     sa.sa_handler = sigint_handler;
     sigaction(SIGINT,&sa,NULL);
+
+    //Create socket to send data
+    Socket_Client socket {IPADDR, PORTNO, socket_send};
     
     //Create shared memory for visualization
     Shared_Memory<Shared_Buffer> sharedBuffer {"finalOutputBuffer"}; 
