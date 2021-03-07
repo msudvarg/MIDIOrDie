@@ -19,7 +19,8 @@ public:
   
   bool HasPitch(int frequency);
   double GetPitchStrength(int frequency);
-  int GetPeakFrequency();
+  int GetPeakPitch();
+  float GetMaxWave();
 
   void SetThreshold(double threshold);
   double GetThreshold();

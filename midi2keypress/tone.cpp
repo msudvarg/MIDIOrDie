@@ -21,7 +21,7 @@ double Tone::GetPitchStrength(int frequency) {
     return interval[index];
 }
 
-int Tone::GetPeakFrequency() {
+int Tone::GetPeakPitch() {
     double max = 0.0;
     int idx = 0;
     for (int i = 0; i < fft_size / 2 + 1; i++) {
@@ -31,6 +31,16 @@ int Tone::GetPeakFrequency() {
 	}
     }
     return idx * max_hz / fft_size;
+}
+
+float Tone::GetMaxWave() {
+  float max = 0.0;
+  for (int i = 0; i < fft_size; i++) {
+    if (raw_audio[i] > max) {
+      max = raw_audio[i];
+    }
+  }
+  return max;
 }
 
 void Tone::SetFFTSize(int fft_size) {

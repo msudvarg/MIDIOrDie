@@ -11,15 +11,16 @@ KeyEventSender kes;
 int main() {
   LocalController lc;
   int oldkey = -1;
+  float lastmax = 0.0f;
   
   try {
     kes.Connect();
     while (!done) {
       Tone tone;
       lc.GetData(tone.interval, tone.raw_audio);
+      float maxamp = tone.GetMaxWave();
       int newkey;
-      int peakfreq = tone.GetPeakFrequency();
-      int volume = tone.GetPitchStrength(peakfreq);
+      int peakfreq = tone.GetPeakPitch();
       if (peakfreq >= 160 and peakfreq < 175) {
 	newkey = KEY_F1;
       } else if (peakfreq >= 175 and peakfreq < 180) {
@@ -44,14 +45,13 @@ int main() {
       }
 
       // Watch the attack
-      if (volume > 20.0) {
-	kes.Buffer(KEY_ENTER, 0);
+      kes.Buffer(KEY_ENTER, 0);
+      if (maxamp > 0.0001 and maxamp > lastmax * 10) {
 	kes.Buffer(KEY_ENTER, 1);
-      } else {
-	kes.Buffer(KEY_ENTER, 0);
       }
-      
       kes.Send();
+
+      lastmax = maxamp;
       oldkey = newkey;
       usleep(100);
     }
