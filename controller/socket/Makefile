@@ -1,4 +1,4 @@
-CPPFLAGS = -O2 -std=c++17
+CPPFLAGS = -O2 -std=c++17 -fPIC
 LIBS = -lrt
 LIBTARGET = libsocket.a
 all: base.o server.o client.o connection.o $(LIBTARGET)

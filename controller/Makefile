@@ -9,5 +9,5 @@ test: test.cpp
 	$(CXX) $(CPPFLAGS) -o $@ $^ $(LIBS)
 controller: main.o
 	$(CXX) $(CPPFLAGS) -o $@ $^ $(LIBS) 
-fft_histogram.so: fft_histogram.cpp
+fft_histogram.so: fft_histogram.cpp socket/base.cpp socket/client.cpp socket/server.cpp socket/connection.cpp
 	$(CXX) $(CPPFLAGS) -shared -fPIC -o $@ $^ $(LIBS)
