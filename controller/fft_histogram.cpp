@@ -3,25 +3,33 @@
 
 #include <iostream>
 
-#include "common.h"
-#include "Shared_Memory.h"
+#include "common.h" //FFT parameters and shared data structure
+#include "shared_memory.h" //Shared memory wrapper
+#include "socket/socket.h" //Socket wrapper
+#include "socket_helpers.h" //Functions to pass to socket connections
+#include "shared_array.h" //Thread-safe array
+
+//Thread-safe array to receive FFT data from socket
+Shared_Array<double,ROLLING_WINDOW_SIZE> sharedArray;
+
+//Socket server to receive FFT data from client
+static Socket::Server socket {IPADDR, PORTNO, socket_recv};
 
 //Open shared memory for visualization
-static Shared_Memory<Shared_Buffer> sharedBuffer {"fftData"}; 
+//static Shared_Memory<Shared_Array> sharedBuffer {"fftData"}; 
 
 static PyObject *
 fft_histogram_histogram(PyObject *self, PyObject *args) {
-    
-    double *fftData = sharedBuffer->Read();
+
+    //Copy shared array to local array
+    decltype(sharedArray)::array_type localArray = sharedArray.read();
 
     PyObject * pylist = PyList_New(OUTPUT_FFT_SIZE);
 
-    for(int i = 0; i < OUTPUT_FFT_SIZE; ++i) {
-        PyObject * pydouble = Py_BuildValue("d",fftData[i]);
+    for(size_t i = 0; i < OUTPUT_FFT_SIZE; ++i) {
+        PyObject * pydouble = Py_BuildValue("d",localArray[i]);
         PyList_SetItem(pylist, i, pydouble);
     }
-
-    delete[] fftData;
     
     return pylist;
 }

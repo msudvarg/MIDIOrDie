@@ -4,7 +4,7 @@
 #include <thread>
 #include <chrono>
 #include "common.h"
-#include "shared_buffer.h"
+#include "shared_array.h"
 #include "socket/socket.h"
 
 //Socket manifest variables for default port/IP

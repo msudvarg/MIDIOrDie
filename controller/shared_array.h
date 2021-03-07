@@ -74,7 +74,7 @@ template <typename T, unsigned N>
 void Shared_Array<T,N>::write(T input[N]) {
     std::scoped_lock lk {m};
     lock_sequence++;
-    for(int i = 0; i < N; ++i) {
+    for(size_t i = 0; i < N; ++i) {
         buffer[i] = input[i];
     }
     lock_sequence++;

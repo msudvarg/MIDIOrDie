@@ -33,7 +33,7 @@ int main(int argc, char * argv[]) {
     sigaction(SIGINT,&sa,NULL);
 
     //Create socket to send data
-    socket::client socket {IPADDR, PORTNO, socket_send};
+    Socket::Client socket {IPADDR, PORTNO, socket_send};
     
     //Create shared memory for visualization
     Shared_Memory<Shared_Buffer> sharedBuffer {"finalOutputBuffer"}; 
@@ -59,7 +59,7 @@ int main(int argc, char * argv[]) {
         
         //Write to shared memory
         sharedBuffer->fftData.write(finalOutputBuffer);
-        
+
     }
     
     return 0;
