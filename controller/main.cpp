@@ -6,7 +6,7 @@
 #include <iterator>
 #include "portaudio.h"
 #include "common.h"
-#include "Shared_Memory.h"
+#include "shared_memory.h"
 
 using namespace std;
 
