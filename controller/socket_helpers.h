@@ -9,7 +9,7 @@
 #include "socket/socket.h"
 
 //Socket manifest variables for default port/IP
-constexpr char IPADDR[] = "127.0.0.1";
+constexpr char IPADDR[] = "0.0.0.0"; //Server binds to all available IPs
 constexpr int PORTNO = 10520;
 
 extern Shared_Array<double,ROLLING_WINDOW_SIZE> sharedArray;

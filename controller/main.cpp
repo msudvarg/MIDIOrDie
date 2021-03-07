@@ -1,12 +1,18 @@
 #include <stdio.h>
 #include <string.h>
+#include <signal.h>
+#include <getopt.h>
 #include <iostream>
 #include <complex>
 #include <cmath>
 #include <iterator>
 #include "portaudio.h"
-#include "common.h"
-#include "shared_memory.h"
+
+#include "common.h" //FFT parameters and shared data structure
+#include "shared_memory.h" //Shared memory wrapper
+#include "socket/socket.h" //Socket wrapper
+#include "socket_helpers.h" //Functions to pass to socket connections
+#include "shared_array.h" //Thread-safe array
 
 using namespace std;
 
@@ -17,6 +23,9 @@ complex<double> complexOutputBuffer[ROLLING_WINDOW_SIZE];
 double finalOutputBuffer[ROLLING_WINDOW_SIZE];
 static bool dataAvailable = false;
 static int count = 0;
+
+//Thread-safe array to send FFT data over socket
+Shared_Array<double,ROLLING_WINDOW_SIZE> sharedArray;
 
 
 unsigned int bitReverse(unsigned int x, int log2n) {
@@ -35,17 +44,17 @@ void fft(Iter_T a, Iter_T b, int log2n)
 {
     typedef typename iterator_traits<Iter_T>::value_type complex;
     const complex J(0, 1);
-    int n = 1 << log2n;
+    unsigned int n = 1 << log2n;
     for (unsigned int i=0; i < n; ++i) {
         b[bitReverse(i, log2n)] = a[i];
     }
     for (int s = 1; s <= log2n; ++s) {
-        int m = 1 << s;
-        int m2 = m >> 1;
+        unsigned int m = 1 << s;
+        unsigned int m2 = m >> 1;
         complex w(1, 0);
         complex wm = exp(-J * (PI / m2));
-        for (int j=0; j < m2; ++j) {
-            for (int k=j; k < n; k += m) {
+        for (unsigned int j=0; j < m2; ++j) {
+            for (unsigned int k=j; k < n; k += m) {
                 complex t = w * b[k + m2];
                 complex u = b[k];
                 b[k] = u + t;
@@ -86,26 +95,49 @@ static int patestCallback( const void *inputBuffer, void *outputBuffer,
     return 0;
 }
 
+//Destructors not correctly called if program interrupted
+//Use a signal handler and quit flag instead
+sig_atomic_t quit = 0;
+void sigint_handler(int signum) {
+    quit = 1;
+}
+
 int main(int argc, char** argv) {
+
+    //Register signal handler
+    struct sigaction sa;
+    sa.sa_handler = sigint_handler;
+    sigaction(SIGINT,&sa,NULL);
 
     int opt;
     bool forever = false;
+    string ipaddr = "127.0.0.1";
 
-    while((opt = getopt(argc, argv, "f")) != -1) {
-	switch(opt) {
-	case 'f':
-	    forever = true;
-	    break;
-	default:
-	    std::cerr << "Usage: " << argv[0] << " [-f]\n" << std::endl;
-	}
+    //Get command-line options
+    while((opt = getopt(argc, argv, "fi:")) != -1) {
+        switch(opt) {
+
+        //Run forever
+        case 'f':
+            forever = true;
+            break;
+
+        //IP Address
+        case 'i':
+            if(optarg) ipaddr.assign(optarg);
+            break;
+
+        default:
+            std::cerr << "Usage: " << argv[0] << " [-f] [-i0.0.0.0]\n" << std::endl;
+        }
     }
+
+    //Create socket to send data
+    //TODO: Pass max_hz and bucket_hz as well
+    Socket::Client socket {ipaddr.c_str(), PORTNO, socket_send};
     
     //Create shared memory for visualization
-    Shared_Memory<Shared_Buffer> sharedBuffer {"fftData"}; 
-    std::cout << "Shared memory size: " << sizeof(Shared_Buffer) << std::endl;
-    sharedBuffer->lock_sequence = 0;
-    memset(sharedBuffer->fftData, 0, sizeof(sharedBuffer->fftData));     // TODO: Pass max_hz and bucket_hz as well
+    //Shared_Memory<Shared_Buffer> sharedBuffer {"fftData"};
 
     std::cout << "Sample rate: " << SAMPLE_RATE << "Hz" << std::endl
         << "Precision: " << DELTA_HZ << "Hz" << std::endl
@@ -154,7 +186,7 @@ int main(int argc, char** argv) {
     Pa_Sleep(1000);
 
     // TODO: Program here (What program?)
-    for(int i = 0; i < 1000; forever ? i : i++) {
+    for(int i = 0; i < 1000 && !quit; forever ? i : i++) {
         while(!dataAvailable);
 
         // Copy latest sample into rolling window
@@ -198,9 +230,9 @@ int main(int argc, char** argv) {
               << "2nd largest frequency: " << bucket_size * (max1_ind+1) << "Hz" << std::endl
               << "3rd largest frequency: " << bucket_size * (max2_ind+1) << "Hz" << std::endl << std::endl;
 
-        sharedBuffer->lock_sequence++;
-        memcpy(sharedBuffer->fftData, finalOutputBuffer, sizeof(sharedBuffer->fftData));        // Copy half of fft data into shared memory
-        sharedBuffer->lock_sequence++;
+
+        //Copy FFT values to shared array
+        sharedArray.write(finalOutputBuffer);
     }
     std::cout << "Number of callbacks: " << count << std::endl;
 
@@ -218,9 +250,10 @@ int main(int argc, char** argv) {
         return err;
     }
     err = Pa_Terminate();
-    if( err != paNoError )
+    if( err != paNoError ) {
         printf(  "PortAudio error: %s\n", Pa_GetErrorText( err ) );
         return err;
+    }
 
     return 0;    
 }

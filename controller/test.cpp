@@ -1,9 +1,10 @@
 
 #include <string.h>
+#include <signal.h>
+#include <getopt.h>
 #include <complex>
 #include <cmath>
 #include <iostream>
-#include <signal.h>
 #include <random>
 #include <chrono>
 
@@ -32,8 +33,25 @@ int main(int argc, char * argv[]) {
     sa.sa_handler = sigint_handler;
     sigaction(SIGINT,&sa,NULL);
 
+    int opt;
+    std::string ipaddr = "127.0.0.1";
+
+    //Get command-line options
+    while((opt = getopt(argc, argv, "i:")) != -1) {
+        switch(opt) {
+
+        //IP Address
+        case 'i':
+            if(optarg) ipaddr.assign(optarg);
+            break;
+
+        default:
+            std::cerr << "Usage: " << argv[0] << " [-i0.0.0.0]\n" << std::endl;
+        }
+    }
+
     //Create socket to send data
-    Socket::Client socket {IPADDR, PORTNO, socket_send};
+    Socket::Client socket {ipaddr.c_str(), PORTNO, socket_send};
     
     //Create shared memory for visualization
     Shared_Memory<Shared_Buffer> sharedBuffer {"finalOutputBuffer"}; 
