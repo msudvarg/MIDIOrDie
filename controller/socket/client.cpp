@@ -17,7 +17,7 @@ Client::Client(
 		throw Connection_Error{};
 	}
 
-    std::make_unique<Connection>(sfd, f);  
+    connection = std::make_unique<Connection>(sfd, f);  
 
 }
 

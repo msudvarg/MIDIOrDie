@@ -8,9 +8,9 @@ Connection::Connection(
     void (*f_)(Connection*)) :
     //Initialize member variables
     cfd {cfd_},
+    running {true},
     f {f_}
-{
-    //Run thread
+{    //Run thread
     t = std::thread { [this] {this->run();} };
 }
 

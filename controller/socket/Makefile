@@ -12,3 +12,6 @@ connection.o: connection.cpp
 	$(CXX) $(CPPFLAGS) $(LIBS) -c $^
 $(LIBTARGET):
 	$(AR) rcs $(LIBTARGET) *.o
+clean:
+	-rm *.o
+	-rm *.a
