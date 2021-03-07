@@ -3,6 +3,7 @@
 
 #include <thread>
 #include <chrono>
+#include <iostream>
 #include "common.h"
 #include "shared_array.h"
 #include "socket/socket.h"
@@ -22,6 +23,8 @@ void socket_send(Socket::Connection * client) {
     client->send(
         localArray.data(),
         sizeof(decltype(sharedArray)::value_type) * decltype(sharedArray)::size);
+        
+    std::cout << "Sent over socket: " << localArray[1];
 
     //Sleep
     std::this_thread::sleep_for(std::chrono::milliseconds(100));
@@ -40,6 +43,8 @@ void socket_recv(Socket::Connection * client) {
 
     //Copy local array to shared array
     sharedArray.write(localArray);
+    
+    std::cout << "Received over socket: " << localArray[1];
     
     std::this_thread::sleep_for(std::chrono::milliseconds(100));
 
