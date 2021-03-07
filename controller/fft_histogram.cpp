@@ -13,7 +13,7 @@
 Shared_Array<double,ROLLING_WINDOW_SIZE> sharedArray;
 
 //Socket server to receive FFT data from client
-static Socket::Server socket {IPADDR, PORTNO, socket_recv};
+static Socket::Server socket_server {IPADDR, PORTNO, socket_recv};
 
 //Open shared memory for visualization
 //static Shared_Memory<Shared_Array> sharedBuffer {"fftData"}; 
