@@ -51,7 +51,7 @@ int main(int argc, char * argv[]) {
         
         //Generate random FFT histogram values
         for (int i = 0; i < ROLLING_WINDOW_SIZE; ++i) {
-            finalOutputBuffer[i] = d(g);
+            finalOutputBuffer[i] = d(g) * 1000;
         }
 
         //copy random values to shared array

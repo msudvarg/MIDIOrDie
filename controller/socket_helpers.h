@@ -23,11 +23,9 @@ void socket_send(Socket::Connection * client) {
     client->send(
         localArray.data(),
         sizeof(decltype(sharedArray)::value_type) * decltype(sharedArray)::size);
-        
-    std::cout << "Sent over socket: " << localArray[1] << std::endl;
 
     //Sleep
-    std::this_thread::sleep_for(std::chrono::milliseconds(1000));
+    std::this_thread::sleep_for(std::chrono::milliseconds(50));
 
 }
 
@@ -44,8 +42,6 @@ void socket_recv(Socket::Connection * client) {
     //Copy local array to shared array
     sharedArray.write(localArray);
     
-    std::cout << "Received over socket: " << localArray[1] << std::endl;
-    
-    std::this_thread::sleep_for(std::chrono::milliseconds(1000));
+    std::this_thread::sleep_for(std::chrono::milliseconds(50));
 
 }
