@@ -58,4 +58,20 @@ void Connection::send(void * buf, size_t count) {
     }
 }
 
+//Receive data from socket
+void Connection::recv(void * buf, size_t count) {
+    size_t remaining = count;
+    while (remaining > 0) {
+        ssize_t ret = read(cfd, buf, count);
+        if (
+            ret == -1 || //Read error
+            (count > 0 && ret == 0)) //End of file
+        {
+            running = false;
+            return;
+        }
+        remaining -= ret;
+    }
+}
+
 }

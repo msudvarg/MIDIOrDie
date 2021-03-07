@@ -2,6 +2,7 @@
 
 #include <vector>
 #include "socket.h"
+#include "connection.h"
 
 namespace Socket {
 

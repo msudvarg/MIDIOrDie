@@ -6,10 +6,21 @@
 #include <arpa/inet.h>
 #include <unistd.h>
 #include <thread>
-#include "connection.h"
-#include "socket_manifest.h"
 
 namespace Socket {
+
+//Manifest constants
+constexpr int default_backlog = 10;
+
+//Exceptions
+class No_Socket {};
+class Invalid_IP {};
+class Bind_Error {};
+class Listen_Error {};
+class Connection_Error {};
+
+//Forward declaration
+class Connection;
     
 class Socket {
 

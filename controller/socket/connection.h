@@ -6,6 +6,7 @@
 #include <arpa/inet.h>
 #include <unistd.h>
 #include <thread>
+#include "socket.h"
 
 namespace Socket {
 
@@ -24,8 +25,10 @@ private:
 
 public:
     
-    //Send Data
+    //Send and receive over socket
     void send(void * buf, size_t count);
+    void recv(void * buf, size_t count);
+
 
     //Constructor
     Connection(

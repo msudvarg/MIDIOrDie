@@ -21,7 +21,7 @@ Server::Server(
 	}
 
     //Listen on socket
-    int backlog = max_clients > 0 ? max_clients : BACKLOG;
+    int backlog = max_clients > 0 ? max_clients : default_backlog;
 	if (listen(sfd, backlog) == -1) {
 		throw Listen_Error{};
 	}
