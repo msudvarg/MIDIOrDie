@@ -1,12 +1,7 @@
 #pragma once
 
-#include <sys/un.h>
-#include <sys/socket.h>
-#include <netinet/ip.h>
-#include <arpa/inet.h>
-#include <unistd.h>
 #include <thread>
-#include "socket.h"
+#include "base.h"
 
 namespace Socket {
 

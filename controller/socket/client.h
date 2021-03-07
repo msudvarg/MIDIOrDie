@@ -1,7 +1,7 @@
 #pragma once
 
 #include <memory>
-#include "socket.h"
+#include "base.h"
 #include "connection.h"
 
 namespace Socket {

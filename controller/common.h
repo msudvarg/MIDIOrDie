@@ -3,6 +3,7 @@
 #include <complex>
 #include <cmath>
 #include <string.h>
+#include "shared_array.h"
 
 static inline constexpr
 uint_fast8_t log2floor (uint32_t value)
@@ -52,30 +53,8 @@ constexpr int ROLLING_WINDOW_SIZE = SAMPLE_RATE / DELTA_HZ;                 // N
 constexpr int OUTPUT_FFT_SIZE = OUTPUT_FFT_MAX_HZ / DELTA_HZ;               // Number of Hz bins to visualize
 
 struct Shared_Buffer {
-    int lock_sequence;
     float max_hz;
     float bucket_hz;
-    double fftData[OUTPUT_FFT_SIZE];
-    
-    double *Read() {
-	/*
-	  This is a sequence lock:
-	  We assume a single writer. It supports multiple readers.
-	  The writer increments the sequence variable before writing,
-	  so if it's odd we must restart the read.
-	  Additionally, if the sequence variable is different before and after the read,
-	  we must restart.
-	*/
-	double *data = new double[OUTPUT_FFT_SIZE];
-	int lock_before, lock_after;
-        do {
-            lock_before = lock_sequence;
-            if (lock_before % 2) continue; //Odd indicates we are in a write stage
-            memcpy(data, fftData, OUTPUT_FFT_SIZE * sizeof(double));
-            lock_after = lock_sequence;
-        }
-        while(lock_before != lock_after);
-	return data;
-    }
+    Shared_Array<double,OUTPUT_FFT_SIZE> fftData;
 };
 

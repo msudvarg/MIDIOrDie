@@ -6,40 +6,40 @@
 #include <signal.h>
 #include <random>
 #include <chrono>
-#include "common.h"
-#include "Shared_Memory.h"
-#include "socket_client.h"
-#include "socket_manifest.h"
-#include "socket_send.h"
-#include "shared_buffer.h"
 
+#include "common.h" //FFT parameters and shared data structure
+#include "shared_memory.h" //Shared memory wrapper
+#include "socket/socket.h" //Socket wrapper
+#include "socket_helpers.h" //Functions to pass to socket connections
+#include "shared_array.h" //Thread-safe array
+
+//Thread-safe array to send FFT data over socket
 Shared_Array<double,ROLLING_WINDOW_SIZE> sharedArray;
-
-sig_atomic_t quit = 0;
+//Local array
 double finalOutputBuffer[ROLLING_WINDOW_SIZE];
 
+//Destructors not correctly called if program interrupted
+//Use a signal handler and quit flag instead
+sig_atomic_t quit = 0;
 void sigint_handler(int signum) {
     quit = 1;
 }
 
 int main(int argc, char * argv[]) {
 
-    
+    //Register signal handler
     struct sigaction sa;
     sa.sa_handler = sigint_handler;
     sigaction(SIGINT,&sa,NULL);
 
     //Create socket to send data
-    Socket_Client socket {IPADDR, PORTNO, socket_send};
+    socket::client socket {IPADDR, PORTNO, socket_send};
     
     //Create shared memory for visualization
     Shared_Memory<Shared_Buffer> sharedBuffer {"finalOutputBuffer"}; 
     std::cout << "Shared memory size: " << sizeof(Shared_Buffer) << std::endl;
-    
-    sharedBuffer->lock_sequence = 0;
 
-    memset(sharedBuffer->fftData, 0, sizeof(finalOutputBuffer));
-
+    //RNG for random FFT histogram values
     std::default_random_engine g;
     using std::chrono::duration_cast;
     using std::chrono::milliseconds;
@@ -48,16 +48,18 @@ int main(int argc, char * argv[]) {
     std::uniform_real_distribution<double> d;
 
     while(!quit) {
-
+        
+        //Generate random FFT histogram values
         for (int i = 0; i < ROLLING_WINDOW_SIZE; ++i) {
             finalOutputBuffer[i] = d(g);
         }
+
+        //copy random values to shared array
+        sharedArray.write(finalOutputBuffer);
         
+        //Write to shared memory
+        sharedBuffer->fftData.write(finalOutputBuffer);
         
-        // TODO: Dump finalOutputBuffer here for visualization
-        sharedBuffer->lock_sequence++;
-        memcpy(sharedBuffer->fftData, finalOutputBuffer, sizeof(finalOutputBuffer));
-        sharedBuffer->lock_sequence++;
     }
     
     return 0;

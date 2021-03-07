@@ -3,28 +3,44 @@
 
 #include <thread>
 #include <chrono>
+#include "common.h"
 #include "shared_buffer.h"
-#include "socket_client.h"
-#include "socket_connection.h"
+#include "socket/socket.h"
+
+//Socket manifest variables for default port/IP
+constexpr char IPADDR[] = "127.0.0.1";
+constexpr int PORTNO = 10520;
 
 extern Shared_Array<double,ROLLING_WINDOW_SIZE> sharedArray;
 
-void socket_send(Socket_Client * client) {
+void socket_send(Socket::Connection * client) {
 
+    //Copy shared array to local array
     decltype(sharedArray)::array_type localArray = sharedArray.read();
-    client->send(localArray.data(), sizeof(decltype(sharedArray)::value_type) * decltype(sharedArray)::size);
-    std::this_thread::sleep_for(std::chrono::milliseconds(100));
 
-    return;
+    //Send local array over socket
+    client->send(
+        localArray.data(),
+        sizeof(decltype(sharedArray)::value_type) * decltype(sharedArray)::size);
+
+    //Sleep
+    std::this_thread::sleep_for(std::chrono::milliseconds(100));
 
 }
 
-void socket_recv(Socket_Connection * client) {
+void socket_recv(Socket::Connection * client) {
 
-    decltype(sharedArray)::array_type localArray = sharedArray.read();
-    client->send(localArray.data(), sizeof(decltype(sharedArray)::value_type) * decltype(sharedArray)::size);
+    //Declare local array
+    decltype(sharedArray)::array_type localArray;
+
+    //Read from socket into local array
+    client->recv(
+        localArray.data(),
+        sizeof(decltype(sharedArray)::value_type) * decltype(sharedArray)::size);
+
+    //Copy local array to shared array
+    sharedArray.write(localArray);
+    
     std::this_thread::sleep_for(std::chrono::milliseconds(100));
-
-    return;
 
 }
