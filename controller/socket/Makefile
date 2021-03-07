@@ -1,0 +1,14 @@
+CPPFLAGS = -O2 -std=c++17
+LIBS = -lrt
+LIBTARGET = libsocket.a
+all: base.o server.o client.o connection.o $(LIBTARGET)
+base.o: base.cpp
+	$(CXX) $(CPPFLAGS) $(LIBS) -c $^
+server.o: base.cpp
+	$(CXX) $(CPPFLAGS) $(LIBS) -c $^
+client.o: client.cpp
+	$(CXX) $(CPPFLAGS) $(LIBS) -c $^
+connection.o: connection.cpp
+	$(CXX) $(CPPFLAGS) $(LIBS) -c $^
+$(LIBTARGET):
+	$(AR) rcs $(LIBTARGET) *.o
