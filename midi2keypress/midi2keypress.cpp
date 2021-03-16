@@ -1,63 +1,58 @@
 #include <iostream>
 #include <unistd.h>
 
-#include "input.h"
 #include "localcontroller.h"
 #include "tone.h"
+#include "midi.h"
 
 bool done = false;
-KeyEventSender kes;
 
 int main() {
   LocalController lc;
-  int oldkey = -1;
+  int oldnote = -1;
   float lastmax = 0.0f;
   
-  try {
-    kes.Connect();
-    while (!done) {
-      Tone tone;
-      lc.GetData(tone.interval, tone.raw_audio);
-      float maxamp = tone.GetMaxWave();
-      int newkey;
-      int peakfreq = tone.GetPeakPitch();
-      if (peakfreq >= 160 and peakfreq < 175) {
-	newkey = KEY_F1;
-      } else if (peakfreq >= 175 and peakfreq < 180) {
-	newkey = KEY_F2;
-      } else if (peakfreq >= 180 and peakfreq < 190) {
-	newkey = KEY_F3;
-      } else if (peakfreq >= 190 and peakfreq < 200) {
-	newkey = KEY_F4;
-      } else if (peakfreq >= 200 and peakfreq < 225) {
-	newkey = KEY_F5;
-      } else {
-	newkey = -1;
-      }
-      // Change the key
-      if (newkey != oldkey) {
-	if (oldkey != -1) {
-	  kes.Buffer(oldkey, 0);
-	}
-	if (newkey != -1) {
-	  kes.Buffer(newkey, 1);
-	}
-      }
-
-      // Watch the attack
-      kes.Buffer(KEY_ENTER, 0);
-      if (maxamp > 0.0001 and maxamp > lastmax * 10) {
-	kes.Buffer(KEY_ENTER, 1);
-      }
-      kes.Send();
-
-      lastmax = maxamp;
-      oldkey = newkey;
-      usleep(100);
+  MidiStream ms;
+  ms.Init();
+  
+  while (!done) {
+    Tone tone;
+    lc.GetData(tone.interval, tone.raw_audio);
+    float maxamp = tone.GetMaxWave();
+    int newnote;
+    int peakfreq = tone.GetPeakPitch();
+    if (peakfreq >= 160 and peakfreq < 175) {
+      newnote = 52;
+	} else if (peakfreq >= 175 and peakfreq < 180) {
+      newnote = 53;
+	} else if (peakfreq >= 180 and peakfreq < 190) {
+      newnote = 54;
+	} else if (peakfreq >= 190 and peakfreq < 200) {
+      newnote = 55;
+	} else if (peakfreq >= 200 and peakfreq < 225) {
+      newnote = 56;
+    } else {
+      newnote = -1;
     }
-    kes.Disconnect();
-  } catch (const char *err) {
-    std::cerr << err << std::endl;
+    // Change the note
+    if (newnote != oldnote) {
+      if (oldnote != -1) {
+	ms.Send(oldnote, false);
+      }
+      if (newnote != -1) {
+	ms.Send(newnote, true);
+      }
+    }
+
+    // Watch the attack
+    if (maxamp > 0.0001 and maxamp > lastmax * 10 and newnote != -1) {
+      // Attack again
+      ms.Send(newnote, false);
+      ms.Send(newnote, true);
+    }
+
+    lastmax = maxamp;
+    oldnote = newnote;
   }
 }
 

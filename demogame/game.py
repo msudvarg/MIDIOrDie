@@ -5,11 +5,11 @@ import pygame.midi
 CHANNEL_1_NOTE_ON = 144
 CHANNEL_1_NOTE_OFF = 128
 
-MIDDLE_C = 60
+E3 = 52
 
 pygame.init()
 pygame.midi.init()
-midistream = pygame.midi.Input(2)
+midistream = pygame.midi.Input(pygame.midi.get_default_input_id())
 
 width, height = 320, 240
 
@@ -33,21 +33,17 @@ while not should_quit:
   while midistream.poll():
     event = midistream.read(1)[0][0]
     if event[0] == CHANNEL_1_NOTE_ON:
-      if event[1] >= MIDDLE_C and event[1] < MIDDLE_C + 5:
-        keys[event[1] - MIDDLE_C] = True
+      if event[1] >= E3 and event[1] < E3 + 5:
+        keys[event[1] - E3] = True
     if event[0] == CHANNEL_1_NOTE_OFF:
-      if event[1] >= MIDDLE_C and event[1] < MIDDLE_C + 5:
-        keys[event[1] - MIDDLE_C] = False
-    print(keys)
+      if event[1] >= E3 and event[1] < E3 + 5:
+        keys[event[1] - E3] = False
   
-  ballrect = ballrect.move(speed)
-  if ballrect.left < 0 or ballrect.right > width:
-    speed[0] = -speed[0]
-  if ballrect.top < 0 or ballrect.bottom > height:
-    speed[1] = -speed[1]
-
   screen.fill(black)
+
+  for i in range(5):
+    if keys[i]:
+      pygame.draw.rect(screen, (255, 0, 0), pygame.Rect(width / 5 * i, 0, width / 5, height))
   
-  screen.blit(ball, ballrect)
   pygame.display.flip()
   pygame.time.wait(int(1000 / 60))
