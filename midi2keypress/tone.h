@@ -43,7 +43,7 @@ private:
 };
 
 static inline FreqList FreqDifference(FreqList a, FreqList b) {
-  FreqList v(20);
+  FreqList v(a.size());
   auto it = std::set_difference(a.begin(), a.end(), b.begin(), b.end(), v.begin());
   v.resize(it-v.begin());
   return v;
