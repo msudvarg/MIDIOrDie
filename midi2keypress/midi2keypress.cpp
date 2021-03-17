@@ -1,4 +1,5 @@
 #include <iostream>
+#include <algorithm>
 #include <unistd.h>
 
 #include "localcontroller.h"
@@ -9,41 +10,30 @@ bool done = false;
 
 int main() {
   LocalController lc;
-  int oldnote = -1;
-  float lastmax = 0.0f;
-  
   MidiStream ms;
   ms.Init();
+
+  FreqList old_peaks;
   
   while (!done) {
     Tone tone;
     lc.GetData(tone.interval, tone.raw_audio);
-    float maxamp = tone.GetMaxWave();
-    int peakfreq = tone.GetPeakPitch();
-    
-    if (peakfreq > 0) {
-      int newnote = Freq2Midi(peakfreq);
 
-      // Change the note
-      if (newnote != oldnote) {
-	if (oldnote != -1) {
-	  ms.Send(oldnote, false);
-	}
-	if (newnote != -1) {
-	  ms.Send(newnote, true);
-	}
+    FreqList peaks = tone.GetPeakPitches();
+
+    for (int freq : FreqDifference(peaks, old_peaks)) {
+      if (InMidiRange(freq)) {
+	ms.Send(Freq2Midi(freq), true);
       }
-
-      // Watch the attack
-      if (maxamp > 0.0001 and maxamp > lastmax * 10 and newnote != -1) {
-	// Attack again
-	ms.Send(newnote, false);
-	ms.Send(newnote, true);
-      }
-
-      lastmax = maxamp;
-      oldnote = newnote;
     }
+
+    for (int freq : FreqDifference(old_peaks, peaks)) {
+      if (InMidiRange(freq)) {
+	ms.Send(Freq2Midi(freq), false);
+      }
+    }
+
+    old_peaks = peaks;
   }
 }
 
