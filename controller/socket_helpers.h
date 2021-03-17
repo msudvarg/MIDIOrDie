@@ -12,7 +12,7 @@
 constexpr char IPADDR[] = "0.0.0.0"; //Server binds to all available IPs
 constexpr int PORTNO = 10520;
 
-extern Shared_Array<double,ROLLING_WINDOW_SIZE> sharedArray;
+extern Shared_Array<double,WINDOW_SIZE> sharedArray;
 
 void socket_send(Socket::Connection * client) {
 

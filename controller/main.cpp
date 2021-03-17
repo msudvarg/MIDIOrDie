@@ -6,6 +6,7 @@
 #include <complex>
 #include <cmath>
 #include <iterator>
+#include <vector>
 #include "portaudio.h"
 
 #include "common.h" //FFT parameters and shared data structure
@@ -17,15 +18,15 @@
 using namespace std;
 
 const double PI = 3.1415926536;
-static float sample_data[SAMPLE_WINDOW_SIZE];
-complex<double> complexInputBuffer[ROLLING_WINDOW_SIZE + SAMPLE_WINDOW_SIZE];
-complex<double> complexOutputBuffer[ROLLING_WINDOW_SIZE];
-double finalOutputBuffer[ROLLING_WINDOW_SIZE];
+static float sample_data[WINDOW_SIZE];
+complex<double> complexInputBuffer[WINDOW_SIZE];
+complex<double> complexOutputBuffer[WINDOW_SIZE];
+double finalOutputBuffer[WINDOW_SIZE];
 static bool dataAvailable = false;
 static int count = 0;
 
 //Thread-safe array to send FFT data over socket
-Shared_Array<double,ROLLING_WINDOW_SIZE> sharedArray;
+Shared_Array<double,WINDOW_SIZE> sharedArray;
 
 
 unsigned int bitReverse(unsigned int x, int log2n) {
@@ -78,13 +79,22 @@ double* getMag(Iter_T a, double* b, int length)
     return b;
 }
 
+template<class Iter_T>
+Iter_T hilbert_function(Iter_T a);
+
+// This takes the first derivative and returns the index of every rising edge event over the specified threshhold.
+// Used for finding attack events
+template<class Iter_T>
+std::vector<int> get_cliffs(Iter_T a, double threshhold);
+
 static int patestCallback( const void *inputBuffer, void *outputBuffer,
             unsigned long framesPerBuffer,
             const PaStreamCallbackTimeInfo* timeInfo,
             PaStreamCallbackFlags statusFlags,
             void *userData )
 {
-    if (framesPerBuffer < SAMPLE_WINDOW_SIZE) return -1;
+    std::cout << "Callback called" << std::endl;
+    if (framesPerBuffer < WINDOW_SIZE) return -1;
 
     count++;
 
@@ -142,10 +152,7 @@ int main(int argc, char** argv) {
     std::cout << "Sample rate: " << SAMPLE_RATE << "Hz" << std::endl
         << "Precision: " << DELTA_HZ << "Hz" << std::endl
         << "Desired rolling window Latency: " << WINDOW_LATENCY_MS << "ms" << std::endl
-        << "Samples per rolling window: " << SAMPLE_WINDOW_SIZE << std::endl
-        << "Actual rolling window latency: " << SAMPLE_WINDOW_SIZE * 1000 / SAMPLE_RATE << "ms" << std::endl
-        << "Samples per full window: " << ROLLING_WINDOW_SIZE << std::endl
-        << "Full window latency: " << ROLLING_WINDOW_SIZE * 1000 / SAMPLE_RATE << "ms" << std::endl;
+        << "Samples per rolling window: " << WINDOW_SIZE << std::endl;
 
     PaError err = Pa_Initialize();
     if (err != paNoError) {
@@ -160,7 +167,7 @@ int main(int argc, char** argv) {
                                 0,          /* no output */
                                 paFloat32,  /* 32 bit floating point output */
                                 SAMPLE_RATE,
-                                SAMPLE_WINDOW_SIZE,/* frames per buffer, i.e. the number
+                                WINDOW_SIZE,/* frames per buffer, i.e. the number
                                             of sample frames that PortAudio will
                                             request from the callback. Many apps
                                             may want to use
@@ -187,27 +194,28 @@ int main(int argc, char** argv) {
 
     // TODO: Program here (What program?)
     for(int i = 0; i < 1000 && !quit; forever ? i : i++) {
-        while(!dataAvailable);
+        while(!dataAvailable) {
+            std::cout << "Looping..." << std::endl;
+            usleep(5000);
+        }
+
 
         // Copy latest sample into rolling window
-        for(int i = 0; i < SAMPLE_WINDOW_SIZE; i++) {
-            complexInputBuffer[ROLLING_WINDOW_SIZE+i] = complex<double>(sample_data[i], 0);
+        for(int i = 0; i < WINDOW_SIZE; i++) {
+            complexInputBuffer[i] = complex<double>(sample_data[i], 0);
         }
         dataAvailable = false;
 
-        // Shift new sample into operable part of window
-        for(int i = 0; i < ROLLING_WINDOW_SIZE; i++) {
-            complexInputBuffer[i] = complexInputBuffer[i + SAMPLE_WINDOW_SIZE];
-        }
-
         // Perform fft
-        fft(complexInputBuffer, complexOutputBuffer, log2(ROLLING_WINDOW_SIZE));
-        getMag(complexOutputBuffer, finalOutputBuffer, ROLLING_WINDOW_SIZE);
+        fft(complexInputBuffer, complexOutputBuffer, log2(WINDOW_SIZE));
+        getMag(complexOutputBuffer, finalOutputBuffer, WINDOW_SIZE);
+
+        std::cout << "Performed fft" << std::endl;
 
         // Little bit of stats collection
         double max0=0, max1=0, max2=0;
         int max0_ind=0, max1_ind=0, max2_ind=0;
-        for(int i = 0; i < ROLLING_WINDOW_SIZE/2; i++) {
+        for(int i = 0; i < WINDOW_SIZE/2; i++) {
             if(finalOutputBuffer[i] > max0) {
                 max2 = max1;
                 max2_ind = max1_ind;
@@ -225,7 +233,7 @@ int main(int argc, char** argv) {
                 max2_ind = i;
             }
         }
-        float bucket_size = (float)SAMPLE_RATE / ROLLING_WINDOW_SIZE;
+        float bucket_size = (float)SAMPLE_RATE / WINDOW_SIZE;
         std::cout << "Largest frequency: " << bucket_size * (max0_ind+1) << "Hz" << std::endl
               << "2nd largest frequency: " << bucket_size * (max1_ind+1) << "Hz" << std::endl
               << "3rd largest frequency: " << bucket_size * (max2_ind+1) << "Hz" << std::endl << std::endl;

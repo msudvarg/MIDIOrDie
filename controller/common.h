@@ -45,11 +45,10 @@ uint_fast8_t log2ceil (uint32_t value)
 }
 
 #define SAMPLE_RATE         44000
-#define DELTA_HZ            5
-#define WINDOW_LATENCY_MS   30  
-#define OUTPUT_FFT_MAX_HZ   2000    
-constexpr int SAMPLE_WINDOW_SIZE = SAMPLE_RATE * WINDOW_LATENCY_MS / 1000;  // Number of samples that fit into latency window, rounded down to power of 2
-constexpr int ROLLING_WINDOW_SIZE = SAMPLE_RATE / DELTA_HZ;                 // Number of samples required to discern differences of delta_hz, rounded up to power of 2
+#define WINDOW_LATENCY_MS   40  
+#define OUTPUT_FFT_MAX_HZ   2000  
+constexpr float DELTA_HZ = 1000.0 / 40;  
+constexpr int WINDOW_SIZE = SAMPLE_RATE * WINDOW_LATENCY_MS / 1000;  // Number of samples that fit into latency window, rounded down to power of 2
 constexpr int OUTPUT_FFT_SIZE = OUTPUT_FFT_MAX_HZ / DELTA_HZ;               // Number of Hz bins to visualize
 
 struct Shared_Buffer {

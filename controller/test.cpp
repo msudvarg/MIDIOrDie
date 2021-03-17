@@ -15,9 +15,9 @@
 #include "shared_array.h" //Thread-safe array
 
 //Thread-safe array to send FFT data over socket
-Shared_Array<double,ROLLING_WINDOW_SIZE> sharedArray;
+Shared_Array<double,WINDOW_SIZE> sharedArray;
 //Local array
-double finalOutputBuffer[ROLLING_WINDOW_SIZE];
+double finalOutputBuffer[WINDOW_SIZE];
 
 //Destructors not correctly called if program interrupted
 //Use a signal handler and quit flag instead
@@ -68,7 +68,7 @@ int main(int argc, char * argv[]) {
     while(!quit) {
         
         //Generate random FFT histogram values
-        for (int i = 0; i < ROLLING_WINDOW_SIZE; ++i) {
+        for (int i = 0; i < WINDOW_SIZE; ++i) {
             finalOutputBuffer[i] = d(g) * 1000;
         }
 

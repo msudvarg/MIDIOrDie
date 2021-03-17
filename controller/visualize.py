@@ -20,7 +20,7 @@ while 1:
     y = []
     y = y_full
     plt.cla()
-    plt.ylim(0, 1500)
+    plt.ylim(0, 250)
     plt.plot(x,y)
     plt.gcf().canvas.draw_idle()
     plt.gcf().canvas.start_event_loop(0.1)

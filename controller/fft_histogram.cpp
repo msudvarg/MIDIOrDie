@@ -10,7 +10,7 @@
 #include "shared_array.h" //Thread-safe array
 
 //Thread-safe array to receive FFT data from socket
-Shared_Array<double,ROLLING_WINDOW_SIZE> sharedArray;
+Shared_Array<double,WINDOW_SIZE> sharedArray;
 
 //Socket server to receive FFT data from client
 static Socket::Server socket_server {IPADDR, PORTNO, socket_recv};
