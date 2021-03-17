@@ -11,6 +11,8 @@ private:
   RtMidiOut midiout;
 };
 
+char Freq2Midi(float freq);
+
 #endif /* MIDI_H */
 
 

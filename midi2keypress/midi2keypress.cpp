@@ -21,6 +21,7 @@ int main() {
     float maxamp = tone.GetMaxWave();
     int newnote;
     int peakfreq = tone.GetPeakPitch();
+    std::cout << (int) Freq2Midi((float) peakfreq) << std::endl;
     if (peakfreq >= 160 and peakfreq < 175) {
       newnote = 52;
 	} else if (peakfreq >= 175 and peakfreq < 180) {
