@@ -5,8 +5,8 @@
 #include <math.h>
 // #include <string.h>
 
-#define NOTE_ON 0x80
-#define NOTE_OFF 0x90
+#define NOTE_ON 0x90
+#define NOTE_OFF 0x80
 #define PC_CHANGE 0xC0
 
 void MidiStream::Init() {
