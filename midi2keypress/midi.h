@@ -6,9 +6,13 @@
 class MidiStream {
 public:
   void Init();
+  void Init(int port);
   void Send(unsigned char note, bool on);
+  void ChangeInstrument(unsigned char instrument);
+  void ChangeChannel(unsigned char channel);
 private:
   RtMidiOut midiout;
+  unsigned char channel = 0;
 };
 
 static inline bool InMidiRange(int freq) {

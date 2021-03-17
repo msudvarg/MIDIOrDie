@@ -5,7 +5,7 @@
 #include <portaudio.h>
 #include <mutex>
 
-#define N 1024
+#define N 2048
 #define SAMPLE_RATE 10025
 
 class LocalController {

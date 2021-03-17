@@ -5,7 +5,7 @@
 #include <algorithm>
 
 #define OUTPUT_FFT_MAX_HZ 10025
-#define OUTPUT_FFT_SIZE 1024
+#define OUTPUT_FFT_SIZE 2048
 
 typedef std::vector<int> FreqList;
 

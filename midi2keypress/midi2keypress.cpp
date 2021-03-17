@@ -10,19 +10,30 @@ bool done = false;
 
 int main(int argc, char *argv[]) {
   int opt;
-  bool all;
+  int port = 0;
+  bool drum = false;
+  bool all = false;
   
-  while((opt = getopt(argc, argv, "a")) != -1) {
+  while((opt = getopt(argc, argv, "adp:")) != -1) {
     switch(opt) {
     case 'a':
       all = true;
+      break;
+    case 'p':
+      port = atoi(optarg);
+      break;
+    case 'd':
+      drum = true;
       break;
     }
   }
   
   LocalController lc;
   MidiStream ms;
-  ms.Init();
+  ms.Init(port);
+  if (drum) {
+    ms.ChangeChannel(9);
+  }
 
   FreqList old_peaks;
   
