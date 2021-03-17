@@ -1,63 +1,86 @@
 #include <iostream>
+#include <algorithm>
 #include <unistd.h>
 
-#include "input.h"
 #include "localcontroller.h"
 #include "tone.h"
+#include "midi.h"
 
 bool done = false;
-KeyEventSender kes;
 
-int main() {
-  LocalController lc;
-  int oldkey = -1;
-  float lastmax = 0.0f;
+int main(int argc, char *argv[]) {
+  int opt;
+  int port = 0;
+  bool drum = false;
+  bool all = false;
   
-  try {
-    kes.Connect();
-    while (!done) {
-      Tone tone;
-      lc.GetData(tone.interval, tone.raw_audio);
-      float maxamp = tone.GetMaxWave();
-      int newkey;
-      int peakfreq = tone.GetPeakPitch();
-      if (peakfreq >= 160 and peakfreq < 175) {
-	newkey = KEY_F1;
-      } else if (peakfreq >= 175 and peakfreq < 180) {
-	newkey = KEY_F2;
-      } else if (peakfreq >= 180 and peakfreq < 190) {
-	newkey = KEY_F3;
-      } else if (peakfreq >= 190 and peakfreq < 200) {
-	newkey = KEY_F4;
-      } else if (peakfreq >= 200 and peakfreq < 225) {
-	newkey = KEY_F5;
-      } else {
-	newkey = -1;
-      }
-      // Change the key
-      if (newkey != oldkey) {
-	if (oldkey != -1) {
-	  kes.Buffer(oldkey, 0);
-	}
-	if (newkey != -1) {
-	  kes.Buffer(newkey, 1);
-	}
-      }
-
-      // Watch the attack
-      kes.Buffer(KEY_ENTER, 0);
-      if (maxamp > 0.0001 and maxamp > lastmax * 10) {
-	kes.Buffer(KEY_ENTER, 1);
-      }
-      kes.Send();
-
-      lastmax = maxamp;
-      oldkey = newkey;
-      usleep(100);
+  while((opt = getopt(argc, argv, "adp:")) != -1) {
+    switch(opt) {
+    case 'a':
+      all = true;
+      break;
+    case 'p':
+      port = atoi(optarg);
+      break;
+    case 'd':
+      drum = true;
+      break;
     }
-    kes.Disconnect();
-  } catch (const char *err) {
-    std::cerr << err << std::endl;
+  }
+  
+  LocalController lc;
+  int sleeptime = lc.GetRefreshRate();
+  MidiStream ms;
+  ms.Init(port);
+  if (drum) {
+    ms.ChangeChannel(9);
+  }
+
+  FreqList old_peaks;
+  
+  while (!done) {
+    Tone tone;
+    lc.GetData(tone.interval, tone.raw_audio);
+
+    FreqList peaks = tone.GetPeakPitches();
+
+    if (all) {
+      // Play all the pitches found in the fft
+      for (int freq : FreqDifference(peaks, old_peaks)) {
+	if (InMidiRange(freq)) {
+	  ms.Send(Freq2Midi(freq), true);
+	}
+      }
+
+      for (int freq : FreqDifference(old_peaks, peaks)) {
+	if (InMidiRange(freq)) {
+	  ms.Send(Freq2Midi(freq), false);
+	}
+      }
+    } else {
+      // Just play the fundamental frequency
+      if (peaks.size() > 0) {
+	int freq = peaks[0];
+	if (old_peaks.size() == 0) {
+	  if (InMidiRange(freq)) {
+	    ms.Send(Freq2Midi(freq), true);
+	  }
+	} else if (old_peaks[0] != freq) {
+	  if (InMidiRange(freq)) {
+	    ms.Send(Freq2Midi(freq), true);
+	  }
+	  if (InMidiRange(old_peaks[0])) {
+	    ms.Send(Freq2Midi(old_peaks[0]), false);
+	  }
+	}
+      } else if (old_peaks.size() > 0) {
+	if (InMidiRange(old_peaks[0])) {
+	  ms.Send(Freq2Midi(old_peaks[0]), false);
+	}
+      }
+    }
+    old_peaks = peaks;
+    usleep(sleeptime);
   }
 }
 

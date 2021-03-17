@@ -1,6 +1,6 @@
-CXXFLAGS = -g -I/usr/include/libevdev-1.0 -Ilocalcontroller
-LDFLAGS = -levdev -Llocalcontroller -llc -Wl,-R,localcontroller
-OBJS = midi2keypress.o input.o tone.o
+CXXFLAGS = -g `pkg-config --cflags rtmidi` -Ilocalcontroller
+LDFLAGS = `pkg-config --libs rtmidi` -Llocalcontroller -llc -Wl,-R,localcontroller
+OBJS = midi2keypress.o midi.o tone.o
 
 all: midi2keypress
 midi2keypress: $(OBJS) localcontroller/liblc.so

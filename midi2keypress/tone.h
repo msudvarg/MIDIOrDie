@@ -1,16 +1,13 @@
 #ifndef TONE_H
 #define TONE_H
 
-#define OUTPUT_FFT_MAX_HZ 10025
-#define OUTPUT_FFT_SIZE 1024
+#include <vector>
+#include <algorithm>
 
-enum class Pitch {
-  E2 = 82,
-  F2 = 98,
-  FS2 = 100,
-  G2 = 98,
-  GS2 = 103
-};
+#define OUTPUT_FFT_MAX_HZ 10025
+#define OUTPUT_FFT_SIZE 2048
+
+typedef std::vector<int> FreqList;
 
 class Tone {
 public:
@@ -19,6 +16,7 @@ public:
   
   bool HasPitch(int frequency);
   double GetPitchStrength(int frequency);
+  FreqList GetPeakPitches();
   int GetPeakPitch();
   float GetMaxWave();
 
@@ -35,5 +33,12 @@ private:
   int max_hz = OUTPUT_FFT_MAX_HZ;
   int fft_size = OUTPUT_FFT_SIZE;
 };
+
+static inline FreqList FreqDifference(FreqList a, FreqList b) {
+  FreqList v(a.size());
+  auto it = std::set_difference(a.begin(), a.end(), b.begin(), b.end(), v.begin());
+  v.resize(it-v.begin());
+  return v;
+}
 
 #endif /* TONE_H */

@@ -33,6 +33,18 @@ int Tone::GetPeakPitch() {
     return idx * max_hz / fft_size;
 }
 
+FreqList Tone::GetPeakPitches() {
+  FreqList peaks;
+  for (int i = 1; i < fft_size / 2 + 1; i++) {
+    if (interval[i] < interval[i - 1]) {
+      if (interval[i] > 1.0f) {
+	peaks.push_back(i * max_hz / fft_size);
+      }
+    }
+  }
+  return peaks;
+}
+
 float Tone::GetMaxWave() {
   float max = 0.0;
   for (int i = 0; i < fft_size; i++) {

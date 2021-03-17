@@ -136,16 +136,17 @@ class Input(Task):
         if haveMidi:
             pygame.midi.init()
             for i in range(pygame.midi.get_count()):
+                print(i)
                 interface, name, is_input, is_output, is_opened = pygame.midi.get_device_info(i)
-                log.debug("Found MIDI device: %s on %s" % (name, interface))
+                print("Found MIDI device: %s on %s" % (name, interface))
                 if not is_input:
-                    log.debug("MIDI device is not an input device.")
+                    print("MIDI device is not an input device.")
                     continue
                 try:
                     self.midi.append(pygame.midi.Input(i))
-                    log.debug("Device opened as device number %d." % len(self.midi))
+                    print("Device opened as device number %d." % len(self.midi))
                 except pygame.midi.MidiException:
-                    log.error("Error opening device for input.")
+                    print("Error opening device for input.")
             if len(self.midi) == 0:
                 log.debug("No MIDI input ports found.")
         else:
@@ -414,6 +415,8 @@ class Input(Task):
                     #MFH - must check for 0x80 - 0x8F for Note Off events (keyReleased) and 0x90 - 0x9F for Note On events (keyPressed)
                     noteOn = False
                     noteOff = False
+
+                    print(midimsg, id)
 
                     if (midimsg[0] >= 0x90) and (midimsg[0] <= 0x9F):   #note ON range
                         if midimsg[2] > 0:  #velocity > 0, confirmed note on
