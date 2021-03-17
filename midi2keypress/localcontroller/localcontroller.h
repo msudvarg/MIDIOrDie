@@ -5,19 +5,21 @@
 #include <portaudio.h>
 #include <mutex>
 
-#define N 2048
-#define SAMPLE_RATE 10025
+#define DEFAULT_N 2048
+#define DEFAULT_SAMPLE_RATE 10025
 
 class LocalController {
 public:
   LocalController();
+  LocalController(int n, int sample_rate);
   void GetData(double *fft_data_out, float *raw_audio_out);
   double GetRefreshRate();
   ~LocalController();
 private:
-  float window[N];
-  float fft_data[N];
-  float raw_audio[N];
+  int n, sample_rate;
+  float *window;
+  float *fft_data;
+  float *raw_audio;
   PaStream *stream;
   fftw_complex *in, *out;
   fftw_plan p;
