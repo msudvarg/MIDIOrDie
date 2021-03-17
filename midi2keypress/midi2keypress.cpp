@@ -37,9 +37,10 @@ int main(int argc, char *argv[]) {
   }
 
   FreqList old_peaks;
+  Tone tone;
+
   
   while (!done) {
-    Tone tone;
     lc.GetData(tone.interval, tone.raw_audio);
 
     FreqList peaks = tone.GetPeakPitches();

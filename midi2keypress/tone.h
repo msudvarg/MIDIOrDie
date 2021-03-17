@@ -13,6 +13,9 @@ class Tone {
 public:
   Tone();
   Tone(double threshold);
+  Tone(int fft_size, int max_hz);
+  Tone(int fft_size, int max_hz, double threshold);
+  ~Tone();
   
   bool HasPitch(int frequency);
   double GetPitchStrength(int frequency);
@@ -26,12 +29,12 @@ public:
   void SetFFTSize(int fft_size);
   void SetMaxHz(int max_hz);
 
-  double interval[OUTPUT_FFT_SIZE];
-  float raw_audio[OUTPUT_FFT_SIZE];
+  double *interval;
+  float *raw_audio;
 private:
   double threshold;
-  int max_hz = OUTPUT_FFT_MAX_HZ;
-  int fft_size = OUTPUT_FFT_SIZE;
+  int max_hz;
+  int fft_size;
 };
 
 static inline FreqList FreqDifference(FreqList a, FreqList b) {
