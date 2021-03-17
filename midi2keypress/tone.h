@@ -9,14 +9,6 @@
 
 typedef std::vector<int> FreqList;
 
-enum class Pitch {
-  E2 = 82,
-  F2 = 98,
-  FS2 = 100,
-  G2 = 98,
-  GS2 = 103
-};
-
 class Tone {
 public:
   Tone();
