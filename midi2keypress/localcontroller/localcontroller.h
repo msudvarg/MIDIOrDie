@@ -12,6 +12,7 @@ class LocalController {
 public:
   LocalController();
   void GetData(double *fft_data_out, float *raw_audio_out);
+  double GetRefreshRate();
   ~LocalController();
 private:
   float window[N];

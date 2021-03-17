@@ -29,6 +29,7 @@ int main(int argc, char *argv[]) {
   }
   
   LocalController lc;
+  int sleeptime = lc.GetRefreshRate();
   MidiStream ms;
   ms.Init(port);
   if (drum) {
@@ -79,6 +80,7 @@ int main(int argc, char *argv[]) {
       }
     }
     old_peaks = peaks;
+    usleep(sleeptime);
   }
 }
 

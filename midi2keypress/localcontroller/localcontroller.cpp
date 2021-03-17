@@ -20,7 +20,7 @@ LocalController::LocalController() {
   if (err != paNoError) {
     throw Pa_GetErrorText(err);
   }
-  PaStream *stream;
+  
   err = Pa_OpenDefaultStream(
     &stream,
     1,
@@ -68,6 +68,10 @@ void LocalController::GetData(double *fft_data_out, float *raw_audio_out) {
   }
   memcpy(raw_audio_out, raw_audio, N * sizeof(float));
   mtx.unlock();
+}
+
+double LocalController::GetRefreshRate() {
+  return 1.0 / Pa_GetStreamInfo(stream)->sampleRate / 1000.0;
 }
 
 LocalController::~LocalController() {

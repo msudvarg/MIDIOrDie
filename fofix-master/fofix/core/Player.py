@@ -114,6 +114,7 @@ DRUMBASSA = 17
 GUITARTYPES = [-1, 0, 1, 4]
 DRUMTYPES   = [-1, 2, 3]
 MICTYPES    = [5]
+REALGUITARTYPES = [6]
 
 lefts    = [CONTROL1[LEFT], CONTROL2[LEFT], CONTROL3[LEFT], CONTROL4[LEFT]]
 rights   = [CONTROL1[RIGHT], CONTROL2[RIGHT], CONTROL3[RIGHT], CONTROL4[RIGHT]]
@@ -702,6 +703,10 @@ class Controls:
                     keycode("key_action1", config):       CONTROLS[i][DRUMBASS],
                     keycode("key_start", config):         CONTROLS[i][START],
                 }
+            elif self.type[i] == 6:
+                ## Real guitar
+                controlMapping = {}
+
             elif self.type[i] > -1:
                 # drums do not need special declarations!
                 controlMapping = {
