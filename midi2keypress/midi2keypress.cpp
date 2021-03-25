@@ -37,46 +37,51 @@ int main(int argc, char *argv[]) {
   }
 
   FreqList old_peaks;
-  
+
+  Tone tone;
+  tone.DummySignature();
   while (!done) {
-    Tone tone;
     lc.GetData(tone.interval, tone.raw_audio);
 
-    FreqList peaks = tone.GetPeakPitches();
+    FreqList peaks = tone.ExtractSignatures();
+
+    for(int n : peaks) {
+      std::cout << tone.GetNoteName(n);
+    }
 
     if (all) {
       // Play all the pitches found in the fft
       for (int freq : FreqDifference(peaks, old_peaks)) {
-	if (InMidiRange(freq)) {
-	  ms.Send(Freq2Midi(freq), true);
-	}
+        if (InMidiRange(freq)) {
+          ms.Send(Freq2Midi(freq), true);
+        }
       }
 
       for (int freq : FreqDifference(old_peaks, peaks)) {
-	if (InMidiRange(freq)) {
-	  ms.Send(Freq2Midi(freq), false);
-	}
+        if (InMidiRange(freq)) {
+          ms.Send(Freq2Midi(freq), false);
+        }
       }
     } else {
       // Just play the fundamental frequency
       if (peaks.size() > 0) {
-	int freq = peaks[0];
-	if (old_peaks.size() == 0) {
-	  if (InMidiRange(freq)) {
-	    ms.Send(Freq2Midi(freq), true);
-	  }
-	} else if (old_peaks[0] != freq) {
-	  if (InMidiRange(freq)) {
-	    ms.Send(Freq2Midi(freq), true);
-	  }
-	  if (InMidiRange(old_peaks[0])) {
-	    ms.Send(Freq2Midi(old_peaks[0]), false);
-	  }
-	}
+        int freq = peaks[0];
+        if (old_peaks.size() == 0) {
+          if (InMidiRange(freq)) {
+            ms.Send(Freq2Midi(freq), true);
+          }
+        } else if (old_peaks[0] != freq) {
+          if (InMidiRange(freq)) {
+            ms.Send(Freq2Midi(freq), true);
+          }
+          if (InMidiRange(old_peaks[0])) {
+            ms.Send(Freq2Midi(old_peaks[0]), false);
+          }
+        }
       } else if (old_peaks.size() > 0) {
-	if (InMidiRange(old_peaks[0])) {
-	  ms.Send(Freq2Midi(old_peaks[0]), false);
-	}
+        if (InMidiRange(old_peaks[0])) {
+          ms.Send(Freq2Midi(old_peaks[0]), false);
+        }
       }
     }
     old_peaks = peaks;

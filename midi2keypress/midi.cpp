@@ -49,7 +49,5 @@ void MidiStream::ChangeChannel(unsigned char channel) {
 #define LG_440 8.78135971352466f
 
 unsigned char Freq2Midi(int freq) {
-  // int log2_freq = ffs(freq) - 1;
-  // return (log2_freq * 12 - LG_440 * 12) + 69;
-  return (unsigned char) (log2((double) freq / 440) * 12) + 69;
+  return (unsigned char) freq;
 }
