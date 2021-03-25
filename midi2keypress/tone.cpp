@@ -2,9 +2,9 @@
 #include <algorithm>
 
 
-Tone::Tone() : Tone (2048, 10025, 20.0) {}
+Tone::Tone() : Tone (WINDOW_SIZE, OUTPUT_FFT_MAX_HZ, 20.0) {}
 
-Tone::Tone(double threshold) : Tone(1024, 10025, threshold) {}
+Tone::Tone(double threshold) : Tone(WINDOW_SIZE, OUTPUT_FFT_MAX_HZ, threshold) {}
 
 Tone::Tone(int fft_size, int max_hz) : Tone(fft_size, max_hz, 20.0) {}
 
@@ -14,7 +14,7 @@ Tone::Tone(int fft_size, int max_hz, double threshold) {
   this->threshold = threshold;
 
   interval = new double[fft_size];
-  raw_audio = new float[fft_size];
+  raw_audio = new float[fft_size];     // NOTE: Dane, I dislike dynamically adjustable fft windows. Makes me nervous
 }
 
 Tone::~Tone() {

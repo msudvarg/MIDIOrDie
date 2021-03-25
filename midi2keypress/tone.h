@@ -57,8 +57,8 @@ public:
   std::string GetNoteName(int note);
 
 
-  double interval[WINDOW_SIZE];
-  float raw_audio[WINDOW_SIZE];
+  double* interval;
+  float* raw_audio;
   double signature[OUTPUT_FFT_SIZE];
 private:
 
