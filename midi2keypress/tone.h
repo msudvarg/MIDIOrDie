@@ -31,6 +31,9 @@ class Tone {
 public:
   Tone();
   Tone(double threshold);
+  Tone(int fft_size, int max_hz);
+  Tone(int fft_size, int max_hz, double threshold);
+  ~Tone();
   
   bool HasPitch(int frequency);
   double GetPitchStrength(int frequency);

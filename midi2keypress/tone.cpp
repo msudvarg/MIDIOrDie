@@ -2,12 +2,24 @@
 #include <algorithm>
 
 
-Tone::Tone() {
-    this->threshold = 20.0; // Maybe, IDK what a good default for this is yet
+Tone::Tone() : Tone (2048, 10025, 20.0) {}
+
+Tone::Tone(double threshold) : Tone(1024, 10025, threshold) {}
+
+Tone::Tone(int fft_size, int max_hz) : Tone(fft_size, max_hz, 20.0) {}
+
+Tone::Tone(int fft_size, int max_hz, double threshold) {
+  this->fft_size = fft_size;
+  this->max_hz = max_hz;
+  this->threshold = threshold;
+
+  interval = new double[fft_size];
+  raw_audio = new float[fft_size];
 }
 
-Tone::Tone(double threshold) {
-    this->threshold = threshold;
+Tone::~Tone() {
+  delete [] interval;
+  delete [] raw_audio;
 }
 
 double Tone::NoteToFreq(int note) {

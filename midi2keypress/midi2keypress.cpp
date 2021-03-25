@@ -40,6 +40,7 @@ int main(int argc, char *argv[]) {
 
   Tone tone;
   tone.DummySignature();
+  
   while (!done) {
     lc.GetData(tone.interval, tone.raw_audio);
 
