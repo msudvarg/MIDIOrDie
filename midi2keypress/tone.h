@@ -12,6 +12,7 @@
 #define WINDOW_SIZE       1760
 #define DELTA_HZ          25
 #define HARMONICS 8   // Default number of harmonics to capture in the signature
+#define MATCH_CONFIDENCE  0.9
 
 // 40 = E2
 // 45 = A2
@@ -55,6 +56,8 @@ public:
   void SetMaxHz(int max_hz);
 
   std::string GetNoteName(int note);
+
+  void PrintFFT();
 
 
   double* interval;

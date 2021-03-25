@@ -38,17 +38,19 @@ int main(int argc, char *argv[]) {
 
   FreqList old_peaks;
 
-  Tone tone;
+  Tone tone = Tone(WINDOW_SIZE, OUTPUT_FFT_MAX_HZ);
   tone.DummySignature();
-  
+
   while (!done) {
     lc.GetData(tone.interval, tone.raw_audio);
+    //tone.PrintFFT();
 
     FreqList peaks = tone.ExtractSignatures();
 
     for(int n : peaks) {
-      std::cout << tone.GetNoteName(n);
+      std::cout << tone.GetNoteName(n) << " ";
     }
+    std::cout << std::endl;
 
     if (all) {
       // Play all the pitches found in the fft

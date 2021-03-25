@@ -1,5 +1,5 @@
 CXXFLAGS = -g `pkg-config --cflags rtmidi` -Ilocalcontroller
-LDFLAGS = `pkg-config --libs rtmidi` -Llocalcontroller -llc -lportaudio -lfftw3
+LDFLAGS = `pkg-config --libs rtmidi` -Llocalcontroller -llc -lportaudio -lfftw3 -Wl,-R,localcontroller
 OBJS = midi2keypress.o midi.o tone.o
 
 all: midi2keypress

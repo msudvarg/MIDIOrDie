@@ -1,5 +1,6 @@
 #include "tone.h"
 #include <algorithm>
+#include <iostream>
 
 
 Tone::Tone() : Tone (WINDOW_SIZE, OUTPUT_FFT_MAX_HZ, 20.0) {}
@@ -62,15 +63,15 @@ int Tone::GetPeakPitch() {
     return FreqToNote(idx * DELTA_HZ);
 }
 
-// Finds peaks in fft (defined as any bucket above 3rd quartile) and returns list of ints
+// Finds peaks in fft (defined as any bucket above 7th octile) and returns list of ints
 // corresponding to notes. If more that one note resides in a bucket, it returns all of them
 FreqList Tone::GetPeakPitches() {
   FreqList peaks;
 
-  std::vector<double> arr = std::vector<double>(interval, interval + fft_size);
+  std::vector<double> arr = std::vector<double>(interval, interval + OUTPUT_FFT_SIZE);
   std::sort(arr.begin(), arr.end());
 
-  double threshold = arr.data()[3*arr.size()/4];
+  double threshold = arr.data()[7*arr.size()/8];
 
   for(int i = 1; i < fft_size; i++) {
     if (interval[i] > threshold) {
@@ -95,17 +96,24 @@ float Tone::GetMaxWave() {
   return max;
 }
 
-// TODO: Fix this
 void Tone::InterpolateAlias(double* a, double* b, int lenA, int lenB) {
   double interpolation_factor = (double)(lenA - 1) / (lenB - 1);
+  double dummy;
 
   for(int i = 0; i < lenB - 1; i++) {
     double j = i * interpolation_factor;
-    int lower_ind = (int)std::floor(j);
-    int upper_ind = (int)std::ceil(j);
-    double weight = std::modf(j, new double);
+    int lower_ind = (int)std::floor(i * interpolation_factor);
+    double lower_weight = 1 - std::modf(i * interpolation_factor, &dummy);
+    int upper_ind = (int)std::floor((i+1) * interpolation_factor);
+    double upper_weight = std::modf((i+1) * interpolation_factor, &dummy);
 
-    b[i] = weight * a[lower_ind] + (1-weight) * a[upper_ind];
+    // Sum all a buckets that map to bucket b[i], making sure to alias the
+    // edges and account for the fact these are decibels
+    b[i] = (lower_weight * std::pow(10,a[lower_ind]/10) + upper_weight * std::pow(10,a[upper_ind]/10));
+    for(int j = lower_ind + 1; j < upper_ind; j++) {
+      b[i] += std::pow(10,a[j]/10);
+    }
+    b[i] = 10 * std::log10(b[i]);
   }
 
   b[lenB-1] = a[lenA-1];
@@ -127,14 +135,38 @@ void Tone::DummySignature() {
     signature[i] = -50;
   }
 
-  signature[9] = -34;
-  signature[19] = -37;
-  signature[29] = -38.8;
-  signature[39] = -40;
-  signature[49] = -41;
-  signature[59] = -41.8;
-  signature[69] = -42.5;
-  signature[79] = -43;
+  signature[10] = 15;
+  signature[20] = 12;
+  signature[30] = 10.2;
+  signature[40] = 9;
+  signature[50] = 8;
+  signature[60] = 0;
+  signature[70] = -5;
+
+  // signature[8] = 3;
+  // signature[9] = 9;
+  // signature[10] = 3;
+  // signature[18] = 2;
+  // signature[19] = 6;
+  // signature[20] = 2;
+  // signature[28] = 1;
+  // signature[29] = 4.2;
+  // signature[30] = 1;
+  // signature[38] = 0;
+  // signature[39] = 3;
+  // signature[40] = 0;
+  // signature[48] = -1;
+  // signature[49] = 2;
+  // signature[50] = -1;
+  // signature[58] = -2;
+  // signature[59] = 1.2;
+  // signature[60] = -2;
+  // signature[68] = -3;
+  // signature[69] = 0.5;
+  // signature[70] = -3;
+  // signature[78] = -4;
+  // signature[79] = 0;
+  // signature[80] = -4;
 }
 
 FreqList Tone::ExtractSignatures() {
@@ -147,11 +179,13 @@ FreqList Tone::ExtractSignatures(FreqList primers) {
   double bucket_size = max_hz / fft_size;
 
   double fftcopy[OUTPUT_FFT_SIZE];
-  memcpy(fftcopy, interval, OUTPUT_FFT_SIZE);
+  memcpy(fftcopy, interval, OUTPUT_FFT_SIZE * sizeof(double));
 
   for(int f : primers) {
-    if (GetFrequencyPower(f, fftcopy, true) > 0) {
-      found.push_back(f);
+    if (f < FreqToNote(OUTPUT_FFT_MAX_HZ)) {
+      if (GetFrequencyPower(f, fftcopy, false) > 0) {
+        found.push_back(f);
+      }
     }
   }
 
@@ -177,13 +211,15 @@ double Tone::GetFrequencyPower(int note, double* fft, bool remove) {
   for(int i = 0; i < numBins && i < OUTPUT_FFT_SIZE; i++) {
     if (fft[i] > noteSig[i]) {
       matches++;
-      if (fft[i] / noteSig[i] < gain) {
-        gain = fft[i] / noteSig[i];
+      if (fft[i] - noteSig[i] < gain) {
+        gain = fft[i] - noteSig[i];
       }
     }
   }
 
-  if (matches < (numBins > OUTPUT_FFT_SIZE) ? numBins : OUTPUT_FFT_SIZE) {
+  if (matches <
+        MATCH_CONFIDENCE * ((numBins > OUTPUT_FFT_SIZE) ? OUTPUT_FFT_SIZE : numBins)) {
+    free(noteSig);
     return 0;
   }
 
@@ -193,6 +229,7 @@ double Tone::GetFrequencyPower(int note, double* fft, bool remove) {
     }
   }
 
+  free(noteSig);
   return gain;
 }
 
@@ -255,4 +292,13 @@ std::string Tone::GetNoteName(int note) {
       return "B" + std::to_string(octave);
       break;
   }
+}
+
+void Tone::PrintFFT() {
+  for(int i = 0; i < 20; i++) {
+    for(int j = -10; j < interval[i]; j++)
+      std::cout << "*";
+    std::cout << std::endl;
+  }
+  std::cout << "-----------------" << std::endl;
 }
