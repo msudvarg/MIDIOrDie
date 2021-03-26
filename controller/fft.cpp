@@ -5,7 +5,7 @@
 #include <iostream>
 #include <iterator>
 
-#include "../manifest.h"
+#include "../include/manifest.h"
 #include "../include/poller.h"
 #include "fft.h"
 

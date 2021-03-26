@@ -3,7 +3,7 @@
 
 #include <iostream>
 
-#include "../manifest.h"
+#include "../include/manifest.h"
 #include "../socket/socket.h" //Socket wrapper
 #include "../include/shared_array.h" //Thread-safe array
 #include "../include/poller.h"
