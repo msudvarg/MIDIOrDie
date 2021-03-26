@@ -8,12 +8,11 @@
 #include "../socket/socket.h" //Socket wrapper
 #include "../include/shared_array.h" //Thread-safe array
 #include "../include/poller.h"
-#include "../controller/"
-
-sig_atomic_t quit = 0;
+#include "../controller/fft.h"
 
 //Destructors not correctly called if program interrupted
 //Use a signal handler and quit flag instead
+sig_atomic_t quit = 0;
 void sigint_handler(int signum) {
     quit = 1;
 }
@@ -21,20 +20,18 @@ void sigint_handler(int signum) {
 
 void socket_recv(Socket::Connection * client) {
 
-    //Make MIDIExtraction object
-    //Loop and do stuff
+    //TODO: Declare and construct MIDIExtraction object
 
+    //Loop and do stuff
     while(client->isrunning()) {
         
         Poller poller(polling_freq);
 
-        //Copy shared array to local array
-        FFT::Shared_Array_t::array_type localArray = fft.read();
-
-        //Send local array over socket
-        client->send(
-            localArray.data(),
-            sizeof(FFT::Shared_Array_t::value_type) * FFT::Shared_Array_t::size);
+        //TODO: Read from socket into MIDIExtraction object
+        /*
+        client->recv(
+            midi.data(),
+            sizeof(decltype(sharedArray)::value_type) * decltype(sharedArray)::size); */
 
     }
 
@@ -47,54 +44,20 @@ int main(int argc, char** argv) {
     sa.sa_handler = sigint_handler;
     sigaction(SIGINT,&sa,NULL);
 
-
-
-    int opt;
-    bool forever = false;
-    std::string ipaddr = "127.0.0.1";
-
     //Get command-line options
-    while((opt = getopt(argc, argv, "fi:")) != -1) {
-        switch(opt) {
-
-        //Run forever
-        case 'f':
-            forever = true;
-            break;
-
-        //IP Address
-        case 'i':
-            if(optarg) ipaddr.assign(optarg);
-            break;
-
-        default:
-            std::cerr << "Usage: " << argv[0] << " [-f] [-i0.0.0.0]\n" << std::endl;
-        }
-    }
+    //TODO: Add command-line options for MIDIExtraction
+    //int opt;
 
     //Exception handling
 
     try {
         
-        std::unique_ptr<Socket::Client> socket;
+        //Socket server to receive FFT data from client
+        static Socket::Server socket_server {IPADDR, PORTNO, socket_recv};
 
-        fft.init();
-
-        //Create socket to send data
-        //Keep looping on connection error in case server has not been set up
         while(!quit) {
-            try {
-                socket = std::make_unique<Socket::Client>(ipaddr.c_str(), PORTNO, socket_send);
-            }
-            catch (Socket::Connection_Error &) {
-                Poller poller (1000); //Wait 1 second between connection attempts
-                std::cerr << "Connection to server failed, reconnecting ..." << std::endl;
-                continue;
-            }
-            break;
+            Poller poller (polling_freq);
         }
-
-        fft.run(forever);
 
     }
     catch (PaError ret) {

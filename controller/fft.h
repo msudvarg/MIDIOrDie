@@ -76,8 +76,8 @@ private:
 public:
 
     void init();
-    void run(bool forever);
-    void end() noexcept { quit = true; }
+    void run();
+    void end();
     Shared_Array_t::array_type read() { return sharedArray.read(); }
 
 

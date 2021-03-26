@@ -109,65 +109,65 @@ void FFT::init() {
 
 }
 
-void FFT::run(bool forever) {
+void FFT::run() {
 
     PaError err;
-    
-    //FFT loop
-    for(int i = 0; i < 1000 && !quit; forever ? i : i++) {
-    
-        Poller poller(polling_freq);
 
-        while(!dataAvailable) {
-            std::cout << "Looping..." << std::endl;
-            usleep(5000);
-        }
-
-        // Copy latest sample into rolling window
-        for(int i = 0; i < WINDOW_SIZE; i++) {
-            complexInputBuffer[i] = std::complex<double>(sample_data[i], 0);
-        }
-        dataAvailable = false;
-
-        // Perform fft
-        fft(complexInputBuffer, complexOutputBuffer, log2(WINDOW_SIZE));
-        getMag(complexOutputBuffer, finalOutputBuffer, WINDOW_SIZE);
-
-        std::cout << "Performed fft" << std::endl;
-
-        // Little bit of stats collection
-        double max0=0, max1=0, max2=0;
-        int max0_ind=0, max1_ind=0, max2_ind=0;
-        for(int i = 0; i < WINDOW_SIZE/2; i++) {
-            if(finalOutputBuffer[i] > max0) {
-                max2 = max1;
-                max2_ind = max1_ind;
-                max1 = max0;
-                max1_ind = max0_ind;
-                max0 = finalOutputBuffer[i];
-                max0_ind = i;
-            } else if(finalOutputBuffer[i] > max1) {
-                max2 = max1;
-                max2_ind = max1_ind;
-                max1 = finalOutputBuffer[i];
-                max1_ind = i;
-            } else if(finalOutputBuffer[i] > max2) {
-                max2 = finalOutputBuffer[i];
-                max2_ind = i;
-            }
-        }
-        float bucket_size = (float)SAMPLE_RATE / WINDOW_SIZE;
-        std::cout << "Largest frequency: " << bucket_size * (max0_ind+1) << "Hz" << std::endl
-              << "2nd largest frequency: " << bucket_size * (max1_ind+1) << "Hz" << std::endl
-              << "3rd largest frequency: " << bucket_size * (max2_ind+1) << "Hz" << std::endl << std::endl;
-
-
-        //Copy FFT values to shared array
-        sharedArray.write(finalOutputBuffer);
+    while(!dataAvailable) {
+        std::cout << "Looping..." << std::endl;
+        usleep(5000);
     }
-    
+
+    // Copy latest sample into rolling window
+    for(int i = 0; i < WINDOW_SIZE; i++) {
+        complexInputBuffer[i] = std::complex<double>(sample_data[i], 0);
+    }
+    dataAvailable = false;
+
+    // Perform fft
+    fft(complexInputBuffer, complexOutputBuffer, log2(WINDOW_SIZE));
+    getMag(complexOutputBuffer, finalOutputBuffer, WINDOW_SIZE);
+
+    std::cout << "Performed fft" << std::endl;
+
+    // Little bit of stats collection
+    double max0=0, max1=0, max2=0;
+    int max0_ind=0, max1_ind=0, max2_ind=0;
+    for(int i = 0; i < WINDOW_SIZE/2; i++) {
+        if(finalOutputBuffer[i] > max0) {
+            max2 = max1;
+            max2_ind = max1_ind;
+            max1 = max0;
+            max1_ind = max0_ind;
+            max0 = finalOutputBuffer[i];
+            max0_ind = i;
+        } else if(finalOutputBuffer[i] > max1) {
+            max2 = max1;
+            max2_ind = max1_ind;
+            max1 = finalOutputBuffer[i];
+            max1_ind = i;
+        } else if(finalOutputBuffer[i] > max2) {
+            max2 = finalOutputBuffer[i];
+            max2_ind = i;
+        }
+    }
+    float bucket_size = (float)SAMPLE_RATE / WINDOW_SIZE;
+    std::cout << "Largest frequency: " << bucket_size * (max0_ind+1) << "Hz" << std::endl
+            << "2nd largest frequency: " << bucket_size * (max1_ind+1) << "Hz" << std::endl
+            << "3rd largest frequency: " << bucket_size * (max2_ind+1) << "Hz" << std::endl << std::endl;
+
+
+    //Copy FFT values to shared array
+    sharedArray.write(finalOutputBuffer);
+
+}
+
+void FFT::end() {
+
     //Cleanup
     std::cout << "Number of callbacks: " << count << std::endl;
+
+    PaError err;
 
     /* Stop stream */
     err = Pa_StopStream(stream);
@@ -187,7 +187,6 @@ void FFT::run(bool forever) {
         printf(  "PortAudio error: %s\n", Pa_GetErrorText( err ) );
         throw err;
     }
-
 }
 
 int FFT::paCallback(

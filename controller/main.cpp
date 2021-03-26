@@ -11,12 +11,11 @@
 #include "fft.h"
 
 FFT fft;
-sig_atomic_t quit = 0;
 
 //Destructors not correctly called if program interrupted
 //Use a signal handler and quit flag instead
+sig_atomic_t quit = 0;
 void sigint_handler(int signum) {
-    fft.end();
     quit = 1;
 }
 
@@ -45,8 +44,6 @@ int main(int argc, char** argv) {
     struct sigaction sa;
     sa.sa_handler = sigint_handler;
     sigaction(SIGINT,&sa,NULL);
-
-
 
     int opt;
     bool forever = false;
@@ -92,8 +89,14 @@ int main(int argc, char** argv) {
             }
             break;
         }
-
-        fft.run(forever);
+        
+        //FFT loop
+        for(int i = 0; i < 1000 && !quit; forever ? i : i++) {
+            Poller poller(polling_freq);
+            fft.run();
+        }
+        
+        fft.end();
 
     }
     catch (PaError ret) {

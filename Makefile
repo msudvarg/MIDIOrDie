@@ -1,4 +1,4 @@
-all: socket controller #server
+all: socket controller server
 
 socket: ../socket/libsocket.a
 ../socket/libsocket.a:
@@ -7,8 +7,8 @@ socket: ../socket/libsocket.a
 controller: controller/main.o controller/fft.o
 	$(MAKE) -C controller
 
-#server: server/main.o
-#	$(MAKE) -C server
+server: server/main.o
+	$(MAKE) -C server
 
 
 clean:

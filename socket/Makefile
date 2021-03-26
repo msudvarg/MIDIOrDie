@@ -4,7 +4,7 @@ LIBTARGET = libsocket.a
 all: base.o server.o client.o connection.o $(LIBTARGET)
 base.o: base.cpp
 	$(CXX) $(CPPFLAGS) $(LIBS) -c $^
-server.o: base.cpp
+server.o: server.cpp
 	$(CXX) $(CPPFLAGS) $(LIBS) -c $^
 client.o: client.cpp
 	$(CXX) $(CPPFLAGS) $(LIBS) -c $^
