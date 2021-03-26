@@ -3,7 +3,7 @@
 
 #include <iostream>
 
-#include "socket/socket.h" //Socket wrapper
+#include "../socket/socket.h" //Socket wrapper
 #include "socket_manifest.h" //Functions to pass to socket connections
 #include "shared_array.h" //Thread-safe array
 #include "fft.h"
