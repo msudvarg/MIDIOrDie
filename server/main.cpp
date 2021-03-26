@@ -1,14 +1,13 @@
 #include <signal.h>
 #include <getopt.h>
 #include <iostream>
-#include <memory>
+#include <thread>
 #include "portaudio.h"
 
 #include "../include/manifest.h"
 #include "../socket/socket.h" //Socket wrapper
 #include "../include/shared_array.h" //Thread-safe array
 #include "../include/poller.h"
-#include "../controller/fft.h"
 #include "../fft2midi/fft2midi.h"
 
 int port = 0;
@@ -25,19 +24,20 @@ void sigint_handler(int signum) {
 
 void socket_recv(Socket::Connection * client) {
 
-    //TODO: Declare and construct MIDIExtraction object
     Desynthesizer desynth {port, drum, all);
+    FFT::Shared_Array_t::array_type & fft_data = desynth.fft_data;
 
     //Loop and do stuff
     while(client->isrunning()) {
         
         Poller poller(polling_freq);
 
-        //TODO: Read from socket into MIDIExtraction object
-        /*
+        //Read from socket into MIDIExtraction object
         client->recv(
-            midi.data(),
-            sizeof(decltype(sharedArray)::value_type) * decltype(sharedArray)::size); */
+            fft_data,
+            sizeof(decltype(fft_data)::value_type) * decltype(fft_data)::size);
+
+        desynth.run();
 
     }
 
@@ -76,7 +76,8 @@ int main(int argc, char** argv) {
         static Socket::Server socket_server {IPADDR, PORTNO, socket_recv};
 
         while(!quit) {
-            Poller poller (polling_freq);
+            //Socket connections handle everything
+            std::this_thread::yield();
         }
 
     }

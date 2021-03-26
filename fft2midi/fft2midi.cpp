@@ -2,7 +2,6 @@
 #include <algorithm>
 #include <unistd.h>
 
-#include "localcontroller.h"
 #include "fft2midi.h"
 
 bool done = false;
@@ -23,9 +22,6 @@ Desynthesizer(int _port, bool _drum, bool _all) :
 
 void Desynthesizer::run() {
 
-    //Change to socket getter
-    //lc.GetData(tone.interval, tone.raw_audio);
-  
     FreqList peaks = tone.ExtractSignatures();
 
     for(int n : peaks) {
