@@ -9,8 +9,6 @@
 #include "fft.h"
 #include "poller.h"
 
-using namespace std;
-
 FFT fft;
 sig_atomic_t quit = 0;
 
@@ -48,7 +46,7 @@ int main(int argc, char** argv) {
 
     int opt;
     bool forever = false;
-    string ipaddr = "127.0.0.1";
+    std::string ipaddr = "127.0.0.1";
 
     //Get command-line options
     while((opt = getopt(argc, argv, "fi:")) != -1) {
