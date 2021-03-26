@@ -6,9 +6,9 @@
 
 #include "../manifest.h"
 #include "../socket/socket.h" //Socket wrapper
-#include "shared_array.h" //Thread-safe array
+#include "../include/shared_array.h" //Thread-safe array
+#include "../include/poller.h"
 #include "fft.h"
-#include "poller.h"
 
 FFT fft;
 sig_atomic_t quit = 0;

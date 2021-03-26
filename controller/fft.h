@@ -3,7 +3,7 @@
 #include <complex>
 #include <vector>
 #include "portaudio.h"
-#include "shared_array.h"
+#include "../include/shared_array.h" //Thread-safe array
 
 class FFT {
     

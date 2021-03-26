@@ -4,11 +4,11 @@
 #include <memory>
 #include "portaudio.h"
 
-#include "../manifest.h" //Functions to pass to socket connections
+#include "../manifest.h"
 #include "../socket/socket.h" //Socket wrapper
-#include "shared_array.h" //Thread-safe array
+#include "../include/shared_array.h" //Thread-safe array
+#include "../include/poller.h"
 #include "fft.h"
-#include "poller.h"
 
 //Specific to test.cpp
 #include <random>

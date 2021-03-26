@@ -5,9 +5,9 @@
 
 #include "../manifest.h"
 #include "../socket/socket.h" //Socket wrapper
-#include "shared_array.h" //Thread-safe array
+#include "../include/shared_array.h" //Thread-safe array
+#include "../include/poller.h"
 #include "fft.h"
-#include "poller.h"
 
 //Thread-safe array to receive FFT data from socket
 FFT::Shared_Array_t sharedArray;

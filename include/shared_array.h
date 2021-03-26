@@ -44,7 +44,7 @@ public:
 
 template <typename T, unsigned N>
 typename Shared_Array<T,N>::array_type Shared_Array<T,N>::read() {
-    std::scoped_lock lk {m};
+    std::lock_guard<std::mutex> lk {m};
     return buffer;
 }
 
@@ -64,7 +64,7 @@ typename Shared_Array<T,N>::array_type Shared_Array<T,N>::read_sequence() {
 
 template <typename T, unsigned N>
 void Shared_Array<T,N>::write(Shared_Array<T,N>::array_type input) {
-    std::scoped_lock lk {m};
+    std::lock_guard<std::mutex> lk {m};
     lock_sequence++;
     buffer = input;
     lock_sequence++;
@@ -72,7 +72,7 @@ void Shared_Array<T,N>::write(Shared_Array<T,N>::array_type input) {
 
 template <typename T, unsigned N>
 void Shared_Array<T,N>::write(T input[N]) {
-    std::scoped_lock lk {m};
+    std::lock_guard<std::mutex> lk {m};
     lock_sequence++;
     for(size_t i = 0; i < N; ++i) {
         buffer[i] = input[i];

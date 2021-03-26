@@ -6,8 +6,8 @@
 #include <iterator>
 
 #include "../manifest.h"
+#include "../include/poller.h"
 #include "fft.h"
-#include "poller.h"
 
 unsigned int FFT::bitReverse(unsigned int x, int log2n) {
     int n = 0;
