@@ -12,11 +12,13 @@
 using namespace std;
 
 FFT fft;
+sig_atomic_t quit = 0;
 
 //Destructors not correctly called if program interrupted
 //Use a signal handler and quit flag instead
 void sigint_handler(int signum) {
     fft.end();
+    quit = 1;
 }
 
 
@@ -75,7 +77,7 @@ int main(int argc, char** argv) {
 
         //Create socket to send data
         //Keep looping on connection error in case server has not been set up
-        while(true) {
+        while(!quit) {
             try {
                 Socket::Client socket {ipaddr.c_str(), PORTNO, socket_send};
             }
