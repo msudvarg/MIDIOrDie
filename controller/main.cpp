@@ -22,16 +22,20 @@ void sigint_handler(int signum) {
 
 
 void socket_send(Socket::Connection * client) {
-    
-    Poller poller(polling_freq);
 
-    //Copy shared array to local array
-    FFT::Shared_Array_t::array_type localArray = fft.read();
+    while(client->isrunning()) {
+        
+        Poller poller(polling_freq);
 
-    //Send local array over socket
-    client->send(
-        localArray.data(),
-        sizeof(FFT::Shared_Array_t::value_type) * FFT::Shared_Array_t::size);
+        //Copy shared array to local array
+        FFT::Shared_Array_t::array_type localArray = fft.read();
+
+        //Send local array over socket
+        client->send(
+            localArray.data(),
+            sizeof(FFT::Shared_Array_t::value_type) * FFT::Shared_Array_t::size);
+
+    }
 
 }
 

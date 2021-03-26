@@ -14,21 +14,23 @@ FFT::Shared_Array_t sharedArray;
 
 //Function to receive from socket
 void socket_recv(Socket::Connection * client) {
+
+    while(client->isrunning()) {
     
-    Poller poller(polling_freq);
+        Poller poller(polling_freq);
 
-    //Declare local array
-    decltype(sharedArray)::array_type localArray;
+        //Declare local array
+        decltype(sharedArray)::array_type localArray;
 
-    //Read from socket into local array
-    client->recv(
-        localArray.data(),
-        sizeof(decltype(sharedArray)::value_type) * decltype(sharedArray)::size);
+        //Read from socket into local array
+        client->recv(
+            localArray.data(),
+            sizeof(decltype(sharedArray)::value_type) * decltype(sharedArray)::size);
 
-    //Copy local array to shared array
-    sharedArray.write(localArray);
-    
-    std::this_thread::sleep_for(std::chrono::milliseconds(50));
+        //Copy local array to shared array
+        sharedArray.write(localArray);
+
+    }
 
 }
 

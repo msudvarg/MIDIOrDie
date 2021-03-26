@@ -38,11 +38,9 @@ Connection::~Connection() {
     if(t.joinable()) t.join();
 }
 
-//Run registered function until socket disconnects
+//Run registered function
 void Connection::run() {
-    while (running) {
-        f(this);
-    }
+    f(this);
 }
 
 //Send data over socket

@@ -24,6 +24,9 @@ public:
     void send(void * buf, size_t count);
     void recv(void * buf, size_t count);
 
+    //Check running status
+    bool isrunning() const { return running; }
+
 
     //Constructor
     Connection(

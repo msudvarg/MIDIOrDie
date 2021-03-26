@@ -13,4 +13,3 @@ clean:
 	-rm controller
 	-rm *.so
 	-rm *.o
-	$(MAKE) -C ../socket clean
