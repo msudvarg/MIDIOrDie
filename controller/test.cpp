@@ -1,6 +1,7 @@
 #include <signal.h>
 #include <getopt.h>
 #include <iostream>
+#include <memory>
 #include "portaudio.h"
 
 #include "../socket/socket.h" //Socket wrapper
@@ -73,15 +74,18 @@ int main(int argc, char * argv[]) {
         using std::chrono::system_clock;
         g.seed(duration_cast<milliseconds>(system_clock::now().time_since_epoch()).count());
         std::uniform_real_distribution<double> d;
+        
+        std::unique_ptr<Socket::Client> socket;
 
         //Create socket to send data
         //Keep looping on connection error in case server has not been set up
         while(!quit) {
             try {
-                Socket::Client socket {ipaddr.c_str(), PORTNO, socket_send};
+                socket = std::make_unique<Socket::Client>(ipaddr.c_str(), PORTNO, socket_send);
             }
             catch (Socket::Connection_Error &) {
                 Poller poller (1000); //Wait 1 second between connection attempts
+                std::cerr << "Connection to server failed, reconnecting ..." << std::endl;
                 continue;
             }
             break;
