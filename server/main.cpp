@@ -9,6 +9,11 @@
 #include "../include/shared_array.h" //Thread-safe array
 #include "../include/poller.h"
 #include "../controller/fft.h"
+#include "../fft2midi/fft2midi.h"
+
+int port = 0;
+bool drum = false;
+bool all = false;
 
 //Destructors not correctly called if program interrupted
 //Use a signal handler and quit flag instead
@@ -21,6 +26,7 @@ void sigint_handler(int signum) {
 void socket_recv(Socket::Connection * client) {
 
     //TODO: Declare and construct MIDIExtraction object
+    Desynthesizer desynth {port, drum, all);
 
     //Loop and do stuff
     while(client->isrunning()) {
@@ -46,7 +52,21 @@ int main(int argc, char** argv) {
 
     //Get command-line options
     //TODO: Add command-line options for MIDIExtraction
-    //int opt;
+    int opt;
+  
+    while((opt = getopt(argc, argv, "adp:")) != -1) {
+        switch(opt) {
+            case 'a':
+                all = true;
+                break;
+            case 'p':
+                port = atoi(optarg);
+                break;
+            case 'd':
+                drum = true;
+                break;
+        }
+    }
 
     //Exception handling
 
@@ -73,11 +93,6 @@ int main(int argc, char** argv) {
         std::cerr << "Unknown exception! "<< std::endl;
         return -1;
     }
-    
-    //Create shared memory for visualization
-    //Shared_Memory<Shared_Buffer> sharedBuffer {"fftData"};
-
-
 
     return 0;    
 }

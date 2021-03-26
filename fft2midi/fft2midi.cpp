@@ -3,48 +3,29 @@
 #include <unistd.h>
 
 #include "localcontroller.h"
-#include "tone.h"
-#include "midi.h"
+#include "fft2midi.h"
 
 bool done = false;
 
-int main(int argc, char *argv[]) {
-  int opt;
-  int port = 0;
-  bool drum = false;
-  bool all = false;
-  
-  while((opt = getopt(argc, argv, "adp:")) != -1) {
-    switch(opt) {
-    case 'a':
-      all = true;
-      break;
-    case 'p':
-      port = atoi(optarg);
-      break;
-    case 'd':
-      drum = true;
-      break;
-    }
-  }
-  
-  LocalController lc;
-  int sleeptime = lc.GetRefreshRate();
-  MidiStream ms;
-  ms.Init(port);
+Desynthesizer(int _port, bool _drum, bool _all) :
+  port (_port),
+  drum (_drum),
+  all (_all),
+  tone (WINDOW_SIZE, OUTPUT_FFT_MAX_HZ)
+{
+  ms.init(port);
   if (drum) {
     ms.ChangeChannel(9);
   }
 
-  FreqList old_peaks;
-
-  Tone tone = Tone(WINDOW_SIZE, OUTPUT_FFT_MAX_HZ);
   tone.DummySignature();
+}
 
-  while (!done) {
-    lc.GetData(tone.interval, tone.raw_audio);
-    //tone.PrintFFT();
+void Desynthesizer::run() {
 
+    //Change to socket getter
+    //lc.GetData(tone.interval, tone.raw_audio);
+  
     FreqList peaks = tone.ExtractSignatures();
 
     for(int n : peaks) {
@@ -88,7 +69,8 @@ int main(int argc, char *argv[]) {
       }
     }
     old_peaks = peaks;
-    usleep(sleeptime);
-  }
+
 }
+
+
 
