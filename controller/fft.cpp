@@ -4,6 +4,8 @@
 #include <cmath>
 #include <iostream>
 #include <iterator>
+
+#include "../manifest.h"
 #include "fft.h"
 #include "poller.h"
 
@@ -113,8 +115,8 @@ void FFT::run(bool forever) {
     
     //FFT loop
     for(int i = 0; i < 1000 && !quit; forever ? i : i++) {
-        //TODO: What's our sampling rate?
-        Poller poller(10); //10 ms?
+    
+        Poller poller(polling_freq);
 
         while(!dataAvailable) {
             std::cout << "Looping..." << std::endl;

@@ -4,8 +4,8 @@
 #include <memory>
 #include "portaudio.h"
 
+#include "../manifest.h"
 #include "../socket/socket.h" //Socket wrapper
-#include "socket_manifest.h" //Functions to pass to socket connections
 #include "shared_array.h" //Thread-safe array
 #include "fft.h"
 #include "poller.h"
@@ -23,8 +23,7 @@ void sigint_handler(int signum) {
 
 void socket_send(Socket::Connection * client) {
     
-    //TODO: What's our send rate?
-    Poller poller(50); //50 ms?
+    Poller poller(polling_freq);
 
     //Copy shared array to local array
     FFT::Shared_Array_t::array_type localArray = fft.read();

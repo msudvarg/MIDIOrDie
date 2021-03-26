@@ -3,8 +3,8 @@
 
 #include <iostream>
 
+#include "../manifest.h"
 #include "../socket/socket.h" //Socket wrapper
-#include "socket_manifest.h" //Functions to pass to socket connections
 #include "shared_array.h" //Thread-safe array
 #include "fft.h"
 #include "poller.h"
@@ -14,6 +14,8 @@ FFT::Shared_Array_t sharedArray;
 
 //Function to receive from socket
 void socket_recv(Socket::Connection * client) {
+    
+    Poller poller(polling_freq);
 
     //Declare local array
     decltype(sharedArray)::array_type localArray;
