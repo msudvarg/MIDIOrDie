@@ -7,7 +7,7 @@ socket/libsocket.a:
 	$(MAKE) -C socket
 test: test.cpp
 	$(CXX) $(CPPFLAGS) -o $@ $^ $(LIBS)
-controller: main.o
+controller: main.o fft.o
 	$(CXX) $(CPPFLAGS) -o $@ $^ $(LIBS) -g 
 fft_histogram.so: fft_histogram.cpp socket/base.cpp socket/client.cpp socket/server.cpp socket/connection.cpp
 	$(CXX) $(CPPFLAGS) -shared -fPIC -o $@ $^ $(LIBS)

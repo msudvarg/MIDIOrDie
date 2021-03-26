@@ -5,6 +5,7 @@
 #include <netinet/ip.h>
 #include <arpa/inet.h>
 #include <unistd.h>
+#include <exception>
 
 namespace Socket {
 
@@ -12,11 +13,25 @@ namespace Socket {
 constexpr int default_backlog = 10;
 
 //Exceptions
-class No_Socket {};
-class Invalid_IP {};
-class Bind_Error {};
-class Listen_Error {};
-class Connection_Error {};
+struct No_Socket : std::exception {
+    const char* what() const noexcept {return "Could not open socket!\n";}
+};
+
+struct Invalid_IP : std::exception {
+    const char* what() const noexcept {return "Invalid IP address!\n";}
+};
+
+struct Bind_Error : std::exception { 
+    const char* what() const noexcept {return "Could not bind to socket!\n";}
+};
+
+struct Listen_Error : std::exception { 
+    const char* what() const noexcept {return "Could not listen to socket!\n";}
+};
+
+struct Connection_Error : std::exception { 
+    const char* what() const noexcept {return "Could not connect to socket!\n";}
+};
 
 //Forward declaration
 class Connection;

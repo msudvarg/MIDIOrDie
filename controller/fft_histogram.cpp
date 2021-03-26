@@ -3,14 +3,32 @@
 
 #include <iostream>
 
-#include "common.h" //FFT parameters and shared data structure
-#include "shared_memory.h" //Shared memory wrapper
 #include "socket/socket.h" //Socket wrapper
-#include "socket_helpers.h" //Functions to pass to socket connections
+#include "socket_manifest.h" //Functions to pass to socket connections
 #include "shared_array.h" //Thread-safe array
+#include "fft.h"
+#include "poller.h"
 
 //Thread-safe array to receive FFT data from socket
-Shared_Array<double,WINDOW_SIZE> sharedArray;
+FFT::Shared_Array_t sharedArray;
+
+//Function to receive from socket
+void socket_recv(Socket::Connection * client) {
+
+    //Declare local array
+    decltype(sharedArray)::array_type localArray;
+
+    //Read from socket into local array
+    client->recv(
+        localArray.data(),
+        sizeof(decltype(sharedArray)::value_type) * decltype(sharedArray)::size);
+
+    //Copy local array to shared array
+    sharedArray.write(localArray);
+    
+    std::this_thread::sleep_for(std::chrono::milliseconds(50));
+
+}
 
 //Socket server to receive FFT data from client
 static Socket::Server socket_server {IPADDR, PORTNO, socket_recv};
@@ -24,9 +42,9 @@ fft_histogram_histogram(PyObject *self, PyObject *args) {
     //Copy shared array to local array
     decltype(sharedArray)::array_type localArray = sharedArray.read();
 
-    PyObject * pylist = PyList_New(OUTPUT_FFT_SIZE);
+    PyObject * pylist = PyList_New(FFT::OUTPUT_FFT_SIZE);
 
-    for(size_t i = 0; i < OUTPUT_FFT_SIZE; ++i) {
+    for(size_t i = 0; i < FFT::OUTPUT_FFT_SIZE; ++i) {
         PyObject * pydouble = Py_BuildValue("d",localArray[i]);
         PyList_SetItem(pylist, i, pydouble);
     }
@@ -36,13 +54,13 @@ fft_histogram_histogram(PyObject *self, PyObject *args) {
 
 static PyObject *
 fft_histogram_bin_count(PyObject *self, PyObject *args) {
-    PyObject * val = PyLong_FromLong(OUTPUT_FFT_SIZE);
+    PyObject * val = PyLong_FromLong(FFT::OUTPUT_FFT_SIZE);
     return val;
 }
 
 static PyObject *
 fft_histogram_max_hz(PyObject *self, PyObject *args) {
-    PyObject * val = PyLong_FromLong(OUTPUT_FFT_MAX_HZ);
+    PyObject * val = PyLong_FromLong(FFT::OUTPUT_FFT_MAX_HZ);
     return val;
 }
 

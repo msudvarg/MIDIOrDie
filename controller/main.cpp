@@ -1,115 +1,38 @@
-#include <stdio.h>
-#include <string.h>
 #include <signal.h>
 #include <getopt.h>
 #include <iostream>
-#include <complex>
-#include <cmath>
-#include <iterator>
-#include <vector>
 #include "portaudio.h"
 
-#include "common.h" //FFT parameters and shared data structure
-#include "shared_memory.h" //Shared memory wrapper
 #include "socket/socket.h" //Socket wrapper
-#include "socket_helpers.h" //Functions to pass to socket connections
+#include "socket_manifest.h" //Functions to pass to socket connections
 #include "shared_array.h" //Thread-safe array
+#include "fft.h"
+#include "poller.h"
 
 using namespace std;
 
-const double PI = 3.1415926536;
-static float sample_data[WINDOW_SIZE];
-complex<double> complexInputBuffer[WINDOW_SIZE];
-complex<double> complexOutputBuffer[WINDOW_SIZE];
-double finalOutputBuffer[WINDOW_SIZE];
-static bool dataAvailable = false;
-static int count = 0;
-
-//Thread-safe array to send FFT data over socket
-Shared_Array<double,WINDOW_SIZE> sharedArray;
-
-
-unsigned int bitReverse(unsigned int x, int log2n) {
-    int n = 0;
-    int mask = 0x1;
-    for (int i=0; i < log2n; i++) {
-      n <<= 1;
-      n |= (x & 1);
-      x >>= 1;
-    }
-    return n;
-}
-
-template<class Iter_T>
-void fft(Iter_T a, Iter_T b, int log2n)
-{
-    typedef typename iterator_traits<Iter_T>::value_type complex;
-    const complex J(0, 1);
-    unsigned int n = 1 << log2n;
-    for (unsigned int i=0; i < n; ++i) {
-        b[bitReverse(i, log2n)] = a[i];
-    }
-    for (int s = 1; s <= log2n; ++s) {
-        unsigned int m = 1 << s;
-        unsigned int m2 = m >> 1;
-        complex w(1, 0);
-        complex wm = exp(-J * (PI / m2));
-        for (unsigned int j=0; j < m2; ++j) {
-            for (unsigned int k=j; k < n; k += m) {
-                complex t = w * b[k + m2];
-                complex u = b[k];
-                b[k] = u + t;
-                b[k + m2] = u - t;
-            }
-            w *= wm;
-        }
-    }
-}
-
-
-template<class Iter_T>
-double* getMag(Iter_T a, double* b, int length)
-{
-    typedef typename iterator_traits<Iter_T>::value_type complex;
-
-    for(int i = 0; i < length; i++) {
-        b[i] = sqrt(a[i].real()*a[i].real() + a[i].imag()*a[i].imag());
-    }
-
-    return b;
-}
-
-template<class Iter_T>
-Iter_T hilbert_function(Iter_T a);
-
-// This takes the first derivative and returns the index of every rising edge event over the specified threshhold.
-// Used for finding attack events
-template<class Iter_T>
-std::vector<int> get_cliffs(Iter_T a, double threshhold);
-
-static int patestCallback( const void *inputBuffer, void *outputBuffer,
-            unsigned long framesPerBuffer,
-            const PaStreamCallbackTimeInfo* timeInfo,
-            PaStreamCallbackFlags statusFlags,
-            void *userData )
-{
-    std::cout << "Callback called" << std::endl;
-    if (framesPerBuffer < WINDOW_SIZE) return -1;
-
-    count++;
-
-    memcpy(userData, inputBuffer, framesPerBuffer * sizeof(float));
-
-    dataAvailable = true;
-
-    return 0;
-}
+FFT fft;
 
 //Destructors not correctly called if program interrupted
 //Use a signal handler and quit flag instead
-sig_atomic_t quit = 0;
 void sigint_handler(int signum) {
-    quit = 1;
+    fft.end();
+}
+
+
+void socket_send(Socket::Connection * client) {
+    
+    //TODO: What's our send rate?
+    Poller poller(50); //50 ms?
+
+    //Copy shared array to local array
+    FFT::Shared_Array_t::array_type localArray = fft.read();
+
+    //Send local array over socket
+    client->send(
+        localArray.data(),
+        sizeof(FFT::Shared_Array_t::value_type) * FFT::Shared_Array_t::size);
+
 }
 
 int main(int argc, char** argv) {
@@ -118,6 +41,8 @@ int main(int argc, char** argv) {
     struct sigaction sa;
     sa.sa_handler = sigint_handler;
     sigaction(SIGINT,&sa,NULL);
+
+
 
     int opt;
     bool forever = false;
@@ -142,126 +67,43 @@ int main(int argc, char** argv) {
         }
     }
 
-    //Create socket to send data
-    //TODO: Pass max_hz and bucket_hz as well
-    Socket::Client socket {ipaddr.c_str(), PORTNO, socket_send};
+    //Exception handling
+
+    try {
+
+        fft.init();
+
+        //Create socket to send data
+        //Keep looping on connection error in case server has not been set up
+        while(true) {
+            try {
+                Socket::Client socket {ipaddr.c_str(), PORTNO, socket_send};
+            }
+            catch (Socket::Connection_Error &) { continue; }
+            break;
+        }
+
+        fft.run(forever);
+
+    }
+    catch (PaError ret) {
+        return ret;
+    }
+    catch (int ret) {
+        return ret;
+    }
+    catch (std::exception & e) {
+        std::cerr << e.what() << std::endl;
+    }
+    catch (...) {
+        std::cerr << "Unknown exception! "<< std::endl;
+        return -1;
+    }
     
     //Create shared memory for visualization
     //Shared_Memory<Shared_Buffer> sharedBuffer {"fftData"};
 
-    std::cout << "Sample rate: " << SAMPLE_RATE << "Hz" << std::endl
-        << "Precision: " << DELTA_HZ << "Hz" << std::endl
-        << "Desired rolling window Latency: " << WINDOW_LATENCY_MS << "ms" << std::endl
-        << "Samples per rolling window: " << WINDOW_SIZE << std::endl;
 
-    PaError err = Pa_Initialize();
-    if (err != paNoError) {
-        printf(  "PortAudio error: %s\n", Pa_GetErrorText( err ) );
-        return err;
-    }
-
-    PaStream *stream;
-    /* Open an audio I/O stream. */
-    err = Pa_OpenDefaultStream( &stream,
-                                1,          /* 1 input channel */
-                                0,          /* no output */
-                                paFloat32,  /* 32 bit floating point output */
-                                SAMPLE_RATE,
-                                WINDOW_SIZE,/* frames per buffer, i.e. the number
-                                            of sample frames that PortAudio will
-                                            request from the callback. Many apps
-                                            may want to use
-                                            paFramesPerBufferUnspecified, which
-                                            tells PortAudio to pick the best,
-                                            possibly changing, buffer size.*/
-                                patestCallback, /* this is your callback function */
-                                &sample_data ); /*This is a pointer that will be passed to
-                                                   your callback*/
-    if( err != paNoError ) {
-        printf(  "PortAudio error: %s\n", Pa_GetErrorText( err ) );
-        return err;
-    }
-
-    /* Start stream */
-    err = Pa_StartStream( stream );
-    if( err != paNoError ) {
-        printf(  "PortAudio error: %s\n", Pa_GetErrorText( err ) );
-        return err;
-    }
-
-    /* Sleep for a bit to collect data */
-    Pa_Sleep(1000);
-
-    // TODO: Program here (What program?)
-    for(int i = 0; i < 1000 && !quit; forever ? i : i++) {
-        while(!dataAvailable) {
-            std::cout << "Looping..." << std::endl;
-            usleep(5000);
-        }
-
-
-        // Copy latest sample into rolling window
-        for(int i = 0; i < WINDOW_SIZE; i++) {
-            complexInputBuffer[i] = complex<double>(sample_data[i], 0);
-        }
-        dataAvailable = false;
-
-        // Perform fft
-        fft(complexInputBuffer, complexOutputBuffer, log2(WINDOW_SIZE));
-        getMag(complexOutputBuffer, finalOutputBuffer, WINDOW_SIZE);
-
-        std::cout << "Performed fft" << std::endl;
-
-        // Little bit of stats collection
-        double max0=0, max1=0, max2=0;
-        int max0_ind=0, max1_ind=0, max2_ind=0;
-        for(int i = 0; i < WINDOW_SIZE/2; i++) {
-            if(finalOutputBuffer[i] > max0) {
-                max2 = max1;
-                max2_ind = max1_ind;
-                max1 = max0;
-                max1_ind = max0_ind;
-                max0 = finalOutputBuffer[i];
-                max0_ind = i;
-            } else if(finalOutputBuffer[i] > max1) {
-                max2 = max1;
-                max2_ind = max1_ind;
-                max1 = finalOutputBuffer[i];
-                max1_ind = i;
-            } else if(finalOutputBuffer[i] > max2) {
-                max2 = finalOutputBuffer[i];
-                max2_ind = i;
-            }
-        }
-        float bucket_size = (float)SAMPLE_RATE / WINDOW_SIZE;
-        std::cout << "Largest frequency: " << bucket_size * (max0_ind+1) << "Hz" << std::endl
-              << "2nd largest frequency: " << bucket_size * (max1_ind+1) << "Hz" << std::endl
-              << "3rd largest frequency: " << bucket_size * (max2_ind+1) << "Hz" << std::endl << std::endl;
-
-
-        //Copy FFT values to shared array
-        sharedArray.write(finalOutputBuffer);
-    }
-    std::cout << "Number of callbacks: " << count << std::endl;
-
-    /* Stop stream */
-    err = Pa_StopStream(stream);
-    if( err != paNoError ) {
-        printf(  "PortAudio error: %s\n", Pa_GetErrorText( err ) );
-        return err;
-    }
-
-    /* Close program */
-    err = Pa_CloseStream(stream);
-    if( err != paNoError ) {
-        printf(  "PortAudio error: %s\n", Pa_GetErrorText( err ) );
-        return err;
-    }
-    err = Pa_Terminate();
-    if( err != paNoError ) {
-        printf(  "PortAudio error: %s\n", Pa_GetErrorText( err ) );
-        return err;
-    }
 
     return 0;    
 }
