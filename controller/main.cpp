@@ -81,7 +81,10 @@ int main(int argc, char** argv) {
             try {
                 Socket::Client socket {ipaddr.c_str(), PORTNO, socket_send};
             }
-            catch (Socket::Connection_Error &) { continue; }
+            catch (Socket::Connection_Error &) {
+                Poller poller (1000); //Wait 1 second between connection attempts
+                continue;
+            }
             break;
         }
 
