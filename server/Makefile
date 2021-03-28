@@ -3,7 +3,7 @@ LIBS = -lrt -L../socket -lsocket `pkg-config --libs portaudiocpp rtmidi`
 SOCKET = ../socket/libsocket.a
 FFT2MIDIDIR = ../fft2midi
 FFT2MIDI = $(FFT2MIDIDIR)/fft2midi.o
-FFT2MIDIOBJS = $(FFT2MIDIDIR)/midi.o $(FFT2MIDIDIR)/tone.o
+FFT2MIDIOBJS = $(FFT2MIDIDIR)/midi.o $(FFT2MIDIDIR)/tone.o $(FFT2MIDIDIR)/portbroker.o
 
 all: server
 

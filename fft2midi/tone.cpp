@@ -290,6 +290,10 @@ std::string Tone::GetNoteName(int note) {
     case 11:
       return "B" + std::to_string(octave);
       break;
+    
+    //Should never get here:
+    default:
+      return "";
   }
 }
 

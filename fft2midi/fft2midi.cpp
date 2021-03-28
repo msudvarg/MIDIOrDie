@@ -2,14 +2,15 @@
 #include <algorithm>
 #include <unistd.h>
 
-#include "../fft/fft.h"
 #include "fft2midi.h"
 
 bool done = false;
 
-Desynthesizer::Desynthesizer(int _port, bool _drum, bool _all) :
-  port (_port),
-  drum (_drum),
+Desynthesizer::Desynthesizer(const Port & port, bool _all):
+  Desynthesizer(port.get_port(), port.get_drum(), _all)
+  {}
+
+Desynthesizer::Desynthesizer(unsigned int port, bool drum, bool _all) :
   all (_all),
   tone (FFT::WINDOW_SIZE, FFT::OUTPUT_FFT_MAX_HZ)
 {

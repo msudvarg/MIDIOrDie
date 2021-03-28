@@ -1,6 +1,6 @@
 CXXFLAGS = -g `pkg-config --cflags rtmidi` #-Ilocalcontroller
 LDFLAGS = `pkg-config --libs rtmidi` -lportaudio # -Llocalcontroller -llc -lfftw3 -Wl,-R,localcontroller
-OBJS = fft2midi.o midi.o tone.o
+OBJS = fft2midi.o midi.o tone.o portbroker.o
 
 all: fft2midi.o
 

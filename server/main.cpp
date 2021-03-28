@@ -11,10 +11,9 @@
 #include "../include/poller.h"
 #include "../fft2midi/fft2midi.h"
 
-//If drum is specified, only first client gets the drum
-std::mutex drumlock;
-bool drum = false;
+PortBroker portbroker;
 
+bool drum = false;
 bool all = false;
 
 //Destructors not correctly called if program interrupted
@@ -27,19 +26,9 @@ void sigint_handler(int signum) {
 
 void socket_recv(Socket::Connection * client) {
 
-    bool localdrum;
+    Port port(portbroker, drum);
 
-    //Obtain the drum
-    {
-        std::lock_guard<std::mutex> lk {drumlock};
-        localdrum = drum;
-        if (localdrum) drum = false;
-    }
-
-    //Hacky, but should work if there aren't too many clients or other open file descriptors
-    int port = client->get_cfd() - 4;
-
-    Desynthesizer desynth {port, drum, all};
+    Desynthesizer desynth {port, all};
     FFT::Shared_Array_t::array_type & fft_data = desynth.fft_data;
 
     //Loop and do stuff
@@ -54,12 +43,6 @@ void socket_recv(Socket::Connection * client) {
 
         desynth.run();
 
-    }
-
-    //Give back the drum on disconnect
-    {
-        std::lock_guard<std::mutex> lk {drumlock};
-        if (localdrum) drum = true;
     }
 
 }

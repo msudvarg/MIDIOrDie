@@ -2,6 +2,7 @@
 
 #include "tone.h"
 #include "midi.h"
+#include "portbroker.h"
 #include "../fft/fft.h"
 
 class Desynthesizer {
@@ -10,8 +11,6 @@ private:
     MidiStream ms;
     FreqList old_peaks;
     Tone tone;
-    int port;
-    bool drum;
     bool all;
 
 public:
@@ -20,7 +19,8 @@ public:
 
     void run();
 
-    Desynthesizer(int _port, bool _drum, bool _all);
+    Desynthesizer(const Port & port, bool _all);
+    Desynthesizer(unsigned int port, bool drum, bool _all);
     ~Desynthesizer() = default;
 
 };
