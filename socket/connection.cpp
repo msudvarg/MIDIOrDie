@@ -1,3 +1,6 @@
+#include <exception>
+#include <iostream>
+
 #include "connection.h"
 
 namespace Socket {
@@ -40,7 +43,15 @@ Connection::~Connection() {
 
 //Run registered function
 void Connection::run() {
-    f(this);
+    try {
+        f(this);
+    }
+    catch (std::exception & e) {
+        std::cerr << e.what() << std::endl;
+    }
+    catch (...) {
+        std::cerr << "Unknown exception! "<< std::endl;
+    }
 }
 
 //Send data over socket
