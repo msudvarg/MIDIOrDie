@@ -111,8 +111,6 @@ void FFT::init() {
 
 void FFT::run() {
 
-    PaError err;
-
     while(!dataAvailable) {
         std::cout << "Looping..." << std::endl;
         usleep(5000);

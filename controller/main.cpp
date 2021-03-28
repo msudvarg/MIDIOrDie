@@ -2,13 +2,12 @@
 #include <getopt.h>
 #include <iostream>
 #include <memory>
-#include "portaudio.h"
 
 #include "../include/manifest.h"
 #include "../socket/socket.h" //Socket wrapper
 #include "../include/shared_array.h" //Thread-safe array
 #include "../include/poller.h"
-#include "fft.h"
+#include "../fft/fft.h"
 
 FFT fft;
 

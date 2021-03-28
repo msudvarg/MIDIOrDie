@@ -8,7 +8,7 @@
 #include "../socket/socket.h" //Socket wrapper
 #include "../include/shared_array.h" //Thread-safe array
 #include "../include/poller.h"
-#include "fft.h"
+#include "../fft/fft.h"
 
 //Specific to test.cpp
 #include <random>

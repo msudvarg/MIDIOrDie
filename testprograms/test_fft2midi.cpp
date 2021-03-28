@@ -1,18 +1,22 @@
+
 #include <signal.h>
 #include <getopt.h>
 #include <iostream>
 #include <thread>
-#include "portaudio.h"
 
 #include "../include/manifest.h"
-#include "../socket/socket.h" //Socket wrapper
 #include "../include/shared_array.h" //Thread-safe array
 #include "../include/poller.h"
+#include "../fft/fft.h"
 #include "../fft2midi/fft2midi.h"
+
+bool forever = false;
 
 int port = 0;
 bool drum = false;
 bool all = false;
+
+FFT fft;
 
 //Destructors not correctly called if program interrupted
 //Use a signal handler and quit flag instead
@@ -21,27 +25,32 @@ void sigint_handler(int signum) {
     quit = 1;
 }
 
+void run_fft() {
+    
+    //FFT loop
+    for(int i = 0; i < 1000 && !quit; forever ? i : i++) {
+        Poller poller(polling_freq);
+        fft.run();
+    }
+}
 
-void socket_recv(Socket::Connection * client) {
+void run_desynth() {
 
     Desynthesizer desynth {port, drum, all};
-    FFT::Shared_Array_t::array_type & fft_data = desynth.fft_data;
 
-    //Loop and do stuff
-    while(client->isrunning()) {
-        
+    //Desynth loop
+    for(int i = 0; i < 1000 && !quit; forever ? i : i++) {
         Poller poller(polling_freq);
 
-        //Read from socket into MIDIExtraction object
-        client->recv(
-            fft_data.data(),
-            sizeof(FFT::Shared_Array_t::value_type) * FFT::Shared_Array_t::size);
+        //Copy FFT data to desynth array
+        desynth.fft_data = fft.read();
 
         desynth.run();
 
     }
 
 }
+
 
 int main(int argc, char** argv) {
 
@@ -50,35 +59,41 @@ int main(int argc, char** argv) {
     sa.sa_handler = sigint_handler;
     sigaction(SIGINT,&sa,NULL);
 
-    //Get command-line options
-    //TODO: Add command-line options for MIDIExtraction
     int opt;
-  
-    while((opt = getopt(argc, argv, "adp:")) != -1) {
+
+    //Get command-line options
+    while((opt = getopt(argc, argv, "fadp:")) != -1) {
         switch(opt) {
-            case 'a':
-                all = true;
-                break;
-            case 'p':
-                port = atoi(optarg);
-                break;
-            case 'd':
-                drum = true;
-                break;
+
+        //Run forever
+        case 'f':
+            forever = true;
+            break;
+
+        case 'a':
+            all = true;
+            break;
+        case 'p':
+            port = atoi(optarg);
+            break;
+        case 'd':
+            drum = true;
+            break;
         }
     }
 
     //Exception handling
 
     try {
-        
-        //Socket server to receive FFT data from client
-        static Socket::Server socket_server {IPADDR, PORTNO, socket_recv};
 
-        while(!quit) {
-            //Socket connections handle everything
-            std::this_thread::yield();
-        }
+        fft.init();
+
+        std::thread thread_fft {run_fft};
+        std::thread thread_desynth {run_desynth};
+        thread_fft.join();
+        thread_desynth.join();
+        
+        fft.end();
 
     }
     catch (PaError ret) {

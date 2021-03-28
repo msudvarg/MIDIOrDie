@@ -14,7 +14,7 @@ void MidiStream::Init() {
 }
 
 void MidiStream::Init(int port) {
-  for (int i = 0; i < midiout.getPortCount(); i++) {
+  for (unsigned int i = 0; i < midiout.getPortCount(); i++) {
     std::cout << i << ": " << midiout.getPortName(i) << std::endl;
   }
   midiout.openPort(port);

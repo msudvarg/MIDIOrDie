@@ -1,18 +1,14 @@
-all: socket controller server
+all: controller server
 
-socket: ../socket/libsocket.a
-../socket/libsocket.a:
-	$(MAKE) -C socket
-
-controller: controller/main.o controller/fft.o
+controller: controller/main.o
 	$(MAKE) -C controller
 
 server: server/main.o
 	$(MAKE) -C server
 
-
 clean:
 	-rm *.so
 	-rm *.o
-	$(MAKE) -C socket clean
 	$(MAKE) -C controller clean
+	$(MAKE) -C server clean
+	$(MAKE) -C testprograms clean

@@ -1,12 +1,15 @@
-CXXFLAGS = -g `pkg-config --cflags rtmidi` -Ilocalcontroller
-LDFLAGS = `pkg-config --libs rtmidi` -Llocalcontroller -llc -lportaudio -lfftw3 -Wl,-R,localcontroller
-OBJS = midi2keypress.o midi.o tone.o
+CXXFLAGS = -g `pkg-config --cflags rtmidi` #-Ilocalcontroller
+LDFLAGS = `pkg-config --libs rtmidi` -lportaudio # -Llocalcontroller -llc -lfftw3 -Wl,-R,localcontroller
+OBJS = fft2midi.o midi.o tone.o
 
-all: midi2keypress
-midi2keypress: $(OBJS) localcontroller/liblc.so
+all: fft2midi.o
+
+fft2midi:
 	$(CXX) -o $@ $(OBJS) $(LDFLAGS) 
-localcontroller/liblc.so:
-	$(MAKE) -C localcontroller liblc.so
+
+#localcontroller/liblc.so:
+#	$(MAKE) -C localcontroller liblc.so
+
 clean:
 	-rm *.so
 	-rm *.o

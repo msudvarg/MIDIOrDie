@@ -1,7 +1,7 @@
 #ifndef MIDI_H
 #define MIDI_H
 
-#include <RtMidi.h>
+#include "../rtmidi/RtMidi.h"
 
 class MidiStream {
 public:

@@ -3,9 +3,9 @@
 #include <iostream>
 
 
-Tone::Tone() : Tone (WINDOW_SIZE, OUTPUT_FFT_MAX_HZ, 20.0) {}
+Tone::Tone() : Tone (FFT::WINDOW_SIZE, FFT::OUTPUT_FFT_MAX_HZ, 20.0) {}
 
-Tone::Tone(double threshold) : Tone(WINDOW_SIZE, OUTPUT_FFT_MAX_HZ, threshold) {}
+Tone::Tone(double threshold) : Tone(FFT::WINDOW_SIZE, FFT::OUTPUT_FFT_MAX_HZ, threshold) {}
 
 Tone::Tone(int fft_size, int max_hz) : Tone(fft_size, max_hz, 20.0) {}
 
@@ -60,7 +60,7 @@ int Tone::GetPeakPitch() {
           idx = i;
       }
     }
-    return FreqToNote(idx * DELTA_HZ);
+    return FreqToNote(idx * FFT::DELTA_HZ);
 }
 
 // Finds peaks in fft (defined as any bucket above 7th octile) and returns list of ints
@@ -68,15 +68,15 @@ int Tone::GetPeakPitch() {
 FreqList Tone::GetPeakPitches() {
   FreqList peaks;
 
-  std::vector<double> arr = std::vector<double>(interval, interval + OUTPUT_FFT_SIZE);
+  std::vector<double> arr = std::vector<double>(interval, interval + FFT::OUTPUT_FFT_SIZE);
   std::sort(arr.begin(), arr.end());
 
   double threshold = arr.data()[7*arr.size()/8];
 
   for(int i = 1; i < fft_size; i++) {
     if (interval[i] > threshold) {
-      int bottom_note = FreqToNote(i * DELTA_HZ, 1);
-      int top_note = FreqToNote((i+1) * DELTA_HZ, -1);
+      int bottom_note = FreqToNote(i * FFT::DELTA_HZ, 1);
+      int top_note = FreqToNote((i+1) * FFT::DELTA_HZ, -1);
 
       for(int j = bottom_note; j <= top_note; j++) {
         peaks.push_back(j);
@@ -101,7 +101,6 @@ void Tone::InterpolateAlias(double* a, double* b, int lenA, int lenB) {
   double dummy;
 
   for(int i = 0; i < lenB - 1; i++) {
-    double j = i * interpolation_factor;
     int lower_ind = (int)std::floor(i * interpolation_factor);
     double lower_weight = 1 - std::modf(i * interpolation_factor, &dummy);
     int upper_ind = (int)std::floor((i+1) * interpolation_factor);
@@ -125,13 +124,13 @@ void Tone::SetSignature(std::vector<double> sig) {
 
 /* Interpolates signature of arbitrary length into local storage for later use */
 void Tone::SetSignature(double* sig, int length) {
-  int fundamental_bin = OUTPUT_FFT_SIZE / 8;    // signature array needs to fit 8 harmonics,
+  int fundamental_bin = FFT::OUTPUT_FFT_SIZE / 8;    // signature array needs to fit 8 harmonics,
                                                 // so align fundamental frequency 8th of way along array
-  InterpolateAlias(sig, signature, length, OUTPUT_FFT_SIZE);
+  InterpolateAlias(sig, signature, length, FFT::OUTPUT_FFT_SIZE);
 }
 
 void Tone::DummySignature() {
-  for(int i = 0; i < OUTPUT_FFT_SIZE; i++) {
+  for(int i = 0; i < FFT::OUTPUT_FFT_SIZE; i++) {
     signature[i] = -50;
   }
 
@@ -178,11 +177,11 @@ FreqList Tone::ExtractSignatures(FreqList primers) {
   FreqList found;
   double bucket_size = max_hz / fft_size;
 
-  double fftcopy[OUTPUT_FFT_SIZE];
-  memcpy(fftcopy, interval, OUTPUT_FFT_SIZE * sizeof(double));
+  double fftcopy[FFT::OUTPUT_FFT_SIZE];
+  memcpy(fftcopy, interval, FFT::OUTPUT_FFT_SIZE * sizeof(double));
 
   for(int f : primers) {
-    if (f < FreqToNote(OUTPUT_FFT_MAX_HZ)) {
+    if (f < FreqToNote(FFT::OUTPUT_FFT_MAX_HZ)) {
       if (GetFrequencyPower(f, fftcopy, false) > 0) {
         found.push_back(f);
       }
@@ -199,16 +198,16 @@ double Tone::GetFrequencyPower(int note, double* fft, bool remove) {
   double hz = NoteToFreq(note);
 
   double scaling_factor = hz / NORMAL_HZ;
-  int numBins = (int)(OUTPUT_FFT_SIZE * scaling_factor);
+  int numBins = (int)(FFT::OUTPUT_FFT_SIZE * scaling_factor);
   if (numBins < 0) return 0;
   double* noteSig = (double*)malloc(numBins * sizeof(double));
 
-  InterpolateAlias(signature, noteSig, OUTPUT_FFT_SIZE, numBins);
+  InterpolateAlias(signature, noteSig, FFT::OUTPUT_FFT_SIZE, numBins);
 
   double gain = INFINITY;
   int matches = 0;
 
-  for(int i = 0; i < numBins && i < OUTPUT_FFT_SIZE; i++) {
+  for(int i = 0; i < numBins && i < FFT::OUTPUT_FFT_SIZE; i++) {
     if (fft[i] > noteSig[i]) {
       matches++;
       if (fft[i] - noteSig[i] < gain) {
@@ -218,13 +217,13 @@ double Tone::GetFrequencyPower(int note, double* fft, bool remove) {
   }
 
   if (matches <
-        MATCH_CONFIDENCE * ((numBins > OUTPUT_FFT_SIZE) ? OUTPUT_FFT_SIZE : numBins)) {
+        MATCH_CONFIDENCE * ((numBins > FFT::OUTPUT_FFT_SIZE) ? FFT::OUTPUT_FFT_SIZE : numBins)) {
     free(noteSig);
     return 0;
   }
 
   if (remove) {
-    for(int i = 0; i < numBins && i < OUTPUT_FFT_SIZE; i++) {
+    for(int i = 0; i < numBins && i < FFT::OUTPUT_FFT_SIZE; i++) {
       fft[i] -= gain*noteSig[i];
     }
   }

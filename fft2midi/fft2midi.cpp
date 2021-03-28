@@ -2,17 +2,18 @@
 #include <algorithm>
 #include <unistd.h>
 
+#include "../fft/fft.h"
 #include "fft2midi.h"
 
 bool done = false;
 
-Desynthesizer(int _port, bool _drum, bool _all) :
+Desynthesizer::Desynthesizer(int _port, bool _drum, bool _all) :
   port (_port),
   drum (_drum),
   all (_all),
-  tone (WINDOW_SIZE, OUTPUT_FFT_MAX_HZ)
+  tone (FFT::WINDOW_SIZE, FFT::OUTPUT_FFT_MAX_HZ)
 {
-  ms.init(port);
+  ms.Init(port);
   if (drum) {
     ms.ChangeChannel(9);
   }

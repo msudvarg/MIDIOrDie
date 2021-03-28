@@ -7,7 +7,7 @@
 #include "../socket/socket.h" //Socket wrapper
 #include "../include/shared_array.h" //Thread-safe array
 #include "../include/poller.h"
-#include "fft.h"
+#include "../fft/fft.h"
 
 //Thread-safe array to receive FFT data from socket
 FFT::Shared_Array_t sharedArray;
@@ -20,12 +20,12 @@ void socket_recv(Socket::Connection * client) {
         Poller poller(polling_freq);
 
         //Declare local array
-        decltype(sharedArray)::array_type localArray;
+        FFT::Shared_Array_t::array_type localArray;
 
         //Read from socket into local array
         client->recv(
             localArray.data(),
-            sizeof(decltype(sharedArray)::value_type) * decltype(sharedArray)::size);
+            sizeof(FFT::Shared_Array_t::value_type) * FFT::Shared_Array_t::size);
 
         //Copy local array to shared array
         sharedArray.write(localArray);
