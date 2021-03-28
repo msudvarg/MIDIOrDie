@@ -2,6 +2,7 @@
 #include <getopt.h>
 #include <iostream>
 #include <thread>
+#include <mutex>
 #include "portaudio.h"
 
 #include "../include/manifest.h"
@@ -10,8 +11,10 @@
 #include "../include/poller.h"
 #include "../fft2midi/fft2midi.h"
 
-int port = 0;
+//If drum is specified, only first client gets the drum
+std::mutex drumlock;
 bool drum = false;
+
 bool all = false;
 
 //Destructors not correctly called if program interrupted
@@ -23,6 +26,18 @@ void sigint_handler(int signum) {
 
 
 void socket_recv(Socket::Connection * client) {
+
+    bool localdrum;
+
+    //Obtain the drum
+    {
+        std::lock_guard<std::mutex> lk {drumlock};
+        localdrum = drum;
+        if (localdrum) drum = false;
+    }
+
+    //Hacky, but should work if there aren't too many clients or other open file descriptors
+    int port = client->get_cfd() - 4;
 
     Desynthesizer desynth {port, drum, all};
     FFT::Shared_Array_t::array_type & fft_data = desynth.fft_data;
@@ -41,6 +56,12 @@ void socket_recv(Socket::Connection * client) {
 
     }
 
+    //Give back the drum on disconnect
+    {
+        std::lock_guard<std::mutex> lk {drumlock};
+        if (localdrum) drum = true;
+    }
+
 }
 
 int main(int argc, char** argv) {
@@ -54,13 +75,10 @@ int main(int argc, char** argv) {
     //TODO: Add command-line options for MIDIExtraction
     int opt;
   
-    while((opt = getopt(argc, argv, "adp:")) != -1) {
+    while((opt = getopt(argc, argv, "ad:")) != -1) {
         switch(opt) {
             case 'a':
                 all = true;
-                break;
-            case 'p':
-                port = atoi(optarg);
                 break;
             case 'd':
                 drum = true;

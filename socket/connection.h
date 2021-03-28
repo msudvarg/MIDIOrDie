@@ -27,6 +27,8 @@ public:
     //Check running status
     bool isrunning() const { return running; }
 
+    //Get cfd
+    int get_cfd() const { return cfd; }
 
     //Constructor
     Connection(
