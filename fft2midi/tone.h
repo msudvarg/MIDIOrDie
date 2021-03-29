@@ -28,11 +28,15 @@ constexpr double NORMAL_HZ = FFT::OUTPUT_FFT_MAX_HZ / HARMONICS;   // The signat
 
 class Tone {
 public:
+/*
   Tone();
   Tone(double threshold);
   Tone(int fft_size, int max_hz);
   Tone(int fft_size, int max_hz, double threshold);
   ~Tone();
+  */
+  Tone() = default;
+  ~Tone() = default;
   
   bool HasPitch(int frequency);
   double GetPitchStrength(int frequency);
@@ -58,9 +62,15 @@ public:
   void PrintFFT();
 
   FFT::Shared_Array_t::array_type interval;
-  //double* interval;
+  std::array<float,FFT::OUTPUT_FFT_SIZE> raw_audio;
+  std::array<double,FFT::OUTPUT_FFT_SIZE> signature;
+  
+  /*
+  double* interval;
   float* raw_audio;
   double signature[FFT::OUTPUT_FFT_SIZE];
+  */
+
 private:
 
   // Tries to find frequency in provided fft. Returns the gain detected compared to the signature amplitude.
@@ -73,7 +83,7 @@ private:
   double NoteToFreq(int note);
   int FreqToNote(double freq, int round=0);
 
-  double threshold;
+  double threshold = 20.0;
   int harmonics_captured = HARMONICS;
   int max_hz = FFT::OUTPUT_FFT_MAX_HZ;
   int fft_size = FFT::OUTPUT_FFT_SIZE;

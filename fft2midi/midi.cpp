@@ -9,11 +9,8 @@
 #define NOTE_OFF 0x80
 #define PC_CHANGE 0xC0
 
-void MidiStream::Init() {
-  Init(0);
-}
-
-void MidiStream::Init(int port) {
+MidiStream::MidiStream(int port) {
+  //port=0 as default in declaration
   midiout.openPort(port);
 }
 
@@ -38,13 +35,4 @@ void MidiStream::ChangeInstrument(unsigned char instrument) {
 
 void MidiStream::ChangeChannel(unsigned char channel) {
   this->channel = channel;
-}
-
-// frequency = 440 * 2^((n-69)/12)
-// n = lg(f/440) * 12 + 69
-
-#define LG_440 8.78135971352466f
-
-unsigned char Freq2Midi(int freq) {
-  return (unsigned char) freq;
 }

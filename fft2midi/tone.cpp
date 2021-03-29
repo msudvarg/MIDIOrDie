@@ -2,26 +2,33 @@
 #include <algorithm>
 #include <iostream>
 
-
+/*
 Tone::Tone() : Tone (FFT::WINDOW_SIZE, FFT::OUTPUT_FFT_MAX_HZ, 20.0) {}
 
 Tone::Tone(double threshold) : Tone(FFT::WINDOW_SIZE, FFT::OUTPUT_FFT_MAX_HZ, threshold) {}
 
 Tone::Tone(int fft_size, int max_hz) : Tone(fft_size, max_hz, 20.0) {}
 
-Tone::Tone(int fft_size, int max_hz, double threshold) {
+Tone::Tone(int _fft_size, int _max_hz, double _threshold) :
+  fft_size(_fft_size),
+  max_hz(_max_hz),
+  threshold(_threshold)
+{
   this->fft_size = fft_size;
   this->max_hz = max_hz;
   this->threshold = threshold;
 
-  //interval = new double[fft_size];
+  interval = new double[fft_size];
   raw_audio = new float[fft_size];     // NOTE: Dane, I dislike dynamically adjustable fft windows. Makes me nervous
 }
+*/
 
+/*
 Tone::~Tone() {
-  //delete [] interval;
+  delete [] interval;
   delete [] raw_audio;
 }
+*/
 
 double Tone::NoteToFreq(int note) {
   return C0_HZ * std::pow(SEMITONE, note - C0);
@@ -56,8 +63,8 @@ int Tone::GetPeakPitch() {
     double max = 0.0;
     int idx = 0;
     for (int i = 0; i < fft_size; i++) {
-      if (interval[i] > max) {
-          max = interval[i];
+      if (interval.at(i) > max) {
+          max = interval.at(i);
           idx = i;
       }
     }
@@ -76,7 +83,7 @@ FreqList Tone::GetPeakPitches() {
   double threshold = arr[7*arr.size()/8];
 
   for(int i = 1; i < fft_size; i++) {
-    if (interval[i] > threshold) {
+    if (interval.at(i) > threshold) {
       int bottom_note = FreqToNote(i * FFT::DELTA_HZ, 1);
       int top_note = FreqToNote((i+1) * FFT::DELTA_HZ, -1);
 
@@ -128,7 +135,7 @@ void Tone::SetSignature(std::vector<double> sig) {
 void Tone::SetSignature(double* sig, int length) {
   int fundamental_bin = FFT::OUTPUT_FFT_SIZE / 8;    // signature array needs to fit 8 harmonics,
                                                 // so align fundamental frequency 8th of way along array
-  InterpolateAlias(sig, signature, length, FFT::OUTPUT_FFT_SIZE);
+  InterpolateAlias(sig, signature.data(), length, signature.size());
 }
 
 void Tone::DummySignature() {
@@ -204,7 +211,7 @@ double Tone::GetFrequencyPower(int note, double* fft, bool remove) {
   if (numBins < 0) return 0;
   double* noteSig = (double*)malloc(numBins * sizeof(double));
 
-  InterpolateAlias(signature, noteSig, FFT::OUTPUT_FFT_SIZE, numBins);
+  InterpolateAlias(signature.data(), noteSig, signature.size(), numBins);
 
   double gain = INFINITY;
   int matches = 0;
@@ -301,7 +308,7 @@ std::string Tone::GetNoteName(int note) {
 
 void Tone::PrintFFT() {
   for(int i = 0; i < 20; i++) {
-    for(int j = -10; j < interval[i]; j++)
+    for(int j = -10; j < interval.at(i); j++)
       std::cout << "*";
     std::cout << std::endl;
   }

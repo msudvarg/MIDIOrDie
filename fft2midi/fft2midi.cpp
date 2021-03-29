@@ -7,11 +7,11 @@
 bool done = false;
 
 Desynthesizer::Desynthesizer(int port, unsigned int channel, bool _all) :
-  all (_all),
-  tone (FFT::WINDOW_SIZE, FFT::OUTPUT_FFT_MAX_HZ)
+  ms (port),
+  //tone (FFT::WINDOW_SIZE, FFT::OUTPUT_FFT_MAX_HZ),
+  all (_all)
 {
-  ms.Init(port);
-  ms.ChangeChannel(9);
+  ms.ChangeChannel(channel);
 
   tone.DummySignature();
 }
