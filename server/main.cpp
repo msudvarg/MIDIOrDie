@@ -10,9 +10,11 @@
 #include "../include/shared_array.h" //Thread-safe array
 #include "../include/poller.h"
 #include "../fft2midi/fft2midi.h"
+#include "channelbroker.h"
 
-PortBroker portbroker;
+ChannelBroker channel_broker;
 
+int port = 0;
 bool drum = false;
 bool all = false;
 
@@ -26,9 +28,9 @@ void sigint_handler(int signum) {
 
 void socket_recv(Socket::Connection * client) {
 
-    Port port(portbroker, drum);
+    Channel channel(channel_broker, drum);
 
-    Desynthesizer desynth {port, all};
+    Desynthesizer desynth {port, channel.get_channel(), all};
     FFT::Shared_Array_t::array_type & fft_data = desynth.fft_data;
 
     //Loop and do stuff
@@ -55,14 +57,16 @@ int main(int argc, char** argv) {
     sigaction(SIGINT,&sa,NULL);
 
     //Get command-line options
-    //TODO: Add command-line options for MIDIExtraction
     int opt;
   
-    while((opt = getopt(argc, argv, "ad:")) != -1) {
+    while((opt = getopt(argc, argv, "adp:")) != -1) {
         switch(opt) {
             case 'a':
                 all = true;
                 break;
+            case 'p':
+                port = atoi(optarg);
+            break;
             case 'd':
                 drum = true;
                 break;

@@ -2,7 +2,6 @@
 
 #include "tone.h"
 #include "midi.h"
-#include "portbroker.h"
 #include "../fft/fft.h"
 
 class Desynthesizer {
@@ -19,8 +18,7 @@ public:
 
     void run();
 
-    Desynthesizer(const Port & port, bool _all);
-    Desynthesizer(unsigned int port, bool drum, bool _all);
+    Desynthesizer(unsigned int port, unsigned int channel, bool _all);
     ~Desynthesizer() = default;
 
 };

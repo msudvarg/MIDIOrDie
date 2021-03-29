@@ -6,18 +6,12 @@
 
 bool done = false;
 
-Desynthesizer::Desynthesizer(const Port & port, bool _all):
-  Desynthesizer(port.get_port(), port.get_drum(), _all)
-  {}
-
-Desynthesizer::Desynthesizer(unsigned int port, bool drum, bool _all) :
+Desynthesizer::Desynthesizer(unsigned int port, unsigned int channel, bool _all) :
   all (_all),
   tone (FFT::WINDOW_SIZE, FFT::OUTPUT_FFT_MAX_HZ)
 {
   ms.Init(port);
-  if (drum) {
-    ms.ChangeChannel(9);
-  }
+  ms.ChangeChannel(9);
 
   tone.DummySignature();
 }
