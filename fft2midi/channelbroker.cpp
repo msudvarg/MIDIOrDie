@@ -45,6 +45,7 @@ void ChannelBroker::freeChannel (unsigned int channel) {
 ChannelBroker::ChannelBroker() {
     RtMidiOut midiout;
     unsigned int port_count = midiout.getPortCount();
+    std::cout << "There are " << port_count << " MIDI ports" << std::endl;
     for (unsigned int i = 0; i < port_count; i++) {
         std::cout << i << ": " << midiout.getPortName(i) << std::endl;
     }
