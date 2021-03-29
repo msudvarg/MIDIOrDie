@@ -6,7 +6,7 @@
 
 bool done = false;
 
-Desynthesizer::Desynthesizer(unsigned int port, unsigned int channel, bool _all) :
+Desynthesizer::Desynthesizer(int port, unsigned int channel, bool _all) :
   all (_all),
   tone (FFT::WINDOW_SIZE, FFT::OUTPUT_FFT_MAX_HZ)
 {

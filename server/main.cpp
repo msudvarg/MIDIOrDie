@@ -10,7 +10,7 @@
 #include "../include/shared_array.h" //Thread-safe array
 #include "../include/poller.h"
 #include "../fft2midi/fft2midi.h"
-#include "channelbroker.h"
+#include "../fft2midi/channelbroker.h"
 
 ChannelBroker channel_broker;
 

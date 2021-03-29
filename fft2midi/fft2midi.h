@@ -18,7 +18,7 @@ public:
 
     void run();
 
-    Desynthesizer(unsigned int port, unsigned int channel, bool _all);
+    Desynthesizer(int port, unsigned int channel, bool _all);
     ~Desynthesizer() = default;
 
 };
