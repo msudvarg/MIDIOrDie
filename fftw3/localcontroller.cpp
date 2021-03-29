@@ -79,6 +79,14 @@ void LocalController::GetData(double *fft_data_out, float *raw_audio_out) {
   mtx.unlock();
 }
 
+void LocalController::GetData(double *fft_data_out) {
+  mtx.lock();
+  for (int i = 0; i < n; i++) {
+    fft_data_out[i] = (double) fft_data[i];
+  }
+  mtx.unlock();
+}
+
 double LocalController::GetRefreshRate() {
   return 1.0 / Pa_GetStreamInfo(stream)->sampleRate / 1000.0;
 }

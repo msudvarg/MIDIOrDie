@@ -8,8 +8,10 @@
 #include "../include/shared_array.h" //Thread-safe array
 #include "../include/poller.h"
 #include "../fft/fft.h"
+#include "../fftw3/localcontroller.h"
 
-FFT fft;
+//FFT fft;
+LocalController lc;
 
 //Destructors not correctly called if program interrupted
 //Use a signal handler and quit flag instead
@@ -21,16 +23,21 @@ void sigint_handler(int signum) {
 
 void socket_send(Socket::Connection * client) {
 
+    double localArray[FFT::WINDOW_SIZE];
+
     while(client->isrunning()) {
         
         Poller poller(polling_freq);
 
         //Copy shared array to local array
-        FFT::Shared_Array_t::array_type localArray = fft.read();
+        //FFT::Shared_Array_t::array_type localArray = fft.read();
+
+        lc.GetData(localArray);
 
         //Send local array over socket
         client->send(
-            localArray.data(),
+            //localArray.data(),
+            localArray,
             sizeof(FFT::Shared_Array_t::value_type) * FFT::Shared_Array_t::size);
 
     }
@@ -73,7 +80,7 @@ int main(int argc, char** argv) {
         
         std::unique_ptr<Socket::Client> socket;
 
-        fft.init();
+        //fft.init();
 
         //Create socket to send data
         //Keep looping on connection error in case server has not been set up
@@ -89,13 +96,14 @@ int main(int argc, char** argv) {
             break;
         }
         
+        /*
         //FFT loop
         for(int i = 0; i < 1000 && !quit; forever ? i : i++) {
             Poller poller(polling_freq);
             fft.run();
         }
         
-        fft.end();
+        fft.end(); */
 
     }
     catch (PaError ret) {

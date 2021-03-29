@@ -13,6 +13,7 @@ public:
   LocalController();
   LocalController(int n, int sample_rate);
   void GetData(double *fft_data_out, float *raw_audio_out);
+  void GetData(double *fft_data_out);
   double GetRefreshRate();
   ~LocalController();
 private:
