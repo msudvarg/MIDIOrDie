@@ -111,9 +111,9 @@ void FFT::init() {
 
 void FFT::run() {
 
-    while(!dataAvailable) {
+    if(!dataAvailable) {
         std::cout << "Looping..." << std::endl;
-        usleep(5000);
+	break;
     }
 
     // Copy latest sample into rolling window
@@ -205,7 +205,7 @@ int FFT::patestCallback(
         const PaStreamCallbackTimeInfo* timeInfo,
         PaStreamCallbackFlags statusFlags )
 {
-    std::cout << "Callback called" << std::endl;
+    //std::cout << "Callback called" << std::endl;
     if (framesPerBuffer < WINDOW_SIZE) return -1;
 
     count++;
