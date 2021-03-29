@@ -29,7 +29,9 @@ void run_fft() {
     
     //FFT loop
     for(int i = 0; i < 1000 && !quit; forever ? i : i++) {
+
         Poller poller(polling_freq);
+
         fft.run();
     }
 }
@@ -40,6 +42,7 @@ void run_desynth() {
 
     //Desynth loop
     for(int i = 0; i < 1000 && !quit; forever ? i : i++) {
+
         Poller poller(polling_freq);
 
         //Copy FFT data to desynth array
