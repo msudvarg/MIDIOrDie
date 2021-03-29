@@ -1,5 +1,5 @@
-CPPFLAGS = -O2 -Wall `pkg-config --cflags portaudiocpp` -Ilocalcontroller
-LIBS = -lrt -L../socket -lsocket `pkg-config --libs portaudiocpp` -Llocalcontroller -llc -lfftw3 -Wl,-R,localcontroller
+CPPFLAGS = -O2 -Wall `pkg-config --cflags portaudiocpp` #-Ilocalcontroller
+LIBS = -lrt -L../socket -lsocket `pkg-config --libs portaudiocpp` -L../fftw3 -llc -lfftw3 -Wl,-R,localcontroller
 FFT = ../fft/fft.o
 FFTW3 = ../fftw3/liblc.so
 SOCKET = ../socket/libsocket.a
