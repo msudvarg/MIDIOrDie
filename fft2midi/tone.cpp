@@ -45,10 +45,11 @@ bool Tone::HasPitch(int frequency) {
 
 double Tone::GetPitchStrength(int frequency) {
     int index = (int) frequency * fft_size / max_hz;
-    if (index > fft_size) {
+    /*
+    if (index >= fft_size) {
 	throw "Frequency is outside of sampling range";
-    }
-    return interval[index];
+    }*/
+    return interval.at(index);
 }
 
 int Tone::GetPeakPitch() {
