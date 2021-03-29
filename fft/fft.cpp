@@ -113,7 +113,7 @@ void FFT::run() {
 
     if(!dataAvailable) {
         std::cout << "Looping..." << std::endl;
-	break;
+	    return;
     }
 
     // Copy latest sample into rolling window
