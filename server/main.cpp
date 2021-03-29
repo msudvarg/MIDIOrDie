@@ -31,7 +31,7 @@ void socket_recv(Socket::Connection * client) {
     Channel channel(channel_broker, drum);
 
     Desynthesizer desynth {port, channel.get_channel(), all};
-    FFT::Shared_Array_t::array_type & fft_data = desynth.fft_data;
+    FFT::Shared_Array_t::array_type & fft_data = desynth.fft_data();
 
     //Loop and do stuff
     while(client->isrunning()) {

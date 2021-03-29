@@ -46,7 +46,7 @@ void run_desynth() {
         Poller poller(polling_freq);
 
         //Copy FFT data to desynth array
-        desynth.fft_data = fft.read();
+        desynth.fft_data() = fft.read();
 
         desynth.run();
 

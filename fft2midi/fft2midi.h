@@ -14,7 +14,8 @@ private:
 
 public:
 
-    FFT::Shared_Array_t::array_type fft_data;
+    //FFT::Shared_Array_t::array_type fft_data;
+    FFT::Shared_Array_t::array_type & fft_data() { return tone.interval; }
 
     void run();
 

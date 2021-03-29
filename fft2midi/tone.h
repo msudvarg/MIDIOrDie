@@ -57,8 +57,8 @@ public:
 
   void PrintFFT();
 
-
-  double* interval;
+  FFT::Shared_Array_t::array_type interval;
+  //double* interval;
   float* raw_audio;
   double signature[FFT::OUTPUT_FFT_SIZE];
 private:

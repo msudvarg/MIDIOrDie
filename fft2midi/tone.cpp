@@ -14,12 +14,12 @@ Tone::Tone(int fft_size, int max_hz, double threshold) {
   this->max_hz = max_hz;
   this->threshold = threshold;
 
-  interval = new double[fft_size];
+  //interval = new double[fft_size];
   raw_audio = new float[fft_size];     // NOTE: Dane, I dislike dynamically adjustable fft windows. Makes me nervous
 }
 
 Tone::~Tone() {
-  delete [] interval;
+  //delete [] interval;
   delete [] raw_audio;
 }
 
@@ -68,10 +68,11 @@ int Tone::GetPeakPitch() {
 FreqList Tone::GetPeakPitches() {
   FreqList peaks;
 
-  std::vector<double> arr = std::vector<double>(interval, interval + FFT::OUTPUT_FFT_SIZE);
+  FFT::Shared_Array_t::array_type arr = interval;
+  //std::vector<double> arr = std::vector<double>(interval, interval + FFT::OUTPUT_FFT_SIZE);
   std::sort(arr.begin(), arr.end());
 
-  double threshold = arr.data()[7*arr.size()/8];
+  double threshold = arr[7*arr.size()/8];
 
   for(int i = 1; i < fft_size; i++) {
     if (interval[i] > threshold) {
@@ -178,7 +179,7 @@ FreqList Tone::ExtractSignatures(FreqList primers) {
   double bucket_size = max_hz / fft_size;
 
   double fftcopy[FFT::OUTPUT_FFT_SIZE];
-  memcpy(fftcopy, interval, FFT::OUTPUT_FFT_SIZE * sizeof(double));
+  memcpy(fftcopy, interval.data(), FFT::OUTPUT_FFT_SIZE * sizeof(double));
 
   for(int f : primers) {
     if (f < FreqToNote(FFT::OUTPUT_FFT_MAX_HZ)) {
