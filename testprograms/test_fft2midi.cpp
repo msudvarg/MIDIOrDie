@@ -9,6 +9,7 @@
 #include "../include/poller.h"
 #include "../fft/fft.h"
 #include "../fft2midi/fft2midi.h"
+#include "../fft2midi/channelbroker.h"
 
 bool forever = false;
 
@@ -17,6 +18,7 @@ bool drum = false;
 bool all = false;
 
 FFT fft;
+ChannelBroker channels;
 
 //Destructors not correctly called if program interrupted
 //Use a signal handler and quit flag instead

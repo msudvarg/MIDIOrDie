@@ -4,7 +4,7 @@ SWIG = swig
 FFT = ../fft/fft.o
 SOCKET = ../socket/libsocket.a
 FFT2MIDIDIR = ../fft2midi
-FFT2MIDIOBJS = $(FFT2MIDIDIR)/midi.o $(FFT2MIDIDIR)/tone.o $(FFT2MIDIDIR)/fft2midi.o
+FFT2MIDIOBJS = $(FFT2MIDIDIR)/midi.o $(FFT2MIDIDIR)/tone.o $(FFT2MIDIDIR)/fft2midi.o $(FFT2MIDIDIR)/channelbroker.o
 
 all: testsocket test_fft2midi visualizer
 
