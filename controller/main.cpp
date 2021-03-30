@@ -8,7 +8,7 @@
 #include "../include/shared_array.h" //Thread-safe array
 #include "../include/poller.h"
 #include "../fft/fft.h"
-#include "../fftw3/localcontroller.h"
+#include "../localcontroller/localcontroller.h"
 
 //FFT fft;
 LocalController lc;

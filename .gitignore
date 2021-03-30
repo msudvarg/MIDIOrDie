@@ -44,3 +44,5 @@
 
 # Hide folder that oren has on his machine
 fft_animation/
+
+build/
