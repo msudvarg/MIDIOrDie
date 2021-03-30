@@ -17,6 +17,7 @@ ChannelBroker channel_broker;
 int port = 0;
 bool drum = false;
 bool all = false;
+bool hillclimb = false;
 
 //Destructors not correctly called if program interrupted
 //Use a signal handler and quit flag instead
@@ -30,7 +31,7 @@ void socket_recv(Socket::Connection * client) {
 
     Channel channel(channel_broker, drum);
 
-    Desynthesizer desynth {port, channel.get_channel(), all};
+    Desynthesizer desynth {port, channel.get_channel(), all, hillclimb};
     FFT::Shared_Array_t::array_type & fft_data = desynth.fft_data();
 
     //Loop and do stuff
@@ -59,17 +60,20 @@ int main(int argc, char** argv) {
     //Get command-line options
     int opt;
   
-    while((opt = getopt(argc, argv, "adp:")) != -1) {
+    while((opt = getopt(argc, argv, "adp:c")) != -1) {
         switch(opt) {
             case 'a':
                 all = true;
                 break;
             case 'p':
                 port = atoi(optarg);
-            break;
+                break;
             case 'd':
                 drum = true;
                 break;
+            case 'c':
+              hillclimb = true;
+              break;
         }
     }
 

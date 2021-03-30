@@ -93,6 +93,20 @@ FreqList Tone::GetPeakPitches() {
   return peaks;
 }
 
+FreqList Tone::Hillclimb() {
+  FreqList peaks;
+  
+  for(int i = 1; i < fft_size / 2; i++) {
+    if (interval.at(i) < interval.at(i - 1)) {
+      if (interval.at(i) > 1.0f) {
+        peaks.push_back(i * max_hz / fft_size);
+      }
+    }
+  }
+  
+  return peaks;
+}
+
 float Tone::GetMaxWave() {
   float max = 0.0;
   for (int i = 0; i < fft_size; i++) {
@@ -295,10 +309,6 @@ std::string Tone::GetNoteName(int note) {
     case 11:
       return "B" + std::to_string(octave);
       break;
-    
-    //Should never get here:
-    default:
-      return "";
   }
 }
 
