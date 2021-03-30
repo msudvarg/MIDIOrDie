@@ -67,7 +67,7 @@ private:
 public:
     
     //Thread-safe array to send FFT data over socket
-    using Shared_Array_t = Shared_Array<double,WINDOW_SIZE>;
+    using Shared_Array_t = Shared_Array<double,OUTPUT_FFT_SIZE>;
 
 private:
 
