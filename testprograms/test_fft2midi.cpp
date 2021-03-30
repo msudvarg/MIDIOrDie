@@ -10,15 +10,17 @@
 #include "../fft/fft.h"
 #include "../fft2midi/fft2midi.h"
 #include "../fft2midi/channelbroker.h"
+#include "../localcontroller/localcontroller.h"
 
 bool forever = false;
 
 int port = 0;
 bool drum = false;
 bool all = false;
+bool hillclimb = false;
 
-FFT fft;
-ChannelBroker channels;
+LocalController lc;
+ChannelBroker channel_broker;
 
 //Destructors not correctly called if program interrupted
 //Use a signal handler and quit flag instead
@@ -27,28 +29,20 @@ void sigint_handler(int signum) {
     quit = 1;
 }
 
-void run_fft() {
-    
-    //FFT loop
-    for(int i = 0; i < 1000 && !quit; forever ? i : i++) {
-
-        Poller poller(FFT::WINDOW_LATENCY_MS);
-
-        fft.run();
-    }
-}
-
 void run_desynth() {
 
-    Desynthesizer desynth {port, drum, all};
+    Channel channel(channel_broker, drum);
+
+    Desynthesizer desynth {port, channel.get_channel(), all, hillclimb};
+
+    double localArray[FFT::WINDOW_SIZE];
 
     //Desynth loop
     for(int i = 0; i < 1000 && !quit; forever ? i : i++) {
-
+        
         Poller poller(FFT::WINDOW_LATENCY_MS);
 
-        //Copy FFT data to desynth array
-        desynth.fft_data() = fft.read();
+        lc.GetData(localArray);
 
         desynth.run();
 
@@ -84,6 +78,9 @@ int main(int argc, char** argv) {
         case 'd':
             drum = true;
             break;
+        case 'c':
+            hillclimb = true;
+            break;
         }
     }
 
@@ -91,14 +88,9 @@ int main(int argc, char** argv) {
 
     try {
 
-        fft.init();
 
-        std::thread thread_fft {run_fft};
         std::thread thread_desynth {run_desynth};
-        thread_fft.join();
         thread_desynth.join();
-        
-        fft.end();
 
     }
     catch (PaError ret) {
