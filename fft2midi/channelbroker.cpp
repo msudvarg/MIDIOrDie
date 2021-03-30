@@ -16,6 +16,7 @@ bool ChannelBroker::getChannel(unsigned int & channel, bool drum) {
 	} else {
 	    channels[drum_channel] = true;
 	    m.unlock();
+	    channel = drum_channel;		
 	    return true;
 	}
     }
