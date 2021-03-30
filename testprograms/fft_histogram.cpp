@@ -17,7 +17,7 @@ void socket_recv(Socket::Connection * client) {
 
     while(client->isrunning()) {
     
-        Poller poller(polling_freq);
+        Poller poller(FFT::WINDOW_LATENCY_MS);
 
         //Declare local array
         FFT::Shared_Array_t::array_type localArray;

@@ -27,8 +27,8 @@ void sigint_handler(int signum) {
 void socket_send(Socket::Connection * client) {
 
     while(client->isrunning()) {
-    
-        Poller poller(polling_freq);
+        
+        Poller poller(FFT::WINDOW_LATENCY_MS);
 
         //Copy shared array to local array
         FFT::Shared_Array_t::array_type localArray = sharedArray.read();

@@ -12,7 +12,7 @@ public:
     static constexpr int SAMPLE_RATE       = 44000;
     static constexpr int WINDOW_LATENCY_MS = 40;
     static constexpr int OUTPUT_FFT_MAX_HZ = 2000;  
-    static constexpr float DELTA_HZ        = 1000.0 / 40;  
+    static constexpr float DELTA_HZ        = 1000.0 / static_cast<float>(WINDOW_LATENCY_MS);  
     static constexpr int WINDOW_SIZE = SAMPLE_RATE * WINDOW_LATENCY_MS / 1000;  // Number of samples that fit into latency window, rounded down to power of 2
     static constexpr int OUTPUT_FFT_SIZE = OUTPUT_FFT_MAX_HZ / DELTA_HZ;        // Number of Hz bins to visualize
 
