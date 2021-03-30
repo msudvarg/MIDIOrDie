@@ -6,40 +6,43 @@
 bool ChannelBroker::getChannel(unsigned int & channel, bool drum) {
 
     //Lock broker
-    std::lock_guard<std::mutex> lk {m};
+    m.lock();
 
-    //Check for free channel
-    if(channels.all()) return false;
-
-    //Try to obtain drum
+    // Only one drum channel
     if (drum) {
-        //Drum available
-        if (!channels.test(drum_channel)) {
-            channel = drum_channel;
-        }
-
-        //Drum unavailable
-        else drum = false;
+	if (channels[drum_channel]) {
+	    m.unlock();
+	    return false;
+	} else {
+	    channels[drum_channel] = true;
+	    m.unlock();
+	    channel = drum_channel;		
+	    return true;
+	}
     }
 
-    //Obtain channel
-    if (!drum) {
-        channel = channels._Find_first();
+    // Find an available channel
+    for(int i = 0; i < 16; i++) {
+	if (!channels[i]) {
+	    m.unlock();
+	    channel = i;
+	    return true;
+	}
     }
 
-    channels.set(channel);
-
-    return true;
-
+    // No available channels
+    m.unlock();
+    return false;
 }
 
 void ChannelBroker::freeChannel (unsigned int channel) {
 
     //Lock broker
-    std::lock_guard<std::mutex> lk {m};
+    m.lock();
 
-    //Remove channel
-    channels.reset(channel);
+    channels[channel] = false;
+
+    m.unlock();
 }
 
 ChannelBroker::ChannelBroker() {
@@ -56,3 +59,7 @@ Channel::Channel(ChannelBroker & _broker, bool _drum) :
 {
     if (!broker.getChannel(channel, _drum)) throw No_Channel{};
 }
+
+// Local Variables:
+// c-basic-offset: 4
+// End:

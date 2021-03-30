@@ -1,16 +1,16 @@
 #pragma once
 
-#include <bitset>
 #include <exception>
 #include <mutex>
 
+// God almighty this was overengineered
+// Also wrong because _Find_first returns the first _set_ bit
 
 class ChannelBroker {
     
 private:
-    static constexpr unsigned int channel_count = 16;
-    std::bitset<channel_count> channels;
     std::mutex m;
+    bool channels[16];
 
 public:
     static constexpr unsigned int drum_channel = 9;
@@ -42,3 +42,7 @@ public:
     }
 
 };
+
+// Local Variables:
+// c-basic-offset: 4
+// End:

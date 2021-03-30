@@ -41,6 +41,7 @@ public:
   bool HasPitch(int frequency);
   double GetPitchStrength(int frequency);
   FreqList GetPeakPitches();
+  FreqList Hillclimb();
   int GetPeakPitch();
   float GetMaxWave();
   

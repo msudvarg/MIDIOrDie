@@ -1,6 +1,7 @@
 #ifndef MIDI_H
 #define MIDI_H
 
+#include <cmath>
 #include "../rtmidi/RtMidi.h"
 
 class MidiStream {
@@ -30,7 +31,7 @@ static inline bool InMidiRange(int freq) {
 }
 
 static inline unsigned char Freq2Midi(int freq) {
-    return (unsigned char) freq;
+  return (unsigned char) (log2((double) freq / 440) * 12) + 69;
 }
 
 #endif /* MIDI_H */

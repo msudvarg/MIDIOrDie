@@ -11,6 +11,7 @@ private:
     FreqList old_peaks;
     Tone tone;
     bool all;
+    bool hillclimb;
 
 public:
 
@@ -19,7 +20,7 @@ public:
 
     void run();
 
-    Desynthesizer(int port, unsigned int channel, bool _all);
+  Desynthesizer(int port, unsigned int channel, bool _all, bool _hillclimb);
     ~Desynthesizer() = default;
 
 };

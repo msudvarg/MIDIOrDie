@@ -20,6 +20,8 @@ Tone::Tone(int _fft_size, int _max_hz, double _threshold) :
 
   interval = new double[fft_size];
   raw_audio = new float[fft_size];     // NOTE: Dane, I dislike dynamically adjustable fft windows. Makes me nervous
+                                       // OREN: People's audio interfaces are different, might need it for a card that
+				       // has a different sample rate.
 }
 */
 
@@ -52,10 +54,6 @@ bool Tone::HasPitch(int frequency) {
 
 double Tone::GetPitchStrength(int frequency) {
     int index = (int) frequency * fft_size / max_hz;
-    /*
-    if (index >= fft_size) {
-	throw "Frequency is outside of sampling range";
-    }*/
     return interval.at(index);
 }
 
@@ -92,6 +90,20 @@ FreqList Tone::GetPeakPitches() {
       }
     }
   }
+  return peaks;
+}
+
+FreqList Tone::Hillclimb() {
+  FreqList peaks;
+  
+  for(int i = 1; i < fft_size / 2; i++) {
+    if (interval.at(i) < interval.at(i - 1)) {
+      if (interval.at(i) > 1.0f) {
+        peaks.push_back(i * max_hz / fft_size);
+      }
+    }
+  }
+  
   return peaks;
 }
 
@@ -241,12 +253,10 @@ double Tone::GetFrequencyPower(int note, double* fft, bool remove) {
   return gain;
 }
 
-/* Highly reccomend not using */
 void Tone::SetFFTSize(int fft_size) {
     this->fft_size = fft_size;
 }
 
-/* Highly reccomend not using */
 void Tone::SetMaxHz(int max_hz) {
     this->max_hz = max_hz;
 }
@@ -299,10 +309,6 @@ std::string Tone::GetNoteName(int note) {
     case 11:
       return "B" + std::to_string(octave);
       break;
-    
-    //Should never get here:
-    default:
-      return "";
   }
 }
 

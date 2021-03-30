@@ -8,7 +8,7 @@
 #include "../include/shared_array.h" //Thread-safe array
 #include "../include/poller.h"
 #include "../fft/fft.h"
-#include "../fftw3/localcontroller.h"
+#include "../localcontroller/localcontroller.h"
 
 //FFT fft;
 LocalController lc;
@@ -30,13 +30,12 @@ void socket_send(Socket::Connection * client) {
         Poller poller(FFT::WINDOW_LATENCY_MS);
 
         //Copy shared array to local array
-        //FFT::Shared_Array_t::array_type localArray = fft.read();
+        // FFT::Shared_Array_t::array_type localArray = fft.read();
 
         lc.GetData(localArray);
 
         //Send local array over socket
         client->send(
-            //localArray.data(),
             localArray,
             sizeof(FFT::Shared_Array_t::value_type) * FFT::Shared_Array_t::size);
 
@@ -80,8 +79,6 @@ int main(int argc, char** argv) {
         
         std::unique_ptr<Socket::Client> socket;
 
-        //fft.init();
-
         //Create socket to send data
         //Keep looping on connection error in case server has not been set up
         while(!quit) {
@@ -96,15 +93,12 @@ int main(int argc, char** argv) {
             break;
         }
         
-        /*
+
         //FFT loop
         for(int i = 0; i < 1000 && !quit; forever ? i : i++) {
             Poller poller(FFT::WINDOW_LATENCY_MS);
-            fft.run();
         }
         
-        fft.end(); */
-
     }
     catch (PaError ret) {
         return ret;
@@ -120,10 +114,5 @@ int main(int argc, char** argv) {
         return -1;
     }
     
-    //Create shared memory for visualization
-    //Shared_Memory<Shared_Buffer> sharedBuffer {"fftData"};
-
-
-
     return 0;    
 }

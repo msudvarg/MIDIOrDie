@@ -6,10 +6,11 @@
 
 bool done = false;
 
-Desynthesizer::Desynthesizer(int port, unsigned int channel, bool _all) :
+Desynthesizer::Desynthesizer(int port, unsigned int channel, bool _all, bool _hillclimb) :
   ms (port),
   //tone (FFT::WINDOW_SIZE, FFT::OUTPUT_FFT_MAX_HZ),
-  all (_all)
+  all (_all),
+  hillclimb (_hillclimb)
 {
   ms.ChangeChannel(channel);
 
@@ -17,8 +18,13 @@ Desynthesizer::Desynthesizer(int port, unsigned int channel, bool _all) :
 }
 
 void Desynthesizer::run() {
+  FreqList peaks;
 
-    FreqList peaks = tone.ExtractSignatures();
+  if (hillclimb) {
+    peaks = tone.Hillclimb();
+  } else {
+    peaks = tone.ExtractSignatures();
+  }
 
     for(int n : peaks) {
       std::cout << tone.GetNoteName(n) << " ";
