@@ -5,19 +5,23 @@
 #include <portaudio.h>
 #include <mutex>
 
-#define DEFAULT_N 1760
-#define DEFAULT_SAMPLE_RATE 44100
+static constexpr int SAMPLE_RATE       = 44100;
+static constexpr float WINDOW_LATENCY_MS = 40;
+static constexpr int OUTPUT_FFT_MAX_HZ = 2000;  
+static constexpr float DELTA_HZ        = 1000.0 / WINDOW_LATENCY_MS;  
+static constexpr int WINDOW_SIZE = SAMPLE_RATE * WINDOW_LATENCY_MS / 1000;  // Number of samples that fit into latency window, rounded down to power of 2
+static constexpr int OUTPUT_FFT_SIZE = OUTPUT_FFT_MAX_HZ / DELTA_HZ;        // Number of Hz bins to visualize
 
 class LocalController {
 public:
   LocalController();
-  LocalController(int n, int sample_rate);
+  LocalController(int n, int fft_size, int sample_rate);
   void GetData(double *fft_data_out, float *raw_audio_out);
   void GetData(double *fft_data_out);
   double GetRefreshRate();
   ~LocalController();
 private:
-  int n, sample_rate;
+  int n, fft_size, sample_rate;
   float *window;
   float *fft_data;
   float *raw_audio;
