@@ -4,9 +4,9 @@ Project(MidiOrDie)
 option(BUILD_TEST_PROGRAMS "Extra programs for testing" OFF)
 
 ## Third party libraries
-set(PA_DISABLE_INSTALL ON)
+set(PA_DISABLE_INSTALL ON CACHE "" "" FORCE)
 add_subdirectory(portaudio)
-set(RTMIDI_TARGETNAME_UNINSTALL "rtmidi_uninstall")
+set(RTMIDI_TARGETNAME_UNINSTALL "rtmidi_uninstall" CACHE "" "" FORCE)
 add_subdirectory(rtmidi)
 
 ## MidiOrDie libraries
