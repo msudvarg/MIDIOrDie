@@ -32,3 +32,7 @@ target_link_libraries(test_fft2midi
   fft
   lc
   fft2midi)
+
+add_executable(channelbroker_test testprograms/channelbroker_test.cpp)
+target_link_libraries(channelbroker_test
+  fft2midi)

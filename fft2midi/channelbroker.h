@@ -3,14 +3,13 @@
 #include <exception>
 #include <mutex>
 
-// God almighty this was overengineered
-// Also wrong because _Find_first returns the first _set_ bit
 
 class ChannelBroker {
     
 private:
+    static constexpr unsigned int channel_count = 16;
+    bool channels[channel_count];
     std::mutex m;
-    bool channels[16];
 
 public:
     static constexpr unsigned int drum_channel = 9;
@@ -18,7 +17,7 @@ public:
     bool getChannel(unsigned int & channel, bool drum);
     void freeChannel (unsigned int channel);
 
-    ChannelBroker();
+    ChannelBroker(bool print_ports = true);
 };
 
 class Channel {
@@ -42,7 +41,3 @@ public:
     }
 
 };
-
-// Local Variables:
-// c-basic-offset: 4
-// End:
