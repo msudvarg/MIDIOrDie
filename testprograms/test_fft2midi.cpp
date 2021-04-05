@@ -61,7 +61,7 @@ int main(int argc, char** argv) {
     int opt;
 
     //Get command-line options
-    while((opt = getopt(argc, argv, "fadp:")) != -1) {
+    while((opt = getopt(argc, argv, "fadpc:")) != -1) {
         switch(opt) {
 
         //Run forever
