@@ -22,7 +22,7 @@ bool ChannelBroker::getChannel(unsigned int & channel, bool drum) {
 
     //Obtain channel
     if (!drum) {
-        for (int i = 0; i < channel_count; ++i) {
+        for (unsigned i = 0; i < channel_count; ++i) {
             if(!channels[i]) {
                 channel = i;
                 break;
@@ -52,7 +52,7 @@ void ChannelBroker::freeChannel (unsigned int channel) {
 
 ChannelBroker::ChannelBroker(bool print_ports) {
     //Initialize channel container elements
-    for (int i = 0; i < channel_count; ++i) {
+    for (unsigned i = 0; i < channel_count; ++i) {
         channels[i] = false;
     }
 
