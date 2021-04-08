@@ -18,13 +18,36 @@
 // 55 = G3
 // 59 = B3
 // 64 = E4
-typedef std::vector<int> FreqList;
 
 #define SEMITONE  1.059463094
 #define C0_HZ     16.35
 #define C0        12
 constexpr float NORMAL_HZ = OUTPUT_FFT_MAX_HZ / HARMONICS;   // The signature represents a FFT of a note at this frequency (in Hz)
                                                               // Its amplitude serves as a threshold that must be met for a note to be considered "playing"
+/*
+class FreqList {
+private:
+  std::vector<int> list;
+public:
+  FreqList() {
+    list.reserve(OUTPUT_FFT_SIZE/2);
+  }
+  using size_type = std::vector<int>::size_type;
+  using iterator = std::vector<int>::iterator;
+  using const_iterator = std::vector<int>::const_iterator;
+  void push_back(int x) {list.push_back(x);}
+  size_type size() const noexcept {return list.size();}
+  int & operator[] (size_type i) { return list[i];}
+  const int & operator[] (size_type i) const { return list[i];};
+  iterator begin() noexcept {return list.begin();}
+  const_iterator begin() const noexcept {return list.begin();}
+  const_iterator cbegin() const noexcept {return list.cbegin();}
+  iterator end() noexcept {return list.end();}
+  const_iterator end() const noexcept {return list.end();}
+  const_iterator cend() const noexcept {return list.cend();}
+
+}; */
+using FreqList = std::vector<int>;
 
 class Tone {
 public:
@@ -45,7 +68,8 @@ public:
   int GetPeakPitch();
   float GetMaxWave();
   
-  void SetSignature(std::vector<float> sig);
+  template <class Container>
+  void SetSignature(Container & sig);
   void SetSignature(float* sig, int length);
   void DummySignature();
 

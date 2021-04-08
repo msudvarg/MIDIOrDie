@@ -78,6 +78,7 @@ FreqList Tone::GetPeakPitches() {
   std::sort(arr.begin(), arr.end());
 
   float threshold = arr[7*arr.size()/8];
+  
 
   for(int i = 1; i < fft_size; i++) {
     if (interval.at(i) > threshold) {
@@ -138,7 +139,8 @@ void Tone::InterpolateAlias(float* a, float* b, int lenA, int lenB) {
   b[lenB-1] = a[lenA-1];
 }
 
-void Tone::SetSignature(std::vector<float> sig) {
+template <class Container>
+void Tone::SetSignature(Container & sig) {
   Tone::SetSignature(sig.data(), sig.size());
 }
 
