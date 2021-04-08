@@ -32,6 +32,7 @@ void socket_recv(Socket::Connection * client) {
     Channel channel(channel_broker, drum);
 
     Desynthesizer desynth {port, channel.get_channel(), all, hillclimb};
+    std::cout << "Connecting to MIDI port: " << port << std::endl;
     FFT::Shared_Array_t::array_type & fft_data = desynth.fft_data();
 
     //Loop and do stuff
