@@ -38,7 +38,7 @@ void socket_recv(Socket::Connection * client) {
     //Loop and do stuff
     while(client->isrunning()) {
         
-        Poller poller(FFT::WINDOW_LATENCY_MS);
+        Poller poller(WINDOW_LATENCY_MS);
 
         //Read from socket into MIDIExtraction object
         client->recv(

@@ -1,6 +1,7 @@
 #include "midi.h"
 
 #include <vector>
+#include <iostream>
 
 #include <math.h>
 // #include <string.h>
@@ -12,6 +13,7 @@
 MidiStream::MidiStream(int port) {
   //port=0 as default in declaration
   midiout.openPort(port);
+  std::cout << "Connected to MIDI port " << port << std::endl;
 }
 
 void MidiStream::Send(unsigned char note, bool on) {

@@ -194,12 +194,12 @@ int FFT::paCallback(
         PaStreamCallbackFlags statusFlags,
         void *userData )
 {
-    return reinterpret_cast<FFT *>(userData)->patestCallback(
+    return reinterpret_cast<FFT *>(userData)->paCallback(
         inputBuffer, outputBuffer, framesPerBuffer, timeInfo, statusFlags
     );
 }
 
-int FFT::patestCallback(
+int FFT::paCallback(
         const void *inputBuffer, void *outputBuffer,
         unsigned long framesPerBuffer,
         const PaStreamCallbackTimeInfo* timeInfo,

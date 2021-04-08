@@ -7,6 +7,7 @@
 #include <cmath>
 #include <cstring>
 
+#include "../include/manifest.h"
 #include "../fft/fft.h"
 
 #define HARMONICS 8   // Default number of harmonics to capture in the signature
@@ -23,7 +24,7 @@ typedef std::vector<int> FreqList;
 #define SEMITONE  1.059463094
 #define C0_HZ     16.35
 #define C0        12
-constexpr double NORMAL_HZ = FFT::OUTPUT_FFT_MAX_HZ / HARMONICS;   // The signature represents a FFT of a note at this frequency (in Hz)
+constexpr double NORMAL_HZ = OUTPUT_FFT_MAX_HZ / HARMONICS;   // The signature represents a FFT of a note at this frequency (in Hz)
                                                               // Its amplitude serves as a threshold that must be met for a note to be considered "playing"
 
 class Tone {
@@ -63,8 +64,8 @@ public:
   void PrintFFT();
 
   FFT::Shared_Array_t::array_type interval;
-  std::array<float,FFT::OUTPUT_FFT_SIZE> raw_audio;
-  std::array<double,FFT::OUTPUT_FFT_SIZE> signature;
+  std::array<float,OUTPUT_FFT_SIZE> raw_audio;
+  std::array<double,OUTPUT_FFT_SIZE> signature;
   
   /*
   double* interval;
@@ -86,8 +87,8 @@ private:
 
   double threshold = 20.0;
   int harmonics_captured = HARMONICS;
-  int max_hz = FFT::OUTPUT_FFT_MAX_HZ;
-  int fft_size = FFT::OUTPUT_FFT_SIZE;
+  int max_hz = OUTPUT_FFT_MAX_HZ;
+  int fft_size = OUTPUT_FFT_SIZE;
 };
 
 static inline FreqList FreqDifference(FreqList a, FreqList b) {

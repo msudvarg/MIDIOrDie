@@ -11,10 +11,11 @@ void hamming(int length, float *buffer) {
 
 LocalController::LocalController() : LocalController(WINDOW_SIZE, OUTPUT_FFT_SIZE, SAMPLE_RATE) {}
 
-LocalController::LocalController(int n, int fft_size, int sample_rate) {
-  this->n = n;
-  this->fft_size = fft_size;
-  this->sample_rate = sample_rate;
+LocalController::LocalController(int _n, int _fft_size, int _sample_rate) :
+  n(_n),
+  fft_size(_fft_size),
+  sample_rate(_sample_rate)
+{
 
   window = new float[n];
   fft_data = new float[fft_size];
@@ -50,25 +51,36 @@ int LocalController::callback (const void* input,
 			       void *output,
 			       unsigned long frameCount,
 			       const PaStreamCallbackTimeInfo *timeInfo,
-			       PaStreamCallbackFlags statusFlags,
-			       void *userData) {
-  LocalController *controller = (LocalController *) userData;
+			       PaStreamCallbackFlags statusFlags) {
   float *inputBuffer = (float *) input;
   float *outputBuffer = (float *) output;
-  memcpy(outputBuffer, inputBuffer, controller->n * sizeof(float));
-  controller->mtx.lock();
-  memcpy(controller->raw_audio, inputBuffer, controller->n * sizeof(float));
-  for (int i = 0; i < controller->n; i++) {
-    controller->in[i][0] = (double)inputBuffer[i] * controller->window[i];
-    controller->in[i][1] = 0.0;
+  memcpy(outputBuffer, inputBuffer, n * sizeof(float));
+  mtx.lock();
+  memcpy(raw_audio, inputBuffer, n * sizeof(float));
+  for (int i = 0; i < n; i++) {
+    in[i][0] = (double)inputBuffer[i] * window[i];
+    in[i][1] = 0.0;
   }
-  fftw_execute(controller->p);
-  for (int i = 0; i < controller->fft_size; i++) {
-    controller->fft_data[i] = (float) sqrt(controller->out[i][0] * controller->out[i][0] + controller->out[i][1] * controller->out[i][1]);
-    controller->fft_data[i] = 20 * log10f(controller->fft_data[i]);
+  fftw_execute(p);
+  for (int i = 0; i < fft_size; i++) {
+    fft_data[i] = (float) sqrt(out[i][0] * out[i][0] + out[i][1] * out[i][1]);
+    fft_data[i] = 20 * log10f(fft_data[i]);
   }
-  controller->mtx.unlock();
+  mtx.unlock();
   return 0;
+
+}
+
+int LocalController::callback (const void* input,
+			       void *output,
+			       unsigned long frameCount,
+			       const PaStreamCallbackTimeInfo *timeInfo,
+			       PaStreamCallbackFlags statusFlags,
+			       void *userData) {
+               
+    return reinterpret_cast<LocalController *>(userData)->callback(
+        input, output, frameCount, timeInfo, statusFlags
+    );
 }
 
 void LocalController::GetData(double *fft_data_out, float *raw_audio_out) {
@@ -99,4 +111,7 @@ LocalController::~LocalController() {
   fftw_destroy_plan(p);
   fftw_free(in);
   fftw_free(out);
+  delete[] window;
+  delete[] fft_data;
+  delete[] raw_audio;
 }

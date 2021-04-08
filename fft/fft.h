@@ -4,17 +4,9 @@
 #include <vector>
 #include "portaudio.h"
 #include "../include/shared_array.h" //Thread-safe array
+#include "../include/manifest.h"
 
 class FFT {
-    
-public:
-
-    static constexpr int SAMPLE_RATE       = 44000;
-    static constexpr int WINDOW_LATENCY_MS = 40;
-    static constexpr int OUTPUT_FFT_MAX_HZ = 2000;  
-    static constexpr float DELTA_HZ        = 1000.0 / static_cast<float>(WINDOW_LATENCY_MS);  
-    static constexpr int WINDOW_SIZE = SAMPLE_RATE * WINDOW_LATENCY_MS / 1000;  // Number of samples that fit into latency window, rounded down to power of 2
-    static constexpr int OUTPUT_FFT_SIZE = OUTPUT_FFT_MAX_HZ / DELTA_HZ;        // Number of Hz bins to visualize
 
 private:
 
@@ -40,7 +32,7 @@ private:
             PaStreamCallbackFlags statusFlags,
             void *userData );
 
-    int patestCallback( const void *inputBuffer, void *outputBuffer,
+    int paCallback( const void *inputBuffer, void *outputBuffer,
             unsigned long framesPerBuffer,
             const PaStreamCallbackTimeInfo* timeInfo,
             PaStreamCallbackFlags statusFlags );

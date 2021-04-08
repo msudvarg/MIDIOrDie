@@ -35,12 +35,12 @@ void run_desynth() {
 
     Desynthesizer desynth {port, channel.get_channel(), all, hillclimb};
 
-    double localArray[FFT::WINDOW_SIZE];
+    double localArray[WINDOW_SIZE];
 
     //Desynth loop
     for(int i = 0; i < 1000 && !quit; forever ? i : i++) {
         
-        Poller poller(FFT::WINDOW_LATENCY_MS);
+        Poller poller(WINDOW_LATENCY_MS);
 
         lc.GetData(localArray);
 

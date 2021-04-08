@@ -23,11 +23,11 @@ void sigint_handler(int signum) {
 
 void socket_send(Socket::Connection * client) {
 
-    double localArray[FFT::WINDOW_SIZE];
+    double localArray[WINDOW_SIZE];
 
     while(client->isrunning()) {
         
-        Poller poller(FFT::WINDOW_LATENCY_MS);
+        Poller poller(WINDOW_LATENCY_MS);
 
         //Copy shared array to local array
         // FFT::Shared_Array_t::array_type localArray = fft.read();
@@ -96,7 +96,7 @@ int main(int argc, char** argv) {
 
         //FFT loop
         for(int i = 0; i < 1000 && !quit; forever ? i : i++) {
-            Poller poller(FFT::WINDOW_LATENCY_MS);
+            Poller poller(WINDOW_LATENCY_MS);
         }
         
     }
