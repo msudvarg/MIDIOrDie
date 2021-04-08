@@ -58,7 +58,7 @@ int LocalController::callback (const void* input,
   mtx.lock();
   memcpy(raw_audio, inputBuffer, n * sizeof(float));
   for (int i = 0; i < n; i++) {
-    in[i][0] = (double)inputBuffer[i] * window[i];
+    in[i][0] = (float)inputBuffer[i] * window[i];
     in[i][1] = 0.0;
   }
   fftw_execute(p);
@@ -83,24 +83,20 @@ int LocalController::callback (const void* input,
     );
 }
 
-void LocalController::GetData(double *fft_data_out, float *raw_audio_out) {
+void LocalController::GetData(float *fft_data_out, float *raw_audio_out) {
   mtx.lock();
-  for (int i = 0; i < fft_size; i++) {
-    fft_data_out[i] = (double) fft_data[i];
-  }
+  memcpy(fft_data_out, fft_data, fft_size * sizeof(float));
   memcpy(raw_audio_out, raw_audio, n * sizeof(float));
   mtx.unlock();
 }
 
-void LocalController::GetData(double *fft_data_out) {
+void LocalController::GetData(float *fft_data_out) {
   mtx.lock();
-  for (int i = 0; i < fft_size; i++) {
-    fft_data_out[i] = (double) fft_data[i];
-  }
+  memcpy(fft_data_out, fft_data, fft_size * sizeof(float));
   mtx.unlock();
 }
 
-double LocalController::GetRefreshRate() {
+float LocalController::GetRefreshRate() {
   return 1.0 / Pa_GetStreamInfo(stream)->sampleRate / 1000.0;
 }
 

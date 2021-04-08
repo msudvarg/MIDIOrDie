@@ -7,7 +7,6 @@
 #include "../include/manifest.h"
 #include "../include/shared_array.h" //Thread-safe array
 #include "../include/poller.h"
-#include "../fft/fft.h"
 #include "../fft2midi/fft2midi.h"
 #include "../fft2midi/channelbroker.h"
 #include "../localcontroller/localcontroller.h"
@@ -35,14 +34,14 @@ void run_desynth() {
 
     Desynthesizer desynth {port, channel.get_channel(), all, hillclimb};
 
-    double localArray[WINDOW_SIZE];
+    shared_fft_t::array_type localArray;
 
     //Desynth loop
     for(int i = 0; i < 1000 && !quit; forever ? i : i++) {
         
         Poller poller(WINDOW_LATENCY_MS);
 
-        lc.GetData(localArray);
+        lc.GetData(localArray.data());
 
         desynth.run();
 

@@ -8,13 +8,12 @@
 #include "../socket/socket.h" //Socket wrapper
 #include "../include/shared_array.h" //Thread-safe array
 #include "../include/poller.h"
-#include "../fft/fft.h"
 
 //Specific to test.cpp
 #include <random>
 
 //Thread-safe array to send FFT data over socket
-Shared_Array<double,FFT::WINDOW_SIZE> sharedArray;
+shared_fft_t sharedArray;
 
 //Destructors not correctly called if program interrupted
 //Use a signal handler and quit flag instead
@@ -28,15 +27,15 @@ void socket_send(Socket::Connection * client) {
 
     while(client->isrunning()) {
         
-        Poller poller(FFT::WINDOW_LATENCY_MS);
+        Poller poller(WINDOW_LATENCY_MS);
 
         //Copy shared array to local array
-        FFT::Shared_Array_t::array_type localArray = sharedArray.read();
+        shared_fft_t::array_type localArray = sharedArray.read();
 
         //Send local array over socket
         client->send(
             localArray.data(),
-            sizeof(FFT::Shared_Array_t::value_type) * FFT::Shared_Array_t::size);
+            sizeof(shared_fft_t::value_type) * shared_fft_t::size);
 
     }
 
@@ -95,12 +94,12 @@ int main(int argc, char * argv[]) {
         }
         
         //Local array
-        double finalOutputBuffer[FFT::WINDOW_SIZE];
+        double finalOutputBuffer[WINDOW_SIZE];
 
         while(!quit) {
             
             //Generate random FFT histogram values
-            for (int i = 0; i < FFT::WINDOW_SIZE; ++i) {
+            for (int i = 0; i < WINDOW_SIZE; ++i) {
                 finalOutputBuffer[i] = d(g) * 1000;
             }
 

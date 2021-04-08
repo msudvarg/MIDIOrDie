@@ -33,17 +33,17 @@ void socket_recv(Socket::Connection * client) {
 
     Desynthesizer desynth {port, channel.get_channel(), all, hillclimb};
     std::cout << "Connecting to MIDI port: " << port << std::endl;
-    FFT::Shared_Array_t::array_type & fft_data = desynth.fft_data();
+    shared_fft_t::array_type & fft_data = desynth.fft_data();
 
     //Loop and do stuff
     while(client->isrunning()) {
         
         Poller poller(WINDOW_LATENCY_MS);
 
-        //Read from socket into MIDIExtraction object
+        //Read from socket into Desynth object
         client->recv(
             fft_data.data(),
-            sizeof(FFT::Shared_Array_t::value_type) * FFT::Shared_Array_t::size);
+            sizeof(shared_fft_t::value_type) * shared_fft_t::size);
 
         desynth.run();
 

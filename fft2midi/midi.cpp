@@ -2,7 +2,6 @@
 
 #include <vector>
 #include <iostream>
-
 #include <math.h>
 // #include <string.h>
 
@@ -35,6 +34,6 @@ void MidiStream::ChangeInstrument(unsigned char instrument) {
   midiout.sendMessage(&buf);
 }
 
-void MidiStream::ChangeChannel(unsigned char channel) {
-  this->channel = channel;
+void MidiStream::ChangeChannel(unsigned char _channel) {
+  channel = _channel;
 }

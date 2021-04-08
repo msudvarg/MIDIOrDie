@@ -5,11 +5,11 @@
 /*
 Tone::Tone() : Tone (WINDOW_SIZE, OUTPUT_FFT_MAX_HZ, 20.0) {}
 
-Tone::Tone(double threshold) : Tone(WINDOW_SIZE, OUTPUT_FFT_MAX_HZ, threshold) {}
+Tone::Tone(float threshold) : Tone(WINDOW_SIZE, OUTPUT_FFT_MAX_HZ, threshold) {}
 
 Tone::Tone(int fft_size, int max_hz) : Tone(fft_size, max_hz, 20.0) {}
 
-Tone::Tone(int _fft_size, int _max_hz, double _threshold) :
+Tone::Tone(int _fft_size, int _max_hz, float _threshold) :
   fft_size(_fft_size),
   max_hz(_max_hz),
   threshold(_threshold)
@@ -18,7 +18,7 @@ Tone::Tone(int _fft_size, int _max_hz, double _threshold) :
   this->max_hz = max_hz;
   this->threshold = threshold;
 
-  interval = new double[fft_size];
+  interval = new float[fft_size];
   raw_audio = new float[fft_size];     // NOTE: Dane, I dislike dynamically adjustable fft windows. Makes me nervous
                                        // OREN: People's audio interfaces are different, might need it for a card that
 				       // has a different sample rate.
@@ -32,12 +32,12 @@ Tone::~Tone() {
 }
 */
 
-double Tone::NoteToFreq(int note) {
+float Tone::NoteToFreq(int note) {
   return C0_HZ * std::pow(SEMITONE, note - C0);
 }
 
-int Tone::FreqToNote(double freq, int round) {
-  double factor = freq / C0_HZ;
+int Tone::FreqToNote(float freq, int round) {
+  float factor = freq / C0_HZ;
 
   if (round < 1) {
     return (int)std::floor(std::log(factor) / std::log(SEMITONE));
@@ -52,13 +52,13 @@ bool Tone::HasPitch(int frequency) {
     return GetPitchStrength(frequency) >= threshold;
 }
 
-double Tone::GetPitchStrength(int frequency) {
+float Tone::GetPitchStrength(int frequency) {
     int index = (int) frequency * fft_size / max_hz;
     return interval.at(index);
 }
 
 int Tone::GetPeakPitch() {
-    double max = 0.0;
+    float max = 0.0;
     int idx = 0;
     for (int i = 0; i < fft_size; i++) {
       if (interval.at(i) > max) {
@@ -74,11 +74,10 @@ int Tone::GetPeakPitch() {
 FreqList Tone::GetPeakPitches() {
   FreqList peaks;
 
-  FFT::Shared_Array_t::array_type arr = interval;
-  //std::vector<double> arr = std::vector<double>(interval, interval + OUTPUT_FFT_SIZE);
+  shared_fft_t::array_type arr = interval;
   std::sort(arr.begin(), arr.end());
 
-  double threshold = arr[7*arr.size()/8];
+  float threshold = arr[7*arr.size()/8];
 
   for(int i = 1; i < fft_size; i++) {
     if (interval.at(i) > threshold) {
@@ -117,15 +116,15 @@ float Tone::GetMaxWave() {
   return max;
 }
 
-void Tone::InterpolateAlias(double* a, double* b, int lenA, int lenB) {
-  double interpolation_factor = (double)(lenA - 1) / (lenB - 1);
-  double dummy;
+void Tone::InterpolateAlias(float* a, float* b, int lenA, int lenB) {
+  float interpolation_factor = (float)(lenA - 1) / (lenB - 1);
+  float dummy;
 
   for(int i = 0; i < lenB - 1; i++) {
     int lower_ind = (int)std::floor(i * interpolation_factor);
-    double lower_weight = 1 - std::modf(i * interpolation_factor, &dummy);
+    float lower_weight = 1 - std::modf(i * interpolation_factor, &dummy);
     int upper_ind = (int)std::floor((i+1) * interpolation_factor);
-    double upper_weight = std::modf((i+1) * interpolation_factor, &dummy);
+    float upper_weight = std::modf((i+1) * interpolation_factor, &dummy);
 
     // Sum all a buckets that map to bucket b[i], making sure to alias the
     // edges and account for the fact these are decibels
@@ -139,12 +138,12 @@ void Tone::InterpolateAlias(double* a, double* b, int lenA, int lenB) {
   b[lenB-1] = a[lenA-1];
 }
 
-void Tone::SetSignature(std::vector<double> sig) {
+void Tone::SetSignature(std::vector<float> sig) {
   Tone::SetSignature(sig.data(), sig.size());
 }
 
 /* Interpolates signature of arbitrary length into local storage for later use */
-void Tone::SetSignature(double* sig, int length) {
+void Tone::SetSignature(float* sig, int length) {
   int fundamental_bin = OUTPUT_FFT_SIZE / 8;    // signature array needs to fit 8 harmonics,
                                                 // so align fundamental frequency 8th of way along array
   InterpolateAlias(sig, signature.data(), length, signature.size());
@@ -196,10 +195,10 @@ FreqList Tone::ExtractSignatures() {
 // Primers contains a list of notes to look for
 FreqList Tone::ExtractSignatures(FreqList primers) {
   FreqList found;
-  double bucket_size = max_hz / fft_size;
+  float bucket_size = max_hz / fft_size;
 
-  double fftcopy[OUTPUT_FFT_SIZE];
-  memcpy(fftcopy, interval.data(), OUTPUT_FFT_SIZE * sizeof(double));
+  float fftcopy[OUTPUT_FFT_SIZE];
+  memcpy(fftcopy, interval.data(), OUTPUT_FFT_SIZE * sizeof(float));
 
   for(int f : primers) {
     if (f < FreqToNote(OUTPUT_FFT_MAX_HZ)) {
@@ -215,17 +214,17 @@ FreqList Tone::ExtractSignatures(FreqList primers) {
   
 }
 
-double Tone::GetFrequencyPower(int note, double* fft, bool remove) {
-  double hz = NoteToFreq(note);
+float Tone::GetFrequencyPower(int note, float* fft, bool remove) {
+  float hz = NoteToFreq(note);
 
-  double scaling_factor = hz / NORMAL_HZ;
+  float scaling_factor = hz / NORMAL_HZ;
   int numBins = (int)(OUTPUT_FFT_SIZE * scaling_factor);
   if (numBins < 0) return 0;
-  double* noteSig = (double*)malloc(numBins * sizeof(double));
+  float* noteSig = (float*)malloc(numBins * sizeof(float));
 
   InterpolateAlias(signature.data(), noteSig, signature.size(), numBins);
 
-  double gain = INFINITY;
+  float gain = INFINITY;
   int matches = 0;
 
   for(int i = 0; i < numBins && i < OUTPUT_FFT_SIZE; i++) {
@@ -261,11 +260,11 @@ void Tone::SetMaxHz(int max_hz) {
     this->max_hz = max_hz;
 }
 
-void Tone::SetThreshold(double threshold) {
+void Tone::SetThreshold(float threshold) {
     this->threshold = threshold;
 }
 
-double Tone::GetThreshold() {
+float Tone::GetThreshold() {
     return threshold;
 }
 

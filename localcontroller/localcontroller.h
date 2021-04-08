@@ -10,9 +10,9 @@ class LocalController {
 public:
   LocalController();
   LocalController(int n, int fft_size, int sample_rate);
-  void GetData(double *fft_data_out, float *raw_audio_out);
-  void GetData(double *fft_data_out);
-  double GetRefreshRate();
+  void GetData(float *fft_data_out, float *raw_audio_out);
+  void GetData(float *fft_data_out);
+  float GetRefreshRate();
   ~LocalController();
 private:
   int n, fft_size, sample_rate;

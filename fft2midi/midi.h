@@ -31,7 +31,7 @@ static inline bool InMidiRange(int freq) {
 }
 
 static inline unsigned char Freq2Midi(int freq) {
-  return (unsigned char) (log2((double) freq / 440) * 12) + 69;
+  return (unsigned char) (log2((float) freq / 440) * 12) + 69;
 }
 
 #endif /* MIDI_H */

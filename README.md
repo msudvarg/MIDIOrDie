@@ -8,7 +8,7 @@
 
 Constants related to the FFT are defined as (`constexpr`) values in `include/manifest.h`
 
-* `int SAMPLE_RATE`: 44000 Hz sample rate
+* `int SAMPLE_RATE`: 44100 Hz sample rate
 * `int WINDOW_LATENCY_MS`: 40 ms FFT latency window
 * `int OUTPUT_FFT_MAX_HZ`: 2000 Hz maximum frequency to extract
 * `float DELTA_HZ`: 1000/WINDOW_LATENCY_MS: 25 Hz FFT bin width
@@ -18,6 +18,10 @@ Constants related to the FFT are defined as (`constexpr`) values in `include/man
 The other relevant constant defined in this file is the default socket port:
 
 * `int PORTNO`: 10520
+
+A `Shared_Array` (see below) type alias is defined here as well:
+
+    using shared_fft_t = Shared_Array<float,OUTPUT_FFT_SIZE>;
 
 # Command Line Tools
 ## Controller
@@ -140,4 +144,4 @@ The `Channel` constructor is:
 
 `Channel(ChannelBroker & _broker, bool drum)`, taking a reference to a ChannelBroker, and specifying the request for the drum channel.
 
-
+## Socket

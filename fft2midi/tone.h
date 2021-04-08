@@ -8,7 +8,6 @@
 #include <cstring>
 
 #include "../include/manifest.h"
-#include "../fft/fft.h"
 
 #define HARMONICS 8   // Default number of harmonics to capture in the signature
 #define MATCH_CONFIDENCE  0.9
@@ -24,37 +23,37 @@ typedef std::vector<int> FreqList;
 #define SEMITONE  1.059463094
 #define C0_HZ     16.35
 #define C0        12
-constexpr double NORMAL_HZ = OUTPUT_FFT_MAX_HZ / HARMONICS;   // The signature represents a FFT of a note at this frequency (in Hz)
+constexpr float NORMAL_HZ = OUTPUT_FFT_MAX_HZ / HARMONICS;   // The signature represents a FFT of a note at this frequency (in Hz)
                                                               // Its amplitude serves as a threshold that must be met for a note to be considered "playing"
 
 class Tone {
 public:
 /*
   Tone();
-  Tone(double threshold);
+  Tone(float threshold);
   Tone(int fft_size, int max_hz);
-  Tone(int fft_size, int max_hz, double threshold);
+  Tone(int fft_size, int max_hz, float threshold);
   ~Tone();
   */
   Tone() = default;
   ~Tone() = default;
   
   bool HasPitch(int frequency);
-  double GetPitchStrength(int frequency);
+  float GetPitchStrength(int frequency);
   FreqList GetPeakPitches();
   FreqList Hillclimb();
   int GetPeakPitch();
   float GetMaxWave();
   
-  void SetSignature(std::vector<double> sig);
-  void SetSignature(double* sig, int length);
+  void SetSignature(std::vector<float> sig);
+  void SetSignature(float* sig, int length);
   void DummySignature();
 
   FreqList ExtractSignatures();
   FreqList ExtractSignatures(FreqList primers);
 
-  void SetThreshold(double threshold);
-  double GetThreshold();
+  void SetThreshold(float threshold);
+  float GetThreshold();
 
   void SetFFTSize(int fft_size);
   void SetMaxHz(int max_hz);
@@ -63,14 +62,14 @@ public:
 
   void PrintFFT();
 
-  FFT::Shared_Array_t::array_type interval;
-  std::array<float,OUTPUT_FFT_SIZE> raw_audio;
-  std::array<double,OUTPUT_FFT_SIZE> signature;
+  shared_fft_t::array_type interval;
+  shared_fft_t::array_type raw_audio;
+  shared_fft_t::array_type signature;
   
   /*
-  double* interval;
+  float* interval;
   float* raw_audio;
-  double signature[FFT::OUTPUT_FFT_SIZE];
+  float signature[OUTPUT_FFT_SIZE];
   */
 
 private:
@@ -78,14 +77,14 @@ private:
   // Tries to find frequency in provided fft. Returns the gain detected compared to the signature amplitude.
   // Returns 0 if frequency not found
   // If remove is true, then fft is modified to remove the detected note.
-  double GetFrequencyPower(int note, double* fft, bool remove=false);
+  float GetFrequencyPower(int note, float* fft, bool remove=false);
 
-  void InterpolateAlias(double* a, double* b, int lenA, int lenB);
+  void InterpolateAlias(float* a, float* b, int lenA, int lenB);
 
-  double NoteToFreq(int note);
-  int FreqToNote(double freq, int round=0);
+  float NoteToFreq(int note);
+  int FreqToNote(float freq, int round=0);
 
-  double threshold = 20.0;
+  float threshold = 20.0;
   int harmonics_captured = HARMONICS;
   int max_hz = OUTPUT_FFT_MAX_HZ;
   int fft_size = OUTPUT_FFT_SIZE;

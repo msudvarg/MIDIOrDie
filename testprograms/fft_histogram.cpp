@@ -7,25 +7,24 @@
 #include "../socket/socket.h" //Socket wrapper
 #include "../include/shared_array.h" //Thread-safe array
 #include "../include/poller.h"
-#include "../fft/fft.h"
 
 //Thread-safe array to receive FFT data from socket
-FFT::Shared_Array_t sharedArray;
+shared_fft_t sharedArray;
 
 //Function to receive from socket
 void socket_recv(Socket::Connection * client) {
 
     while(client->isrunning()) {
     
-        Poller poller(FFT::WINDOW_LATENCY_MS);
+        Poller poller(WINDOW_LATENCY_MS);
 
         //Declare local array
-        FFT::Shared_Array_t::array_type localArray;
+        shared_fft_t::array_type localArray;
 
         //Read from socket into local array
         client->recv(
             localArray.data(),
-            sizeof(FFT::Shared_Array_t::value_type) * FFT::Shared_Array_t::size);
+            sizeof(shared_fft_t::value_type) * shared_fft_t::size);
 
         //Copy local array to shared array
         sharedArray.write(localArray);
@@ -46,9 +45,9 @@ fft_histogram_histogram(PyObject *self, PyObject *args) {
     //Copy shared array to local array
     decltype(sharedArray)::array_type localArray = sharedArray.read();
 
-    PyObject * pylist = PyList_New(FFT::OUTPUT_FFT_SIZE);
+    PyObject * pylist = PyList_New(OUTPUT_FFT_SIZE);
 
-    for(size_t i = 0; i < FFT::OUTPUT_FFT_SIZE; ++i) {
+    for(size_t i = 0; i < OUTPUT_FFT_SIZE; ++i) {
         PyObject * pydouble = Py_BuildValue("d",localArray[i]);
         PyList_SetItem(pylist, i, pydouble);
     }
@@ -58,13 +57,13 @@ fft_histogram_histogram(PyObject *self, PyObject *args) {
 
 static PyObject *
 fft_histogram_bin_count(PyObject *self, PyObject *args) {
-    PyObject * val = PyLong_FromLong(FFT::OUTPUT_FFT_SIZE);
+    PyObject * val = PyLong_FromLong(OUTPUT_FFT_SIZE);
     return val;
 }
 
 static PyObject *
 fft_histogram_max_hz(PyObject *self, PyObject *args) {
-    PyObject * val = PyLong_FromLong(FFT::OUTPUT_FFT_MAX_HZ);
+    PyObject * val = PyLong_FromLong(OUTPUT_FFT_MAX_HZ);
     return val;
 }
 

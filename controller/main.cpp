@@ -7,10 +7,8 @@
 #include "../socket/socket.h" //Socket wrapper
 #include "../include/shared_array.h" //Thread-safe array
 #include "../include/poller.h"
-#include "../fft/fft.h"
 #include "../localcontroller/localcontroller.h"
 
-//FFT fft;
 LocalController lc;
 
 //Destructors not correctly called if program interrupted
@@ -23,21 +21,21 @@ void sigint_handler(int signum) {
 
 void socket_send(Socket::Connection * client) {
 
-    double localArray[WINDOW_SIZE];
+    shared_fft_t::array_type localArray;
 
     while(client->isrunning()) {
         
         Poller poller(WINDOW_LATENCY_MS);
 
         //Copy shared array to local array
-        // FFT::Shared_Array_t::array_type localArray = fft.read();
+        // shared_fft_t::array_type localArray = fft.read();
 
-        lc.GetData(localArray);
+        lc.GetData(localArray.data());
 
         //Send local array over socket
         client->send(
-            localArray,
-            sizeof(FFT::Shared_Array_t::value_type) * FFT::Shared_Array_t::size);
+            localArray.data(),
+            sizeof(shared_fft_t::value_type) * shared_fft_t::size);
 
     }
 

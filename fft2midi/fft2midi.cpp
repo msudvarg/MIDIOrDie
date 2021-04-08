@@ -8,12 +8,10 @@ bool done = false;
 
 Desynthesizer::Desynthesizer(int port, unsigned int channel, bool _all, bool _hillclimb) :
   ms (port),
-  //tone (FFT::WINDOW_SIZE, FFT::OUTPUT_FFT_MAX_HZ),
   all (_all),
   hillclimb (_hillclimb)
 {
   ms.ChangeChannel(channel);
-
   tone.DummySignature();
 }
 
