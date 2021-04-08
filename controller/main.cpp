@@ -23,7 +23,7 @@ void socket_send(Socket::Connection * client) {
 
     shared_fft_t::array_type localArray;
 
-    while(client->isrunning()) {
+    while(client->isrunning() && !quit) {
         
         Poller poller(WINDOW_LATENCY_MS);
 

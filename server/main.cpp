@@ -31,12 +31,12 @@ void socket_recv(Socket::Connection * client) {
 
     Channel channel(channel_broker, drum);
 
+    std::cout << "Connecting to MIDI port: " << port << " ..." << std::endl;
     Desynthesizer desynth {port, channel.get_channel(), all, hillclimb};
-    std::cout << "Connecting to MIDI port: " << port << std::endl;
     shared_fft_t::array_type & fft_data = desynth.fft_data();
 
     //Loop and do stuff
-    while(client->isrunning()) {
+    while(client->isrunning() && !quit) {
         
         Poller poller(WINDOW_LATENCY_MS);
 

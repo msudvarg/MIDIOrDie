@@ -12,7 +12,7 @@
 MidiStream::MidiStream(int port) {
   //port=0 as default in declaration
   midiout.openPort(port);
-  std::cout << "Connected to MIDI port " << port << std::endl;
+  std::cout << "Connected to MIDI port: " << port << std::endl;
 }
 
 void MidiStream::Send(unsigned char note, bool on) {
