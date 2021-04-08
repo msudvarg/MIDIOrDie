@@ -96,15 +96,43 @@ FreqList Tone::GetPeakPitches() {
 FreqList Tone::Hillclimb() {
   FreqList peaks;
   
-  for(int i = 1; i < fft_size / 2; i++) {
+  for(int i = 1; i < fft_size; i++) {
     if (interval.at(i) < interval.at(i - 1)) {
-      if (interval.at(i) > 1.0f) {
-        peaks.push_back(i * max_hz / fft_size);
+      if (interval.at(i-1) > 1.0f) {
+        peaks.push_back((i-1) * max_hz / fft_size);
       }
     }
   }
   
   return peaks;
+}
+
+FreqList Tone::HillClimbConstrained() {
+
+  FreqList peaks;
+
+  int max = 0;
+  int max_index = 0;
+  
+  //Get largest peak
+  for(int i = 1; i < fft_size; i++) {
+    if(interval.at(i) > max) {
+      max = interval.at(i);
+      max_index = i;
+    }
+  }
+
+  //Adjust if max in top half of frequency range
+  if(max_index > fft_size/2) max_index = fft_size/2;
+
+  //Iterate over 1 octave in either direction
+  for(int i = max_index/2 + 1; i < max_index*2; ++i) {
+    if (interval.at(i) < interval.at(i - 1)) {
+      if (interval.at(i-1) > 1.0f) {
+        peaks.push_back((i-1) * max_hz / fft_size);
+      }
+    }
+  }
 }
 
 float Tone::GetMaxWave() {

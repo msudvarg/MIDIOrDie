@@ -65,6 +65,7 @@ public:
   float GetPitchStrength(int frequency);
   FreqList GetPeakPitches();
   FreqList Hillclimb();
+  FreqList HillClimbConstrained();
   int GetPeakPitch();
   float GetMaxWave();
   
