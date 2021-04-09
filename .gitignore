@@ -49,3 +49,4 @@ fft_animation/
 fftw3/
 
 build/
+signature_extraction_model/venv3/
