@@ -4,3 +4,9 @@
 [submodule "rtmidi"]
 	path = rtmidi
 	url = https://github.com/thestk/rtmidi
+[submodule "cppflow"]
+	path = cppflow
+	url = https://github.com/serizba/cppflow.git
+[submodule "fft2midi/cnpy"]
+	path = fft2midi/cnpy
+	url = https://github.com/rogersce/cnpy.git

@@ -13,6 +13,7 @@ constexpr int OUTPUT_FFT_MAX_HZ = 2000;
 constexpr float DELTA_HZ        = 1000.0 / WINDOW_LATENCY_MS;  
 constexpr int WINDOW_SIZE = SAMPLE_RATE * WINDOW_LATENCY_MS / 1000;  // Number of samples that fit into latency window, rounded down to power of 2
 constexpr int OUTPUT_FFT_SIZE = OUTPUT_FFT_MAX_HZ / DELTA_HZ;        // Number of Hz bins to visualize
+constexpr int MODEL_OUTPUT_SIZE = 48;
 
 //FFT 
 using shared_fft_t = Shared_Array<float,OUTPUT_FFT_SIZE>;

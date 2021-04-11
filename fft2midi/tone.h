@@ -8,6 +8,9 @@
 #include <cstring>
 
 #include "../include/manifest.h"
+#include "../cppflow/include/cppflow/ops.h"
+#include "../cppflow/include/cppflow/model.h"
+#include "cnpy/cnpy.h"
 
 #define HARMONICS 8   // Default number of harmonics to capture in the signature
 #define MATCH_CONFIDENCE  0.9
@@ -22,6 +25,7 @@
 #define SEMITONE  1.059463094
 #define C0_HZ     16.35
 #define C0        12
+#define E2        40
 constexpr float NORMAL_HZ = OUTPUT_FFT_MAX_HZ / HARMONICS;   // The signature represents a FFT of a note at this frequency (in Hz)
                                                               // Its amplitude serves as a threshold that must be met for a note to be considered "playing"
 /*
@@ -58,7 +62,7 @@ public:
   Tone(int fft_size, int max_hz, float threshold);
   ~Tone();
   */
-  Tone() = default;
+  Tone(std::string model_folder, std::string calibration_filename);
   ~Tone() = default;
   
   bool HasPitch(int frequency);
@@ -108,10 +112,15 @@ private:
   float NoteToFreq(int note);
   int FreqToNote(float freq, int round=0);
 
+  cppflow::model model;
+  std::vector<float> calib;
+  std::vector<float> silence;
+
   float threshold = 20.0;
   int harmonics_captured = HARMONICS;
   int max_hz = OUTPUT_FFT_MAX_HZ;
   int fft_size = OUTPUT_FFT_SIZE;
+  int model_outputs = MODEL_OUTPUT_SIZE;
 };
 
 static inline FreqList FreqDifference(FreqList a, FreqList b) {

@@ -9,10 +9,10 @@ bool done = false;
 Desynthesizer::Desynthesizer(int port, unsigned int channel, bool _all, bool _hillclimb) :
   ms (port),
   all (_all),
-  hillclimb (_hillclimb)
+  hillclimb (_hillclimb),
+  tone ("../signature_extraction_model/tf_model", "../signature_extraction_model/acoustic_oren_calib_row48.npy")    // Make the calib file not hard-coded
 {
   ms.ChangeChannel(channel);
-  tone.DummySignature();
 }
 
 void Desynthesizer::run() {

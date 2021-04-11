@@ -40,7 +40,7 @@ void socket_recv(Socket::Connection * client) {
         
         Poller poller(WINDOW_LATENCY_MS);
 
-        //Read from socket into Desynth object
+        //Read from socket into Desynth object. Contents can be found in desynth.tone.interval
         client->recv(
             fft_data.data(),
             sizeof(shared_fft_t::value_type) * shared_fft_t::size);

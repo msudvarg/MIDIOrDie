@@ -1,6 +1,7 @@
 #include "tone.h"
 #include <algorithm>
 #include <iostream>
+#include <exception>      // std::exception
 
 /*
 Tone::Tone() : Tone (WINDOW_SIZE, OUTPUT_FFT_MAX_HZ, 20.0) {}
@@ -31,6 +32,29 @@ Tone::~Tone() {
   delete [] raw_audio;
 }
 */
+
+Tone::Tone(std::string model_folder, std::string calibration_filename) :
+  model(model_folder)
+{
+  cnpy::NpyArray arr = cnpy::npy_load(calibration_filename);
+
+  //assert(arr.word_size == sizeof(double));
+  assert(arr.shape.size() == 2 && arr.shape[0] == 4 && arr.shape[1] == OUTPUT_FFT_SIZE);
+
+  std::vector<double> arr_vector = arr.as_vec<double>();
+
+  // First row is silence profile, next 3 are bass, mid, treble calibration ffts
+  silence.resize(OUTPUT_FFT_SIZE);
+  calib.resize(3*OUTPUT_FFT_SIZE);
+  for(int i = 0; i < OUTPUT_FFT_SIZE; i++) {
+    silence[i] = arr_vector[i];
+  }
+  for(int i = 0; i < 3*OUTPUT_FFT_SIZE; i++) {
+    calib[i] = arr_vector[i+OUTPUT_FFT_SIZE];
+  }
+  // silence = std::vector<double>(arr_vector.begin(), arr_vector.begin() + OUTPUT_FFT_SIZE);
+  // calib = std::vector<double>(arr_vector.begin() + OUTPUT_FFT_SIZE, arr_vector.end());
+}
 
 float Tone::NoteToFreq(int note) {
   return C0_HZ * std::pow(SEMITONE, note - C0);
@@ -191,7 +215,28 @@ void Tone::DummySignature() {
 }
 
 FreqList Tone::ExtractSignatures() {
-  return ExtractSignatures(GetPeakPitches());
+  std::vector<float> temp;
+  temp.resize(OUTPUT_FFT_SIZE);
+  for(int i = 0; i < OUTPUT_FFT_SIZE; i++) {
+    temp[i] = interval[i] - silence[i];
+  }
+
+  cppflow::tensor calib_input(calib, {1, 3, OUTPUT_FFT_SIZE});
+  cppflow::tensor input(temp, {1, OUTPUT_FFT_SIZE});
+
+  std::vector<cppflow::tensor> output = model({{"serving_default_calibrations:0", calib_input},
+                                               {"serving_default_main_input:0", input}}, {"StatefulPartitionedCall:0"});
+  FreqList frequencies;
+
+  //std::cout << output[0] << std::endl;
+  int i = 0;
+  for(auto v : output[0].get_data<float>()) {
+    if (v > 0.8) {
+      frequencies.push_back(i + E2);
+    }
+    i++;
+  }
+  return frequencies;
 }
 
 // Primers contains a list of notes to look for
