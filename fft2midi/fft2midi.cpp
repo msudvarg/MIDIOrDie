@@ -19,7 +19,7 @@ void Desynthesizer::run() {
   FreqList peaks;
 
   if (hillclimb) {
-    peaks = tone.Hillclimb();
+    peaks = tone.HillClimbConstrained();
   } else {
     peaks = tone.ExtractSignatures();
   }
