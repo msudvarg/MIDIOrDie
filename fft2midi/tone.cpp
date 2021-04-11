@@ -95,8 +95,8 @@ int Tone::GetPeakPitch() {
 
 // Finds peaks in fft (defined as any bucket above 7th octile) and returns list of ints
 // corresponding to notes. If more that one note resides in a bucket, it returns all of them
-FreqList Tone::GetPeakPitches() {
-  FreqList peaks;
+NotesList Tone::GetPeakPitches() {
+  NotesList peaks;
 
   shared_fft_t::array_type arr = interval;
   std::sort(arr.begin(), arr.end());
@@ -117,8 +117,8 @@ FreqList Tone::GetPeakPitches() {
   return peaks;
 }
 
-FreqList Tone::Hillclimb() {
-  FreqList peaks;
+NotesList Tone::Hillclimb() {
+  NotesList peaks;
   
   for(int i = 1; i < fft_size; i++) {
     if (interval.at(i) < interval.at(i - 1)) {
@@ -131,9 +131,9 @@ FreqList Tone::Hillclimb() {
   return peaks;
 }
 
-FreqList Tone::HillClimbConstrained() {
+NotesList Tone::HillClimbConstrained() {
 
-  FreqList peaks;
+  NotesList peaks;
 
   int max = 0;
   int max_index = 0;
@@ -153,10 +153,12 @@ FreqList Tone::HillClimbConstrained() {
   for(int i = max_index/2 + 1; i < max_index*2; ++i) {
     if (interval.at(i) < interval.at(i - 1)) {
       if (interval.at(i-1) > 1.0f) {
-        peaks.push_back((i-1) * max_hz / fft_size);
+        peaks.push_back(Freq2Midi((i-1) * max_hz / fft_size));
       }
     }
   }
+
+  return peaks;
 }
 
 float Tone::GetMaxWave() {
@@ -242,7 +244,7 @@ void Tone::DummySignature() {
   // signature[80] = -4;
 }
 
-FreqList Tone::ExtractSignatures() {
+NotesList Tone::ExtractSignatures() {
   std::vector<float> temp;
   temp.resize(OUTPUT_FFT_SIZE);
   for(int i = 0; i < OUTPUT_FFT_SIZE; i++) {
@@ -254,7 +256,7 @@ FreqList Tone::ExtractSignatures() {
 
   std::vector<cppflow::tensor> output = model({{"serving_default_calibrations:0", calib_input},
                                                {"serving_default_main_input:0", input}}, {"StatefulPartitionedCall:0"});
-  FreqList frequencies;
+  NotesList frequencies;
 
   //std::cout << output[0] << std::endl;
   int i = 0;
@@ -268,8 +270,8 @@ FreqList Tone::ExtractSignatures() {
 }
 
 // Primers contains a list of notes to look for
-FreqList Tone::ExtractSignatures(FreqList primers) {
-  FreqList found;
+NotesList Tone::ExtractSignatures(NotesList primers) {
+  NotesList found;
   float bucket_size = max_hz / fft_size;
 
   float fftcopy[OUTPUT_FFT_SIZE];

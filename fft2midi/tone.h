@@ -7,6 +7,8 @@
 #include <cmath>
 #include <cstring>
 
+#include "midi.h"
+
 #include "../include/manifest.h"
 #include "../cppflow/include/cppflow/ops.h"
 #include "../cppflow/include/cppflow/model.h"
@@ -26,6 +28,7 @@
 #define C0_HZ     16.35
 #define C0        12
 #define E2        40
+#define E6        88
 constexpr float NORMAL_HZ = OUTPUT_FFT_MAX_HZ / HARMONICS;   // The signature represents a FFT of a note at this frequency (in Hz)
                                                               // Its amplitude serves as a threshold that must be met for a note to be considered "playing"
 /*
@@ -51,7 +54,7 @@ public:
   const_iterator cend() const noexcept {return list.cend();}
 
 }; */
-using FreqList = std::vector<int>;
+using NotesList = std::vector<int>;
 
 class Tone {
 public:
@@ -67,9 +70,9 @@ public:
   
   bool HasPitch(int frequency);
   float GetPitchStrength(int frequency);
-  FreqList GetPeakPitches();
-  FreqList Hillclimb();
-  FreqList HillClimbConstrained();
+  NotesList GetPeakPitches();
+  NotesList Hillclimb();
+  NotesList HillClimbConstrained();
   int GetPeakPitch();
   float GetMaxWave();
   
@@ -78,8 +81,8 @@ public:
   void SetSignature(float* sig, int length);
   void DummySignature();
 
-  FreqList ExtractSignatures();
-  FreqList ExtractSignatures(FreqList primers);
+  NotesList ExtractSignatures();
+  NotesList ExtractSignatures(NotesList primers);
 
   void SetThreshold(float threshold);
   float GetThreshold();
@@ -124,8 +127,8 @@ private:
   int model_outputs = MODEL_OUTPUT_SIZE;
 };
 
-static inline FreqList FreqDifference(FreqList a, FreqList b) {
-  FreqList v(a.size());
+static inline NotesList FreqDifference(NotesList a, NotesList b) {
+  NotesList v(a.size());
   auto it = std::set_difference(a.begin(), a.end(), b.begin(), b.end(), v.begin());
   v.resize(it-v.begin());
   return v;

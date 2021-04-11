@@ -16,55 +16,55 @@ Desynthesizer::Desynthesizer(int port, unsigned int channel, bool _all, bool _hi
 }
 
 void Desynthesizer::run() {
-  FreqList peaks;
+  NotesList notes;
 
   if (hillclimb) {
-    peaks = tone.HillClimbConstrained();
+    notes = tone.HillClimbConstrained();
   } else {
-    peaks = tone.ExtractSignatures();
+    notes = tone.ExtractSignatures();
   }
 
-    for(int n : peaks) {
+    for(int n : notes) {
       std::cout << tone.GetNoteName(n) << " ";
     }
     std::cout << std::endl;
 
     if (all) {
       // Play all the pitches found in the fft
-      for (int freq : FreqDifference(peaks, old_peaks)) {
-        if (InMidiRange(freq)) {
-          ms.Send(Freq2Midi(freq), true);
+      for (int note : FreqDifference(notes, old_notes)) {
+        if (InMidiRange(note)) {
+          ms.Send(note, true);
         }
       }
 
-      for (int freq : FreqDifference(old_peaks, peaks)) {
-        if (InMidiRange(freq)) {
-          ms.Send(Freq2Midi(freq), false);
+      for (int note : FreqDifference(old_notes, notes)) {
+        if (InMidiRange(note)) {
+          ms.Send(note, false);
         }
       }
     } else {
       // Just play the fundamental frequency
-      if (peaks.size() > 0) {
-        int freq = peaks[0];
-        if (old_peaks.size() == 0) {
-          if (InMidiRange(freq)) {
-            ms.Send(Freq2Midi(freq), true);
+      if (notes.size() > 0) {
+        int note = notes[0];
+        if (old_notes.size() == 0) {
+          if (InMidiRange(note)) {
+            ms.Send(note, true);
           }
-        } else if (old_peaks[0] != freq) {
-          if (InMidiRange(freq)) {
-            ms.Send(Freq2Midi(freq), true);
+        } else if (old_notes[0] != note) {
+          if (InMidiRange(note)) {
+            ms.Send(note, true);
           }
-          if (InMidiRange(old_peaks[0])) {
-            ms.Send(Freq2Midi(old_peaks[0]), false);
+          if (InMidiRange(old_notes[0])) {
+            ms.Send(old_notes[0], false);
           }
         }
-      } else if (old_peaks.size() > 0) {
-        if (InMidiRange(old_peaks[0])) {
-          ms.Send(Freq2Midi(old_peaks[0]), false);
+      } else if (old_notes.size() > 0) {
+        if (InMidiRange(old_notes[0])) {
+          ms.Send(old_notes[0], false);
         }
       }
     }
-    old_peaks = peaks;
+    old_notes = notes;
 
 }
 

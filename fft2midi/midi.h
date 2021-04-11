@@ -26,8 +26,8 @@ private:
   static constexpr unsigned char PC_CHANGE = 0xC0;
 };
 
-static inline bool InMidiRange(int freq) {
-  return freq > 64 and freq < 4435;
+static inline bool InMidiRange(int note) {
+  return note < 128;
 }
 
 static inline unsigned char Freq2Midi(int freq) {

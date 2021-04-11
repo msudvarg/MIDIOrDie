@@ -1,13 +1,12 @@
 #pragma once
 
 #include "tone.h"
-#include "midi.h"
 
 class Desynthesizer {
 
 private:
     MidiStream ms;
-    FreqList old_peaks;
+    NotesList old_notes;
     Tone tone;
     bool all;
     bool hillclimb;
