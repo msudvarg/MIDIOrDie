@@ -133,6 +133,7 @@ FreqList Tone::HillClimbConstrained() {
       }
     }
   }
+  return peaks;
 }
 
 float Tone::GetMaxWave() {
