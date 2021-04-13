@@ -1,0 +1,33 @@
+[gd_scene load_steps=5 format=2]
+
+[ext_resource path="res://Fretboard.tscn" type="PackedScene" id=1]
+
+[sub_resource type="PlaneMesh" id=1]
+size = Vector2( 2, 1 )
+
+[sub_resource type="ViewportTexture" id=4]
+viewport_path = NodePath("Viewport")
+
+[sub_resource type="SpatialMaterial" id=3]
+resource_local_to_scene = true
+flags_transparent = true
+albedo_texture = SubResource( 4 )
+
+[node name="Spatial" type="Spatial"]
+
+[node name="Viewport" type="Viewport" parent="."]
+size = Vector2( 1024, 512 )
+transparent_bg = true
+handle_input_locally = false
+hdr = false
+usage = 0
+
+[node name="Fretboard" parent="Viewport" instance=ExtResource( 1 )]
+
+[node name="MeshInstance" type="MeshInstance" parent="."]
+mesh = SubResource( 1 )
+material/0 = SubResource( 3 )
+
+[node name="Camera" type="Camera" parent="."]
+transform = Transform( 0.998682, -4.27893e-08, 0.051325, -0.0312084, 0.793895, 0.607254, -0.0407467, -0.608055, 0.792849, 0.118966, 0.732914, 1.08223 )
+current = true

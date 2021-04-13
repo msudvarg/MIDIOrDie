@@ -1,0 +1,98 @@
+[gd_scene load_steps=3 format=2]
+
+[ext_resource path="res://String.tscn" type="PackedScene" id=1]
+[ext_resource path="res://Fretboard.gd" type="Script" id=2]
+
+[node name="Fretboard" type="Control"]
+anchor_right = 1.0
+anchor_bottom = 1.0
+script = ExtResource( 2 )
+__meta__ = {
+"_edit_use_anchors_": false
+}
+
+[node name="String" parent="." instance=ExtResource( 1 )]
+anchor_top = 0.1
+anchor_bottom = 0.1
+
+[node name="String2" parent="." instance=ExtResource( 1 )]
+anchor_top = 0.2
+anchor_bottom = 0.2
+
+[node name="String3" parent="." instance=ExtResource( 1 )]
+anchor_top = 0.3
+anchor_bottom = 0.3
+
+[node name="String4" parent="." instance=ExtResource( 1 )]
+anchor_top = 0.4
+anchor_bottom = 0.4
+
+[node name="String5" parent="." instance=ExtResource( 1 )]
+anchor_top = 0.5
+anchor_bottom = 0.5
+
+[node name="String6" parent="." instance=ExtResource( 1 )]
+anchor_top = 0.6
+anchor_bottom = 0.6
+
+[node name="Frets" type="HBoxContainer" parent="."]
+anchor_right = 1.0
+anchor_bottom = 1.0
+alignment = 1
+__meta__ = {
+"_edit_use_anchors_": false
+}
+
+[node name="VSeparator" type="VSeparator" parent="Frets"]
+margin_left = 46.0
+margin_right = 146.0
+margin_bottom = 600.0
+rect_min_size = Vector2( 100, 0 )
+
+[node name="VSeparator2" type="VSeparator" parent="Frets"]
+margin_left = 150.0
+margin_right = 250.0
+margin_bottom = 600.0
+rect_min_size = Vector2( 100, 0 )
+
+[node name="VSeparator3" type="VSeparator" parent="Frets"]
+margin_left = 254.0
+margin_right = 354.0
+margin_bottom = 600.0
+rect_min_size = Vector2( 100, 0 )
+
+[node name="VSeparator4" type="VSeparator" parent="Frets"]
+margin_left = 358.0
+margin_right = 458.0
+margin_bottom = 600.0
+rect_min_size = Vector2( 100, 0 )
+
+[node name="VSeparator5" type="VSeparator" parent="Frets"]
+margin_left = 462.0
+margin_right = 562.0
+margin_bottom = 600.0
+rect_min_size = Vector2( 100, 0 )
+
+[node name="VSeparator6" type="VSeparator" parent="Frets"]
+margin_left = 566.0
+margin_right = 666.0
+margin_bottom = 600.0
+rect_min_size = Vector2( 100, 0 )
+
+[node name="VSeparator7" type="VSeparator" parent="Frets"]
+margin_left = 670.0
+margin_right = 770.0
+margin_bottom = 600.0
+rect_min_size = Vector2( 100, 0 )
+
+[node name="VSeparator8" type="VSeparator" parent="Frets"]
+margin_left = 774.0
+margin_right = 874.0
+margin_bottom = 600.0
+rect_min_size = Vector2( 100, 0 )
+
+[node name="VSeparator9" type="VSeparator" parent="Frets"]
+margin_left = 878.0
+margin_right = 978.0
+margin_bottom = 600.0
+rect_min_size = Vector2( 100, 0 )
