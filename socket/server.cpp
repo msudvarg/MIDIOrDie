@@ -15,6 +15,12 @@ Server::Server(
     running {true}
 {
 
+    //Set SO_REUSEADDR so socket can be rebound immediately after close
+	int optval = 1;
+	if (setsockopt(sfd, SOL_SOCKET, SO_REUSEADDR, &optval, sizeof(int)) < 0) {
+		throw Reuse_Error{};
+	}
+
     //Bind to socket
 	if (bind(sfd, (struct sockaddr*) &addr, sizeof(struct sockaddr_in)) == -1) {
 		throw Bind_Error{};
