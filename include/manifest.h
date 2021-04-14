@@ -17,3 +17,5 @@ constexpr int MODEL_OUTPUT_SIZE = 48;
 
 //FFT 
 using shared_fft_t = Shared_Array<float,OUTPUT_FFT_SIZE>;
+
+//Clock type for poller and timing measurements
