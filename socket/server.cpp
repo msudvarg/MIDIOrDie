@@ -49,10 +49,15 @@ void Server::accept_clients() {
     
     //TODO: Modify so we only accept up to max_clients connections
     while(running) {
-        int cfd = accept(sfd, NULL, NULL);
+        int cfd = accept4(sfd, NULL, NULL, SOCK_NONBLOCK);
 		if (cfd == -1) {
-            running = false;
-            return;
+            if(errno == EAGAIN || errno == EWOULDBLOCK) {
+                continue;
+            }
+            else {
+                running = false;
+                return;
+            }
         }
         clients.emplace_back(cfd, f);
     }
