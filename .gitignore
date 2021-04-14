@@ -49,3 +49,7 @@ fft_animation/
 fftw3/
 
 build/
+
+# Specific to notensorflow branch
+cppflow/
+fft2midi/cnpy/
