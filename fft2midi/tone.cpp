@@ -157,7 +157,10 @@ NotesList Tone::HillClimbConstrained() {
       }
     }
   }
+<<<<<<< HEAD
 
+=======
+>>>>>>> b7bdd8592e7c09000c8db08a7834c99700d9a957
   return peaks;
 }
 
