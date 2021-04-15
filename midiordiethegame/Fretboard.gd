@@ -1,13 +1,18 @@
 extends Control
 
-func _ready():
-	OS.open_midi_inputs()
-	print("MIDI initialized")
-	
-func _process(_delta):
-	if len(OS.get_connected_midi_inputs()) > 0:
-		print(OS.get_connected_midi_inputs())
+var dot_prefab = preload("res://dot.tscn")
 
-func _input(event):
-	if event is InputEventMIDI:
-		print(event.pitch)
+var fretted = {}
+
+func fret(note):
+	if not fretted.has(note) or not fretted[note]:
+		var dot = dot_prefab.instance()
+		add_child(dot)
+		dot.translate(Vector2(note, note))
+		fretted[note] = dot
+		
+func unfret(note):
+	if fretted.has(note) and fretted[note]:
+		var dot = fretted[note]
+		dot.queue_free()
+		fretted.erase(dot)

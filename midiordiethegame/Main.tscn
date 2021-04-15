@@ -1,19 +1,22 @@
-[gd_scene load_steps=5 format=2]
+[gd_scene load_steps=8 format=2]
 
 [ext_resource path="res://Fretboard.tscn" type="PackedScene" id=1]
+[ext_resource path="res://MidiListener.gd" type="Script" id=2]
+[ext_resource path="res://NoteSpawner.gd" type="Script" id=3]
+[ext_resource path="res://Console.tscn" type="PackedScene" id=4]
 
 [sub_resource type="PlaneMesh" id=1]
 size = Vector2( 2, 1 )
 
-[sub_resource type="ViewportTexture" id=4]
+[sub_resource type="ViewportTexture" id=2]
 viewport_path = NodePath("Viewport")
 
 [sub_resource type="SpatialMaterial" id=3]
 resource_local_to_scene = true
 flags_transparent = true
-albedo_texture = SubResource( 4 )
+albedo_texture = SubResource( 2 )
 
-[node name="Spatial" type="Spatial"]
+[node name="Main" type="Spatial"]
 
 [node name="Viewport" type="Viewport" parent="."]
 size = Vector2( 1024, 512 )
@@ -31,3 +34,13 @@ material/0 = SubResource( 3 )
 [node name="Camera" type="Camera" parent="."]
 transform = Transform( 0.998682, -4.27893e-08, 0.051325, -0.0312084, 0.793895, 0.607254, -0.0407467, -0.608055, 0.792849, 0.118966, 0.732914, 1.08223 )
 current = true
+
+[node name="NoteSpawner" type="Spatial" parent="."]
+transform = Transform( 1, 0, 0, 0, 1, 0, 0, 0, 1, -0.907379, 0.00945204, 0.42822 )
+script = ExtResource( 3 )
+string_colors = PoolColorArray( 0.203922, 0.94902, 0.0470588, 1, 0.945098, 0.0666667, 0.0666667, 1, 0.0509804, 0.901961, 0.988235, 1, 0.761719, 0.124969, 0.721922, 1, 0.87451, 0.772549, 0.0901961, 1, 0.486275, 0.160784, 0.968627, 1 )
+
+[node name="MidiListener" type="Node" parent="."]
+script = ExtResource( 2 )
+
+[node name="Console" parent="." instance=ExtResource( 4 )]

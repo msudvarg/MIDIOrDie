@@ -1,0 +1,18 @@
+[gd_scene load_steps=2 format=2]
+
+[ext_resource path="res://Console.gd" type="Script" id=1]
+
+[node name="Console" type="TextEdit"]
+visible = false
+self_modulate = Color( 1, 1, 1, 0.647059 )
+anchor_left = 0.712891
+anchor_top = 0.00166667
+anchor_right = 0.998961
+anchor_bottom = 0.910333
+margin_right = 0.0639992
+margin_bottom = -0.200001
+caret_block_mode = true
+script = ExtResource( 1 )
+__meta__ = {
+"_edit_use_anchors_": true
+}

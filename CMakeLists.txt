@@ -26,13 +26,15 @@ target_link_libraries(controller
   fft
   lc)
 
-add_executable(test_fft2midi testprograms/test_fft2midi.cpp)
-target_link_libraries(test_fft2midi
-  socket
-  fft
-  lc
-  fft2midi)
+if (BUILD_TEST_PROGRAMS)
+  add_executable(test_fft2midi testprograms/test_fft2midi.cpp)
+  target_link_libraries(test_fft2midi
+    socket
+    fft
+    lc
+    fft2midi)
 
-add_executable(channelbroker_test testprograms/channelbroker_test.cpp)
-target_link_libraries(channelbroker_test
-  fft2midi)
+  add_executable(channelbroker_test testprograms/channelbroker_test.cpp)
+  target_link_libraries(channelbroker_test
+    fft2midi)
+endif ()
