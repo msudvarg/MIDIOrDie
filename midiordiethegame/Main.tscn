@@ -1,9 +1,10 @@
-[gd_scene load_steps=8 format=2]
+[gd_scene load_steps=10 format=2]
 
 [ext_resource path="res://Fretboard.tscn" type="PackedScene" id=1]
 [ext_resource path="res://MidiListener.gd" type="Script" id=2]
 [ext_resource path="res://NoteSpawner.gd" type="Script" id=3]
 [ext_resource path="res://Console.tscn" type="PackedScene" id=4]
+[ext_resource path="res://MidiCPP.tres" type="GDNativeLibrary" id=5]
 
 [sub_resource type="PlaneMesh" id=1]
 size = Vector2( 2, 1 )
@@ -15,6 +16,11 @@ viewport_path = NodePath("Viewport")
 resource_local_to_scene = true
 flags_transparent = true
 albedo_texture = SubResource( 2 )
+
+[sub_resource type="NativeScript" id=4]
+resource_name = "MidiReader"
+class_name = "MidiReader"
+library = ExtResource( 5 )
 
 [node name="Main" type="Spatial"]
 
@@ -34,6 +40,9 @@ material/0 = SubResource( 3 )
 [node name="Camera" type="Camera" parent="."]
 transform = Transform( 0.998682, -4.27893e-08, 0.051325, -0.0312084, 0.793895, 0.607254, -0.0407467, -0.608055, 0.792849, 0.118966, 0.732914, 1.08223 )
 current = true
+
+[node name="MidiReader" type="Node" parent="."]
+script = SubResource( 4 )
 
 [node name="NoteSpawner" type="Spatial" parent="."]
 transform = Transform( 1, 0, 0, 0, 1, 0, 0, 0, 1, -0.907379, 0.00945204, 0.42822 )
