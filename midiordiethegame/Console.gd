@@ -3,6 +3,9 @@ extends TextEdit
 var note_spawner
 var midi_reader
 
+onready var start_timer = $StartTimer
+onready var audio_player = $AudioStreamPlayer
+
 func _ready():
 	note_spawner = $"../NoteSpawner"
 	midi_reader = $"../MidiReader"
@@ -17,8 +20,15 @@ func parse(line : String):
 			cprint("emitting midi note "  + tokens[1] + "\n")
 			note_spawner.spawn(int(tokens[1]))
 		"load":
-			midi_reader.open(tokens[1])
-			print(midi_reader.get_all_notes())
+			var name = tokens[1]
+			midi_reader.open(name + ".mid")
+			audio_player.stream = load(name + ".ogg")
+		"play":
+			note_spawner.play()
+			start_timer.start()
+		"stop":
+			note_spawner.stop()
+			audio_player.stop()
 		_:
 			cprint("Unknown command\n")
 	
@@ -37,4 +47,6 @@ func _input(event):
 			visible = not visible
 			if visible:
 				grab_focus()
-			
+
+func start_timer_timeout():
+	audio_player.play()

@@ -2,10 +2,30 @@ extends Spatial
 
 export(PoolColorArray) var string_colors
 
+var midi_reader
+var playing = false
+var time = 0
+
 var note_prefab = preload("res://Note.tscn")
 
 const xoffset = 0.222
 const zoffset = -0.12
+
+func _ready():
+	midi_reader = $"../MidiReader"
+	
+func _process(delta):
+	if playing:
+		var new_time = time + delta
+		## Get notes starting between time and new time
+		var notes = midi_reader.get_notes_in_range(get_ticks(time), get_ticks(new_time))
+		for note in notes:
+			spawn(note)
+		time = new_time
+		
+func get_ticks(seconds):
+	## 480 midi ticks / 2 seconds
+	return seconds / 0.5 * 480
 
 func spawn(note: int):
 	if not is_playable_range(note):
@@ -25,3 +45,10 @@ func index(note: int):
 	var string = note / 5
 	var fret = note % 5
 	return [string, fret]
+	
+func play():
+	time = 0
+	playing = true
+
+func stop():
+	playing = false

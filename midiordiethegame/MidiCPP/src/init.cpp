@@ -46,12 +46,10 @@ public:
     // Loop over the track data
     unsigned char running_status;
     while (track_end > file->get_position()) {
-      int delta;
+      unsigned int delta;
       delta = read_variable_length();
-      std::cout << "Delta time: " << delta << std::endl;
       time += delta;
       
-
       unsigned char lead_in = file->get_8();
     running_status_reenter:
       if (lead_in == 0xFF) {
@@ -100,12 +98,12 @@ public:
   }
 
   int read_variable_length(int *nbytes=NULL) {
-    int val = 0, bytes = 0;
+    unsigned int val = 0, bytes = 0;
     unsigned char last;
     do {
       bytes++;
       last = file->get_8();
-      val = last & 0x7F;
+      val = (val << 7) + (last & 0x7F);
     } while (last & 0x80);
 
     if (nbytes) {

@@ -1,10 +1,12 @@
-[gd_scene load_steps=10 format=2]
+[gd_scene load_steps=12 format=2]
 
 [ext_resource path="res://Fretboard.tscn" type="PackedScene" id=1]
 [ext_resource path="res://MidiListener.gd" type="Script" id=2]
 [ext_resource path="res://NoteSpawner.gd" type="Script" id=3]
 [ext_resource path="res://Console.tscn" type="PackedScene" id=4]
 [ext_resource path="res://MidiCPP.tres" type="GDNativeLibrary" id=5]
+[ext_resource path="res://Rig.gd" type="Script" id=6]
+[ext_resource path="res://Meglovania.ogg" type="AudioStream" id=7]
 
 [sub_resource type="PlaneMesh" id=1]
 size = Vector2( 2, 1 )
@@ -37,10 +39,6 @@ usage = 0
 mesh = SubResource( 1 )
 material/0 = SubResource( 3 )
 
-[node name="Camera" type="Camera" parent="."]
-transform = Transform( 0.998682, -4.27893e-08, 0.051325, -0.0312084, 0.793895, 0.607254, -0.0407467, -0.608055, 0.792849, 0.118966, 0.732914, 1.08223 )
-current = true
-
 [node name="MidiReader" type="Node" parent="."]
 script = SubResource( 4 )
 
@@ -53,3 +51,19 @@ string_colors = PoolColorArray( 0.203922, 0.94902, 0.0470588, 1, 0.945098, 0.066
 script = ExtResource( 2 )
 
 [node name="Console" parent="." instance=ExtResource( 4 )]
+
+[node name="AudioStreamPlayer" type="AudioStreamPlayer" parent="Console"]
+stream = ExtResource( 7 )
+
+[node name="StartTimer" type="Timer" parent="Console"]
+one_shot = true
+
+[node name="Rig" type="Spatial" parent="."]
+transform = Transform( 1, 0, 0, 0, 0.928991, 0.370103, 0, -0.370103, 0.928991, -0.478232, 0.610219, 1.20949 )
+script = ExtResource( 6 )
+
+[node name="Camera" type="Camera" parent="Rig"]
+current = true
+fov = 43.4
+far = 5.0
+[connection signal="timeout" from="Console/StartTimer" to="Console" method="start_timer_timeout"]
