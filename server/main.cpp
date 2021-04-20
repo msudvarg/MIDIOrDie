@@ -35,6 +35,10 @@ void socket_recv(Socket::Connection * client) {
     Desynthesizer desynth {port, channel.get_channel(), all, hillclimb};
     shared_fft_t::array_type & fft_data = desynth.fft_data();
 
+    //Tell client ready
+    char ready = 1;
+    client->send(&ready, 1);
+
     //Loop and do stuff
     while(client->isrunning() && !quit) {
         
