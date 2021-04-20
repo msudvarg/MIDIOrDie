@@ -1,6 +1,6 @@
 [gd_scene load_steps=12 format=2]
 
-[ext_resource path="res://Fretboard.tscn" type="PackedScene" id=1]
+[ext_resource path="res://Fretboard/Fretboard.tscn" type="PackedScene" id=1]
 [ext_resource path="res://MidiListener.gd" type="Script" id=2]
 [ext_resource path="res://NoteSpawner.gd" type="Script" id=3]
 [ext_resource path="res://Console.tscn" type="PackedScene" id=4]

@@ -2,6 +2,7 @@ extends TextEdit
 
 var note_spawner
 var midi_reader
+var fretboard
 
 onready var start_timer = $StartTimer
 onready var audio_player = $AudioStreamPlayer
@@ -9,6 +10,7 @@ onready var audio_player = $AudioStreamPlayer
 func _ready():
 	note_spawner = $"../NoteSpawner"
 	midi_reader = $"../MidiReader"
+	fretboard = $"../Viewport/Fretboard"
 
 func parse(line : String):
 	if line == "":
@@ -19,6 +21,11 @@ func parse(line : String):
 			assert(note_spawner)
 			cprint("emitting midi note "  + tokens[1] + "\n")
 			note_spawner.spawn(int(tokens[1]))
+		"fret":
+			assert(fretboard)
+			cprint("fretting midi note " + tokens[1] + "\n")
+			fretboard.fret(int(tokens[1]))
+			note_spawner.fret(int(tokens[1]))
 		"load":
 			var name = tokens[1]
 			midi_reader.open(name + ".mid")

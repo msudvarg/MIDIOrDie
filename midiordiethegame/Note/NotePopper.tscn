@@ -1,0 +1,20 @@
+[gd_scene load_steps=3 format=2]
+
+[ext_resource path="res://Note/NotePopper.gd" type="Script" id=1]
+
+[sub_resource type="BoxShape" id=1]
+extents = Vector3( 0.05, 0.2, 0.05 )
+
+[node name="NotePopper" type="Area"]
+script = ExtResource( 1 )
+
+[node name="CollisionShape" type="CollisionShape" parent="."]
+shape = SubResource( 1 )
+
+[node name="DestroyTimer" type="Timer" parent="."]
+wait_time = 0.3
+one_shot = true
+autostart = true
+[connection signal="area_entered" from="." to="." method="note_entered"]
+[connection signal="body_entered" from="." to="." method="note_entered"]
+[connection signal="timeout" from="DestroyTimer" to="." method="queue_free"]

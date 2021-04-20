@@ -1,7 +1,7 @@
 [gd_scene load_steps=3 format=2]
 
-[ext_resource path="res://String.tscn" type="PackedScene" id=1]
-[ext_resource path="res://Fretboard.gd" type="Script" id=2]
+[ext_resource path="res://Fretboard/String.tscn" type="PackedScene" id=1]
+[ext_resource path="res://Fretboard/Fretboard.gd" type="Script" id=2]
 
 [node name="Fretboard" type="Control"]
 anchor_right = 1.0
@@ -96,3 +96,12 @@ margin_left = 878.0
 margin_right = 978.0
 margin_bottom = 600.0
 rect_min_size = Vector2( 100, 0 )
+
+[node name="NoteOrigin" type="Control" parent="."]
+anchor_left = 0.0469563
+anchor_top = 0.0824958
+anchor_right = 0.0469563
+anchor_bottom = 0.0824958
+__meta__ = {
+"_edit_use_anchors_": true
+}
