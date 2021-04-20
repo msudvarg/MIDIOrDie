@@ -23,10 +23,13 @@ void Desynthesizer::run() {
     peaks = tone.ExtractSignatures();
   }
 
+    /*
+    //Print extracted note information
     for(int n : peaks) {
       std::cout << tone.GetNoteName(n) << " ";
     }
     std::cout << std::endl;
+    */
 
     if (all) {
       // Play all the pitches found in the fft

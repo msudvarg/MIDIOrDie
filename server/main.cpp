@@ -30,8 +30,7 @@ void sigint_handler(int signum) {
 void socket_recv(Socket::Connection * client) {
 
     MidiChannel channel(*ms, drum);
-
-    std::cout << "Connecting to MIDI port: " << port << " ..." << std::endl;
+    
     Desynthesizer desynth {channel, all, hillclimb};
     shared_fft_t::array_type & fft_data = desynth.fft_data();
 
@@ -87,6 +86,7 @@ int main(int argc, char** argv) {
     try {
 
         //Construct MidiStream on specified port
+    	std::cout << "Connecting to MIDI port: " << port << " ..." << std::endl;
         ms = std::make_unique<MidiStream>(port);
         
         //Socket server to receive FFT data from client
