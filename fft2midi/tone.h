@@ -10,9 +10,8 @@
 #include "midi.h"
 
 #include "../include/manifest.h"
-#include "../cppflow/include/cppflow/ops.h"
-#include "../cppflow/include/cppflow/model.h"
 #include "cnpy/cnpy.h"
+#include "sigextr.h"
 
 #define HARMONICS 8   // Default number of harmonics to capture in the signature
 #define MATCH_CONFIDENCE  0.9
@@ -116,8 +115,8 @@ private:
   float NoteToFreq(int note);
   int FreqToNote(float freq, int round=0);
 
-  cppflow::model model;
-  std::vector<float> calib;
+  ModelLoader model;
+  std::vector<float> calib;       // Double check if this ever gets used beyond the constructor
   std::vector<float> silence;
 
   float threshold = 20.0;

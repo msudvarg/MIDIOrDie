@@ -1,7 +1,7 @@
 #include "tone.h"
 #include <algorithm>
 #include <iostream>
-#include <exception>      // std::exception
+#include <exception>      // std::exceptionc
 
 /*
 Tone::Tone() : Tone (WINDOW_SIZE, OUTPUT_FFT_MAX_HZ, 20.0) {}
@@ -52,6 +52,8 @@ Tone::Tone(std::string model_folder, std::string calibration_filename) :
   for(int i = 0; i < 3*OUTPUT_FFT_SIZE; i++) {
     calib[i] = arr_vector[i+OUTPUT_FFT_SIZE];
   }
+
+  model.set_calibrations(calib);
   // silence = std::vector<double>(arr_vector.begin(), arr_vector.begin() + OUTPUT_FFT_SIZE);
   // calib = std::vector<double>(arr_vector.begin() + OUTPUT_FFT_SIZE, arr_vector.end());
 }
@@ -250,17 +252,14 @@ NotesList Tone::ExtractSignatures() {
   for(int i = 0; i < OUTPUT_FFT_SIZE; i++) {
     temp[i] = interval[i] - silence[i];
   }
+  std::vector<float> output;
 
-  cppflow::tensor calib_input(calib, {1, 3, OUTPUT_FFT_SIZE});
-  cppflow::tensor input(temp, {1, OUTPUT_FFT_SIZE});
+  model.predict(temp, output);
 
-  std::vector<cppflow::tensor> output = model({{"serving_default_calibrations:0", calib_input},
-                                               {"serving_default_main_input:0", input}}, {"StatefulPartitionedCall:0"});
   NotesList frequencies;
-
   //std::cout << output[0] << std::endl;
   int i = 0;
-  for(auto v : output[0].get_data<float>()) {
+  for(auto v : output) {
     if (v > 0.8) {
       frequencies.push_back(i + E2);
     }

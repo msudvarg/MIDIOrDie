@@ -1,5 +1,7 @@
 Project(MidiOrDie)
 
+find_package(TensorflowCC REQUIRED)
+
 add_library(fft2midi SHARED
   channelbroker.cpp
   channelbroker.h
@@ -8,14 +10,16 @@ add_library(fft2midi SHARED
   midi.cpp
   midi.h
   tone.cpp
-  tone.h)
+  tone.h
+  sigextr.cpp
+  sigextr.h
+  )
 
 add_subdirectory(cnpy)
-link_libraries(tensorflow tensorflow_framework)
+# link_libraries(tensorflow tensorflow_framework)
 
 target_link_libraries(fft2midi
   rtmidi
   portaudio
   cnpy
-  tensorflow
-  tensorflow_framework)
+  TensorflowCC::TensorflowCC)
