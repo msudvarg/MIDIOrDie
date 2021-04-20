@@ -2,6 +2,7 @@
 #define MIDI_H
 
 #include <cmath>
+#include <mutex>
 #include "../rtmidi/RtMidi.h"
 #include "channelbroker.h"
 
@@ -19,6 +20,8 @@ public:
 private:
   RtMidiOut midiout;
   ChannelBroker broker;
+
+  std::mutex send_mtx;
   
   // frequency = 440 * 2^((n-69)/12)
   // n = lg(f/440) * 12 + 69

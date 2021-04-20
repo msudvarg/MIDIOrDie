@@ -23,6 +23,9 @@ void MidiStream::Send(unsigned char note, bool on, unsigned channel) {
   }
   buf[1] = note;
   buf[2] = 127;
+
+  //Not sure if sendMessage is thread safe
+  std::lock_guard<std::mutex> lk {send_mtx};
   midiout.sendMessage(buf, msgsize);
 }
 
