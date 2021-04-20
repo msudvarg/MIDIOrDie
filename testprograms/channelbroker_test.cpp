@@ -3,9 +3,10 @@
 #include <thread>
 #include <atomic>
 #include <mutex>
-#include "../fft2midi/channelbroker.h"
+#include "../fft2midi/midi.h"
+#include "../fft2midi/channel.h"
 
-ChannelBroker channel_broker {false}; //Do not print ports
+MidiStream ms; //Do not print ports
 std::mutex cout_mtx;
 
 //Barrier implementation is dumb but it works
@@ -18,7 +19,7 @@ void barrier(std::atomic<int> & b) {
 
 void test(bool drum) {
     barrier(b1);
-    Channel channel (channel_broker, drum);
+    MidiChannel channel (ms, drum);
     cout_mtx.lock();
     //std::cout << "I am thread " << local_counter << ". ";
     if(drum) std::cout << "I asked for the drum. ";

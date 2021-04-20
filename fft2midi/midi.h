@@ -3,19 +3,22 @@
 
 #include <cmath>
 #include "../rtmidi/RtMidi.h"
+#include "channelbroker.h"
 
 class MidiStream {
 public:
-  void Send(unsigned char note, bool on);
-  void ChangeInstrument(unsigned char instrument);
-  void ChangeChannel(unsigned char channel);
+  void Send(unsigned char note, bool on, unsigned channel);
+  void ChangeInstrument(unsigned char instrument, unsigned channel);
+
+  void freeChannel (unsigned int channel) { broker.freeChannel(channel); }
+  bool getChannel(unsigned int & channel, bool drum) { return broker.getChannel(channel, drum); }
 
   MidiStream(int port = 0);
 
 
 private:
   RtMidiOut midiout;
-  unsigned char channel = 0;
+  ChannelBroker broker;
   
   // frequency = 440 * 2^((n-69)/12)
   // n = lg(f/440) * 12 + 69

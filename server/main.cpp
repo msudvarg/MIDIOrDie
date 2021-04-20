@@ -3,6 +3,7 @@
 #include <iostream>
 #include <thread>
 #include <mutex>
+#include <memory>
 #include "portaudio.h"
 
 #include "../include/manifest.h"
@@ -10,9 +11,8 @@
 #include "../include/shared_array.h" //Thread-safe array
 #include "../include/poller.h"
 #include "../fft2midi/fft2midi.h"
-#include "../fft2midi/channelbroker.h"
 
-ChannelBroker channel_broker;
+std::unique_ptr<MidiStream> ms;
 
 int port = 0;
 bool drum = false;
@@ -29,10 +29,10 @@ void sigint_handler(int signum) {
 
 void socket_recv(Socket::Connection * client) {
 
-    Channel channel(channel_broker, drum);
+    MidiChannel channel(*ms, drum);
 
     std::cout << "Connecting to MIDI port: " << port << " ..." << std::endl;
-    Desynthesizer desynth {port, channel.get_channel(), all, hillclimb};
+    Desynthesizer desynth {channel, all, hillclimb};
     shared_fft_t::array_type & fft_data = desynth.fft_data();
 
     //Tell client ready
@@ -85,6 +85,9 @@ int main(int argc, char** argv) {
     //Exception handling
 
     try {
+
+        //Construct MidiStream on specified port
+        ms = std::make_unique<MidiStream>(port);
         
         //Socket server to receive FFT data from client
         static Socket::Server socket_server {IPADDR, PORTNO, socket_recv};
