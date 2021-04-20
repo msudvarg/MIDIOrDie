@@ -10,7 +10,7 @@ Desynthesizer::Desynthesizer(int port, unsigned int channel, bool _all, bool _hi
   ms (port),
   all (_all),
   hillclimb (_hillclimb),
-  tone ("../signature_extraction_model/tf_model", "../signature_extraction_model/acoustic_oren_calib_row48.npy")    // Make the calib file not hard-coded
+  tone ("../signature_extraction_model/tf_model/", "../signature_extraction_model/acoustic_oren_calib_row48.npy")    // Make the calib file not hard-coded
 {
   ms.ChangeChannel(channel);
 }

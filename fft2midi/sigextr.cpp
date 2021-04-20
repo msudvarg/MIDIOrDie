@@ -1,7 +1,6 @@
 #include "sigextr.h"
 
 ModelLoader::ModelLoader(string path){		
-	session_options.config.mutable_gpu_options()->set_allow_growth(true);	
 	auto status = tensorflow::LoadSavedModel(session_options, run_options, path, {"serve"},
 			&bundle);
 
