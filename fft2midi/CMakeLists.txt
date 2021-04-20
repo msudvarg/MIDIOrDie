@@ -22,4 +22,5 @@ target_link_libraries(fft2midi
   rtmidi
   portaudio
   cnpy
-  TensorflowCC::TensorflowCC)
+  TensorflowCC::TensorflowCC
+  protobuf)

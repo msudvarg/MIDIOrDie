@@ -11,8 +11,6 @@ add_subdirectory(portaudio)
 set(RTMIDI_TARGETNAME_UNINSTALL "rtmidi_uninstall" CACHE "" "" FORCE)
 add_subdirectory(rtmidi)
 
-find_package(TensorflowCC REQUIRED)
-
 ## MidiOrDie libraries
 add_subdirectory(socket)
 add_subdirectory(fft2midi)
@@ -22,9 +20,7 @@ add_subdirectory(localcontroller)
 add_executable(server server/main.cpp)
 target_link_libraries(server
   socket
-  fft2midi
-  TensorflowCC::TensorflowCC
-  protobuf)
+  fft2midi)
 
 add_executable(controller controller/main.cpp)
 target_link_libraries(controller
