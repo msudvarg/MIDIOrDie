@@ -10,7 +10,6 @@
 #include "midi.h"
 
 #include "../include/manifest.h"
-#include "cnpy/cnpy.h"
 #include "sigextr.h"
 
 #define HARMONICS 8   // Default number of harmonics to capture in the signature
@@ -64,7 +63,7 @@ public:
   Tone(int fft_size, int max_hz, float threshold);
   ~Tone();
   */
-  Tone(std::string model_folder, std::string calibration_filename);
+  Tone(std::vector<float> calib_init);
   ~Tone() = default;
   
   bool HasPitch(int frequency);
@@ -80,8 +79,7 @@ public:
   void SetSignature(float* sig, int length);
   void DummySignature();
 
-  NotesList ExtractSignatures();
-  NotesList ExtractSignatures(NotesList primers);
+  NotesList ExtractSignatures(ModelLoader &model);
 
   void SetThreshold(float threshold);
   float GetThreshold();
@@ -115,7 +113,6 @@ private:
   float NoteToFreq(int note);
   int FreqToNote(float freq, int round=0);
 
-  ModelLoader model;
   std::vector<float> calib;       // Double check if this ever gets used beyond the constructor
   std::vector<float> silence;
 

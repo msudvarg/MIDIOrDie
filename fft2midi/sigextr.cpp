@@ -13,15 +13,13 @@ ModelLoader::ModelLoader(string path){
 
 }
 
-void ModelLoader::set_calibrations(std::vector<float> calib_vector) {
-    calib = Tensor(tensorflow::DT_FLOAT, tensorflow::TensorShape({3, 80}));
-
-    std::copy_n(calib_vector.begin(), calib_vector.size(), calib.flat<float>().data());
-}
-
-void ModelLoader::predict(std::vector<float> audio, std::vector<float> &out_pred){
-    Tensor input(tensorflow::DT_FLOAT, tensorflow::TensorShape({3, 80}));
+void ModelLoader::predict(std::vector<float> audio, std::vector<float> calib_vector, std::vector<float> &out_pred){
+    Tensor input(tensorflow::DT_FLOAT, tensorflow::TensorShape({1, 80}));
     std::copy_n(audio.begin(), audio.size(), input.flat<float>().data());
+
+    Tensor calib = Tensor(tensorflow::DT_FLOAT, tensorflow::TensorShape({1, 3, 80}));
+    std::copy_n(calib_vector.begin(), calib_vector.size(), calib.flat<float>().data());
+
 	std::vector<Tensor> inputs = {input, calib};
 	make_prediction(inputs, out_pred);
 }
@@ -32,12 +30,14 @@ void ModelLoader::make_prediction(std::vector<Tensor> &inputs, std::vector<float
 	std::vector<std::pair<string, Tensor>> inputs_data  = {{input_node, inputs[0]}, {calib_node, inputs[1]}};
 	std::vector<string> output_nodes = {{"StatefulPartitionedCall:0"}}; //num_detections
 
-	
 	std::vector<Tensor> predictions;
-	this->bundle.GetSession()->Run(inputs_data, output_nodes, {}, &predictions);
+	auto status = this->bundle.GetSession()->Run(inputs_data, {"StatefulPartitionedCall:0"}, {}, &predictions);
+	if (!status.ok()) {
+		std::cout << status.ToString() << "\n";
+		return;
+	}
 
-
-	auto predicted_notes = predictions[0].tensor<float, 1>();
+	auto predicted_notes = predictions[0].flat<float>();
 	
 	//inflate with predictions
 	for (int i=0; i < predicted_notes.size(); i++){

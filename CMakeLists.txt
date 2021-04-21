@@ -16,10 +16,12 @@ add_subdirectory(socket)
 add_subdirectory(fft2midi)
 add_subdirectory(fft)
 add_subdirectory(localcontroller)
+add_subdirectory(cnpy)
 
 add_executable(server server/main.cpp)
 target_link_libraries(server
   socket
+  cnpy
   fft2midi)
 
 add_executable(controller controller/main.cpp)

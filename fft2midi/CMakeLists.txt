@@ -15,12 +15,10 @@ add_library(fft2midi SHARED
   sigextr.h
   )
 
-add_subdirectory(cnpy)
 # link_libraries(tensorflow tensorflow_framework)
 
 target_link_libraries(fft2midi
   rtmidi
   portaudio
-  cnpy
   TensorflowCC::TensorflowCC
   protobuf)

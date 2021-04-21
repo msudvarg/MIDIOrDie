@@ -8,5 +8,5 @@
 	path = cppflow
 	url = https://github.com/serizba/cppflow.git
 [submodule "fft2midi/cnpy"]
-	path = fft2midi/cnpy
+	path = cnpy
 	url = https://github.com/rogersce/cnpy.git

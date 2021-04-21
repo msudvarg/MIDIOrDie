@@ -44,6 +44,5 @@ class ModelLoader{
 		void make_prediction(std::vector<Tensor> &inputs, std::vector<float> &out_pred);
 	public:
 		ModelLoader(string);
-		void predict(std::vector<float> audio, std::vector<float> &out_pred);
-		void set_calibrations(std::vector<float> calib_vector);
+		void predict(std::vector<float> audio, std::vector<float> calib_vector, std::vector<float> &out_pred);
 };

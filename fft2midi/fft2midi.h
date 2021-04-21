@@ -15,9 +15,9 @@ public:
 
     shared_fft_t::array_type & fft_data() { return tone.interval; }
 
-    void run();
+    void run(ModelLoader &model);
 
-  Desynthesizer(int port, unsigned int channel, bool _all, bool _hillclimb);
+  Desynthesizer(int port, unsigned int channel, bool _all, bool _hillclimb, std::vector<float> calib);
     ~Desynthesizer() = default;
 
 };

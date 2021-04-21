@@ -33,27 +33,18 @@ Tone::~Tone() {
 }
 */
 
-Tone::Tone(std::string model_folder, std::string calibration_filename) :
-  model(model_folder)
+Tone::Tone(std::vector<float> calib_init)
 {
-  cnpy::NpyArray arr = cnpy::npy_load(calibration_filename);
-
-  //assert(arr.word_size == sizeof(double));
-  assert(arr.shape.size() == 2 && arr.shape[0] == 4 && arr.shape[1] == OUTPUT_FFT_SIZE);
-
-  std::vector<double> arr_vector = arr.as_vec<double>();
-
   // First row is silence profile, next 3 are bass, mid, treble calibration ffts
-  silence.resize(OUTPUT_FFT_SIZE);
-  calib.resize(3*OUTPUT_FFT_SIZE);
-  for(int i = 0; i < OUTPUT_FFT_SIZE; i++) {
-    silence[i] = arr_vector[i];
-  }
-  for(int i = 0; i < 3*OUTPUT_FFT_SIZE; i++) {
-    calib[i] = arr_vector[i+OUTPUT_FFT_SIZE];
-  }
+	silence.resize(OUTPUT_FFT_SIZE);
+	calib.resize(3*OUTPUT_FFT_SIZE);
+	for(int i = 0; i < OUTPUT_FFT_SIZE; i++) {
+		silence[i] = calib_init[i];
+	}
+	for(int i = 0; i < 3*OUTPUT_FFT_SIZE; i++) {
+		calib[i] = calib_init[i+OUTPUT_FFT_SIZE];
+	}
 
-  model.set_calibrations(calib);
   // silence = std::vector<double>(arr_vector.begin(), arr_vector.begin() + OUTPUT_FFT_SIZE);
   // calib = std::vector<double>(arr_vector.begin() + OUTPUT_FFT_SIZE, arr_vector.end());
 }
@@ -246,7 +237,7 @@ void Tone::DummySignature() {
   // signature[80] = -4;
 }
 
-NotesList Tone::ExtractSignatures() {
+NotesList Tone::ExtractSignatures(ModelLoader &model) {
   std::vector<float> temp;
   temp.resize(OUTPUT_FFT_SIZE);
   for(int i = 0; i < OUTPUT_FFT_SIZE; i++) {
@@ -254,7 +245,7 @@ NotesList Tone::ExtractSignatures() {
   }
   std::vector<float> output;
 
-  model.predict(temp, output);
+  model.predict(temp, calib, output);
 
   NotesList frequencies;
   //std::cout << output[0] << std::endl;
@@ -266,28 +257,6 @@ NotesList Tone::ExtractSignatures() {
     i++;
   }
   return frequencies;
-}
-
-// Primers contains a list of notes to look for
-NotesList Tone::ExtractSignatures(NotesList primers) {
-  NotesList found;
-  float bucket_size = max_hz / fft_size;
-
-  float fftcopy[OUTPUT_FFT_SIZE];
-  memcpy(fftcopy, interval.data(), OUTPUT_FFT_SIZE * sizeof(float));
-
-  for(int f : primers) {
-    if (f < FreqToNote(OUTPUT_FFT_MAX_HZ)) {
-      if (GetFrequencyPower(f, fftcopy, false) > 0) {
-        found.push_back(f);
-      }
-    }
-  }
-
-  // TODO: Maybe compare gains of notes or something?
-
-  return found;
-  
 }
 
 float Tone::GetFrequencyPower(int note, float* fft, bool remove) {

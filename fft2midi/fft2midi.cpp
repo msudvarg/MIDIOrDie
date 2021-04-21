@@ -6,22 +6,22 @@
 
 bool done = false;
 
-Desynthesizer::Desynthesizer(int port, unsigned int channel, bool _all, bool _hillclimb) :
+Desynthesizer::Desynthesizer(int port, unsigned int channel, bool _all, bool _hillclimb, std::vector<float> calib) :
   ms (port),
   all (_all),
   hillclimb (_hillclimb),
-  tone ("../signature_extraction_model/tf_model/", "../signature_extraction_model/acoustic_oren_calib_row48.npy")    // Make the calib file not hard-coded
+  tone(calib)
 {
   ms.ChangeChannel(channel);
 }
 
-void Desynthesizer::run() {
+void Desynthesizer::run(ModelLoader &model) {
   NotesList notes;
 
   if (hillclimb) {
     notes = tone.HillClimbConstrained();
   } else {
-    notes = tone.ExtractSignatures();
+    notes = tone.ExtractSignatures(model);
   }
 
     for(int n : notes) {
