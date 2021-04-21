@@ -59,10 +59,11 @@ stream = ExtResource( 7 )
 one_shot = true
 
 [node name="Rig" type="Spatial" parent="."]
-transform = Transform( 1, 0, 0, 0, 0.928991, 0.370103, 0, -0.370103, 0.928991, -0.478232, 0.610219, 1.20949 )
+transform = Transform( 1, 0, 0, 0, 1, 0, 0, 0, 1, -0.493446, 0, 0.20029 )
 script = ExtResource( 6 )
 
 [node name="Camera" type="Camera" parent="Rig"]
+transform = Transform( 1, 0, 0, 0, 0.928991, 0.370103, 0, -0.370103, 0.928991, 0.015214, 0.610219, 1.0092 )
 current = true
 fov = 43.4
 far = 5.0
