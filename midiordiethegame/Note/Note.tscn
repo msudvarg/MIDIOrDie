@@ -13,6 +13,7 @@ shader = ExtResource( 2 )
 shader_param/color = Color( 0, 0.129412, 0.968627, 1 )
 
 [sub_resource type="ParticlesMaterial" id=3]
+resource_local_to_scene = true
 emission_shape = 2
 emission_box_extents = Vector3( 0.1, 0.1, 0.1 )
 direction = Vector3( 0, 1, 0 )
@@ -33,6 +34,7 @@ particles_anim_loop = false
 albedo_texture = ExtResource( 4 )
 
 [sub_resource type="QuadMesh" id=5]
+resource_local_to_scene = true
 material = SubResource( 4 )
 size = Vector2( 0.2, 0.2 )
 

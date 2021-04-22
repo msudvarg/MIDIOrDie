@@ -11,5 +11,5 @@ func _ready():
 func _input(event):
 	if event is InputEventMIDI:
 		if event.message == MIDI_MESSAGE_NOTE_ON:
-			fretboard.fret(event.pitch)
-			notespawner.fret(event.pitch)
+			fretboard.call_deferred("fret", event.pitch)
+			notespawner.call_deferred("fret", event.pitch)
