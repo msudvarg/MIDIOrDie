@@ -5,4 +5,5 @@ add_library(lc
   localcontroller.h)
 
 target_link_libraries(lc
-  fftw3)
+  fftw3
+  portaudio)

@@ -12,3 +12,8 @@ func fret(note):
 	var dot = dot_prefab.instance()
 	note_origin.add_child(dot)
 	dot.translate(Vector2(idx[1] * xoffset, idx[0] * yoffset))
+	get_node("String" + str(idx[0] + 1)).freq = Util.freq(note)
+	dot.get_node("DestroyTimer").connect("timeout", self, "unfret", [idx[0] + 1])
+
+func unfret(string):
+	get_node("String" + str(string)).freq = 0

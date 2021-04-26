@@ -7,3 +7,6 @@ static func index(note: int):
 	var string = note / 5
 	var fret = note % 5
 	return [string, fret]
+
+static func freq(note: int):
+	return 440 * pow(2, (note - 69) / 12)
