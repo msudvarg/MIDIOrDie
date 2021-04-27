@@ -8,7 +8,6 @@
 #include "../include/shared_array.h" //Thread-safe array
 #include "../include/poller.h"
 #include "../fft2midi/fft2midi.h"
-#include "../fft2midi/channelbroker.h"
 #include "../localcontroller/localcontroller.h"
 
 bool forever = false;
@@ -19,7 +18,7 @@ bool all = false;
 bool hillclimb = false;
 
 LocalController lc;
-ChannelBroker channel_broker;
+std::unique_ptr<MidiStream> ms;
 
 //Destructors not correctly called if program interrupted
 //Use a signal handler and quit flag instead
@@ -30,9 +29,9 @@ void sigint_handler(int signum) {
 
 void run_desynth() {
 
-    Channel channel(channel_broker, drum);
+    MidiChannel channel(*ms, drum);
 
-    Desynthesizer desynth {port, channel.get_channel(), all, hillclimb};
+    Desynthesizer desynth {channel, all, hillclimb};
 
     shared_fft_t::array_type localArray;
 
@@ -87,6 +86,8 @@ int main(int argc, char** argv) {
 
     try {
 
+        //Construct MidiStream on specified port
+        ms = std::make_unique<MidiStream>(port);
 
         std::thread thread_desynth {run_desynth};
         thread_desynth.join();

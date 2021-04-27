@@ -13,7 +13,8 @@ Connection::Connection(
     cfd {cfd_},
     running {true},
     f {f_}
-{    //Run thread
+{
+    //Run thread
     t = std::thread { [this] {this->run();} };
 }
 
@@ -23,7 +24,9 @@ Connection::Connection(Connection && other) noexcept :
     t {std::move(other.t)},
     running {other.running},
     f {other.f}
-{}
+{
+    other.cfd = -1; //So that a valid file descriptor isn't closed when moved-from is destroyed
+}
 
 //Move assignment operator
 Connection & Connection::operator=(Connection && other) noexcept {
@@ -31,6 +34,9 @@ Connection & Connection::operator=(Connection && other) noexcept {
     t = std::move(other.t);
     running = other.running;
     f = other.f;
+    
+    other.cfd = -1; //So that a valid file descriptor isn't closed when moved-from is destroyed
+    
     return *this;
 }
 

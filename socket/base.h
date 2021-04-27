@@ -33,6 +33,14 @@ struct Connection_Error : std::exception {
     const char* what() const noexcept {return "Could not connect to socket!\n";}
 };
 
+struct Reuse_Error : std::exception {
+    const char* what() const noexcept {return "Could not set SO_REUSEADDR flag!\n";}
+};
+
+struct Nonblock_Error : std::exception {
+    const char* what() const noexcept {return "Could not set socket to nonblocking mode!\n";}
+};
+
 //Forward declaration
 class Connection;
     

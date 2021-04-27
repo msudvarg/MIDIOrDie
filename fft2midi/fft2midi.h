@@ -1,12 +1,12 @@
 #pragma once
 
 #include "tone.h"
-#include "midi.h"
+#include "channel.h"
 
 class Desynthesizer {
 
 private:
-    MidiStream ms;
+    MidiChannel & channel;
     FreqList old_peaks;
     Tone tone;
     bool all;
@@ -18,7 +18,7 @@ public:
 
     void run();
 
-  Desynthesizer(int port, unsigned int channel, bool _all, bool _hillclimb);
+  Desynthesizer(MidiChannel & _channel, bool _all, bool _hillclimb);
     ~Desynthesizer() = default;
 
 };

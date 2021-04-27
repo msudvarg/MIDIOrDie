@@ -1,4 +1,5 @@
 #include "server.h"
+#include <fcntl.h>
 
 namespace Socket {
 
@@ -14,6 +15,17 @@ Server::Server(
     max_clients {max_clients_},
     running {true}
 {
+
+    //Set SO_REUSEADDR so socket can be rebound immediately after close
+	int optval = 1;
+	if (setsockopt(sfd, SOL_SOCKET, SO_REUSEADDR, &optval, sizeof(int)) < 0) {
+		throw Reuse_Error{};
+	}
+
+    //Set O_NONBLOCK so calls to accept() are nonblocking
+	if (fcntl(sfd, F_SETFL, O_NONBLOCK ) < 0) {
+		throw Nonblock_Error{};
+	}
 
     //Bind to socket
 	if (bind(sfd, (struct sockaddr*) &addr, sizeof(struct sockaddr_in)) == -1) {
@@ -44,9 +56,14 @@ void Server::accept_clients() {
     //TODO: Modify so we only accept up to max_clients connections
     while(running) {
         int cfd = accept(sfd, NULL, NULL);
-		if (cfd == -1) {
-            running = false;
-            return;
+        if (cfd == -1) {
+            if(errno == EAGAIN || errno == EWOULDBLOCK) {
+                continue;
+            }
+            else {
+                running = false;
+                return;
+            }
         }
         clients.emplace_back(cfd, f);
     }

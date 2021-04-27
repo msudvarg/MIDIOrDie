@@ -1,6 +1,8 @@
 cmake_minimum_required(VERSION 3.13)
 Project(MidiOrDie)
 
+set (CMAKE_CXX_STANDARD 17)
+
 option(BUILD_TEST_PROGRAMS "Extra programs for testing" OFF)
 
 ## Third party libraries

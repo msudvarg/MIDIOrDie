@@ -16,3 +16,5 @@ constexpr int OUTPUT_FFT_SIZE = OUTPUT_FFT_MAX_HZ / DELTA_HZ;        // Number o
 
 //FFT 
 using shared_fft_t = Shared_Array<float,OUTPUT_FFT_SIZE>;
+
+//Clock type for poller and timing measurements
