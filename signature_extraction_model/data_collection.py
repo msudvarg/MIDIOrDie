@@ -13,6 +13,7 @@ pa = pyaudio.PyAudio()
 LEN = 1764
 INPUTS = 80
 OUTPUTS = 48
+RECORD_DURATION = 25    # 25 increments of 40ms each = 1s
 
 profile_name = input("Enter name to give guitar profile: ")
 
@@ -51,9 +52,8 @@ frames = [f - silence for f in frames]
 c = input("Do you want to perform single note data collection? (if you decline, you'll need to specify you calibration file) (y or n)")
 if c == 'y':
 
-    print("You will progress through all 6 strings, incrementally playing an open string up to the 9th fret on each "
-          "string. You will get a 3-2-1-Now countdown for each fret, and audio will be recorded for 1 second before "
-          "moving onto the next fret. You will have the option to pause between strings")
+    print("You will progress through all 6 strings, playing all frets for each. You will get a 3-2-1-Now "
+          "countdown for each fret, and audio will be recorded for half a second before moving on. First up:\n")
 
     prompts = [("Let's start on the low E string", 0), ("Moving onto the A string", 5), ("Moving onto the D string", 10),
                ("Moving onto the G string", 15), ("Moving onto the B string", 19), ("Finally the high E string", 24)]
@@ -65,16 +65,19 @@ if c == 'y':
         for j in range(10):
             print("Fret " + str(j))
             #input("Press any key when ready")
-            time.sleep(1)
+            time.sleep(0.7)
             for k in range(3,0,-1):
                 print(k)
-                time.sleep(1)
+                time.sleep(0.7)
             print("Now")
             l = np.zeros((OUTPUTS), dtype=float)
             l[i+j] = 1
+
+            # Read for a second
             k = 0
             stream = pa.open(format=pyaudio.paFloat32, channels=1, rate=44100, input=True, output=False, frames_per_buffer=LEN)
-            while stream.is_active() and k < 25:
+            time.sleep(1)
+            while stream.is_active() and k < RECORD_DURATION:
                 data = stream.read(LEN)
                 data = np.frombuffer(data, dtype=np.float32)
                 data = np.multiply(data, signal.windows.hamming(LEN))
@@ -84,7 +87,9 @@ if c == 'y':
                 frames.append(fft_arr[:INPUTS] - silence)
                 labels.append(l)
                 k+=1
+
             stream.close()
+
 
             # # Plot note
             # stacked = np.stack(frames[-75:], axis=0)
@@ -132,14 +137,18 @@ if c == 'y':
 
     calibrations = np.stack([silence, bass, mid, treble], axis=0)
 
-    np.save(profile_name + "_calib_row" + str(OUTPUTS) + ".npy", calibrations)
+    print("Saving calibration to: " + profile_name + "_calib.npy")
+    np.save(profile_name + "_calib.npy", calibrations)
 
+    # Save the last (clean sustain) and 2nd (dirty attack) samples from each note for training later
     print("Packing intermediary data")
+    frames = frames[RECORD_DURATION-1::RECORD_DURATION] #+ frames[1::RECORD_DURATION]
+    labels = labels[RECORD_DURATION-1::RECORD_DURATION] #+ labels[1::RECORD_DURATION]
     frames_stacked = np.stack(frames, axis=0)
     labels_stacked = np.stack(labels, axis=0)
 
-    np.save(profile_name + "_row" + str(INPUTS) + ".npy", frames_stacked)
-    np.save(profile_name + "_labels" + "_row" + str(int(OUTPUTS)) + ".npy", labels_stacked)
+    np.save(profile_name + "_inputs.npy", np.stack([np.concatenate((np.expand_dims(f,axis=0),calibrations[1:])) for f in frames], axis=0))
+    np.save(profile_name + "_labels.npy", labels_stacked)
 
 else:
     calib_filename = input("Enter name of calibration file (eg guitarname_calib_row48.npy): ")
@@ -160,9 +169,9 @@ if c == 'y':
         print(p)
         input("Press enter when ready")
 
-        for j in range(3, 0, -1):
-            print(j)
-            time.sleep(1)
+        for k in range(3,0,-1):
+            print(k)
+            time.sleep(0.7)
         print("Now")
 
         # Build label from chord signature
@@ -185,17 +194,22 @@ if c == 'y':
         j = 0
         stream = pa.open(format=pyaudio.paFloat32, channels=1, rate=44100, input=True, output=False,
                          frames_per_buffer=LEN)
-        while stream.is_active() and j < 25:
+        while stream.is_active() and j < RECORD_DURATION:
             data = stream.read(LEN)
-            data = np.frombuffer(data, dtype=np.float32)
-            data = np.multiply(data, signal.windows.hamming(LEN))
-            fft_arr = fft(data)[:int(LEN / 2)]
-            fft_arr = [math.sqrt(x.real ** 2 + x.imag ** 2) for x in fft_arr]
-            fft_arr = [20 * math.log10(x) for x in fft_arr]
-            frames.append(fft_arr[:INPUTS] - silence)
-            labels.append(l)
+
+            #if j == 1 or j == RECORD_DURATION - 1:
+            if j == RECORD_DURATION - 1:
+                # Save last datapoint (cleanest) and 2nd datapoint (attack) for testing later
+                data = np.frombuffer(data, dtype=np.float32)
+                data = np.multiply(data, signal.windows.hamming(LEN))
+                fft_arr = fft(data)[:int(LEN / 2)]
+                fft_arr = [math.sqrt(x.real ** 2 + x.imag ** 2) for x in fft_arr]
+                fft_arr = [20 * math.log10(x) for x in fft_arr]
+                frames.append(fft_arr[:INPUTS] - silence)
+                labels.append(l)
             j += 1
         stream.close()
+
 
         # # Plot note
         # stacked = np.stack(frames[-75:], axis=0)
@@ -203,19 +217,93 @@ if c == 'y':
         # plt.plot(avg)
         # plt.show()
 
+    # Save the last (ie cleanest) sample from each note for training later
+    print("Packing intermediary data")
+    frames_stacked = np.stack(frames, axis=0)
+    labels_stacked = np.stack(labels, axis=0)
+
+    np.save(profile_name + "_inputs.npy", np.stack([np.concatenate((np.expand_dims(f,axis=0),calibrations[1:])) for f in frames], axis=0))
+    np.save(profile_name + "_labels.npy", labels_stacked)
+
 # ======================= Random intervals ===================================
 c = input("Do you want to perform random interval data collection? (y or n)")
 if c == 'y':
-    print("Psych, not implemented yet")
-    time.sleep(1)
+    print("\nI will generate random (mostly discordant) 2-3 string chords. Press y when you are ready "
+          "to play it. Press n (or literally any other key) if you are unable to play and wish to skip "
+          "it. Press s to stop data collection. This will continue as long as you like, ad infinitum\n")
 
-# ======================== Pack and output dataset =================================
-print("Packing data")
-frames = np.stack(frames, axis=0)
-labels = np.stack(labels, axis=0)
+    key = ''
 
-np.save(profile_name + "_row" + str(INPUTS) + ".npy", frames)
-np.save(profile_name + "_labels" + "_row" + str(int(OUTPUTS)) + ".npy", labels)
+    while key != 's' and key != 'S':
+        # Generate random chord, construct string and label
+        start_string = np.random.randint(5)
+        end_string = start_string + 1
+        three_string = np.random.randint(3) == 0
+        if start_string == 4 and three_string:
+            start_string = 3
+        elif three_string:
+            end_string += 1
+        chord = [' '] * 6
+        capo = np.random.randint(6)
+        for i in range(6):
+            if i < start_string or i > end_string:
+                chord[i] = 'x'
+            else:
+                chord[i] = str(capo + np.random.randint(4))
+        chord = ''.join(chord)
+        
+        # Build label from chord signature
+        l = np.zeros((OUTPUTS), dtype=float)
+        if re.search('[0-9]', chord[0]):
+            l[0 + int(chord[0])] = 1
+        if re.search('[0-9]', chord[1]):
+            l[5 + int(chord[1])] = 1
+        if re.search('[0-9]', chord[2]):
+            l[10 + int(chord[2])] = 1
+        if re.search('[0-9]', chord[3]):
+            l[15 + int(chord[3])] = 1
+        if re.search('[0-9]', chord[4]):
+            l[19 + int(chord[4])] = 1
+        if re.search('[0-9]', chord[5]):
+            l[24 + int(chord[5])] = 1
+
+        # Prompt user
+        key = input("Can you play " + chord + "? (yns)")
+
+        if key == 'y' or key == 'Y':
+            for k in range(3,0,-1):
+                print(k)
+                time.sleep(0.7)
+            print("Now")
+
+            j = 0
+            stream = pa.open(format=pyaudio.paFloat32, channels=1, rate=44100, input=True, output=False,
+                            frames_per_buffer=LEN)
+            while stream.is_active() and j < RECORD_DURATION:
+                data = stream.read(LEN)
+
+                #if j == 1 or j == RECORD_DURATION - 1:
+                if j == RECORD_DURATION - 1:
+                    # Save last datapoint (cleanest) and 2nd datapoint (attack) for testing later
+                    data = np.frombuffer(data, dtype=np.float32)
+                    data = np.multiply(data, signal.windows.hamming(LEN))
+                    fft_arr = fft(data)[:int(LEN / 2)]
+                    fft_arr = [math.sqrt(x.real ** 2 + x.imag ** 2) for x in fft_arr]
+                    fft_arr = [20 * math.log10(x) for x in fft_arr]
+                    frames.append(fft_arr[:INPUTS] - silence)
+                    labels.append(l)
+
+                j += 1
+            stream.close()
+
+
+
+    print("Packing final data")
+    frames_stacked = np.stack(frames, axis=0)
+    labels_stacked = np.stack(labels, axis=0)
+
+    np.save(profile_name + "_inputs.npy", np.stack([np.concatenate((np.expand_dims(f,axis=0),calibrations[1:])) for f in frames], axis=0))
+    np.save(profile_name + "_labels.npy", labels_stacked)
 
 
 print("Done")
