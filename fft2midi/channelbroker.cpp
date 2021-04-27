@@ -66,9 +66,3 @@ ChannelBroker::ChannelBroker(bool print_ports) {
         }
     }
 }
-
-Channel::Channel(ChannelBroker & _broker, bool _drum) :
-    broker (_broker)
-{
-    if (!broker.getChannel(channel, _drum)) throw No_Channel{};
-}

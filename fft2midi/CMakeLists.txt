@@ -3,6 +3,8 @@ Project(MidiOrDie)
 find_package(TensorflowCC REQUIRED)
 
 add_library(fft2midi SHARED
+  channel.h
+  channel.cpp
   channelbroker.cpp
   channelbroker.h
   fft2midi.cpp

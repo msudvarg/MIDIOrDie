@@ -50,3 +50,7 @@ fftw3/
 
 build/
 signature_extraction_model/venv3/
+
+# Specific to notensorflow branch
+cppflow/
+fft2midi/cnpy/

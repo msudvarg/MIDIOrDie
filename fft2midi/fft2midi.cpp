@@ -7,12 +7,11 @@
 bool done = false;
 
 Desynthesizer::Desynthesizer(int port, unsigned int channel, bool _all, bool _hillclimb, std::vector<float> calib) :
-  ms (port),
+  channel (_channel),
   all (_all),
   hillclimb (_hillclimb),
   tone(calib)
 {
-  ms.ChangeChannel(channel);
 }
 
 void Desynthesizer::run(ModelLoader &model) {
@@ -24,22 +23,25 @@ void Desynthesizer::run(ModelLoader &model) {
     notes = tone.ExtractSignatures(model);
   }
 
+    /*
+    //Print extracted note information
     for(int n : notes) {
       std::cout << tone.GetNoteName(n) << " ";
     }
     std::cout << std::endl;
+    */
 
     if (all) {
       // Play all the pitches found in the fft
       for (int note : FreqDifference(notes, old_notes)) {
         if (InMidiRange(note)) {
-          ms.Send(note, true);
+          channel.Send(note, true);
         }
       }
 
       for (int note : FreqDifference(old_notes, notes)) {
         if (InMidiRange(note)) {
-          ms.Send(note, false);
+          channel.Send(note, false);
         }
       }
     } else {
@@ -48,19 +50,19 @@ void Desynthesizer::run(ModelLoader &model) {
         int note = notes[0];
         if (old_notes.size() == 0) {
           if (InMidiRange(note)) {
-            ms.Send(note, true);
+            channel.Send(note, true);
           }
         } else if (old_notes[0] != note) {
           if (InMidiRange(note)) {
-            ms.Send(note, true);
+            channel.Send(note, true);
           }
           if (InMidiRange(old_notes[0])) {
-            ms.Send(old_notes[0], false);
+            channel.Send(old_notes[0], false);
           }
         }
       } else if (old_notes.size() > 0) {
         if (InMidiRange(old_notes[0])) {
-          ms.Send(old_notes[0], false);
+          channel.Send(old_notes[0], false);
         }
       }
     }

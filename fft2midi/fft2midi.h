@@ -1,11 +1,12 @@
 #pragma once
 
 #include "tone.h"
+#include "channel.h"
 
 class Desynthesizer {
 
 private:
-    MidiStream ms;
+    MidiChannel & channel;
     NotesList old_notes;
     Tone tone;
     bool all;
@@ -17,7 +18,7 @@ public:
 
     void run(ModelLoader &model);
 
-  Desynthesizer(int port, unsigned int channel, bool _all, bool _hillclimb, std::vector<float> calib);
+  Desynthesizer(MidiChannel & _channel, bool _all, bool _hillclimb, std::vector<float> calib);
     ~Desynthesizer() = default;
 
 };

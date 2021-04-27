@@ -13,7 +13,7 @@ MidiStream::MidiStream(int port) {
   std::cout << "Connected to MIDI port: " << port << std::endl;
 }
 
-void MidiStream::Send(unsigned char note, bool on) {
+void MidiStream::Send(unsigned char note, bool on, unsigned channel) {
   constexpr unsigned msgsize = 3;
   unsigned char buf[msgsize];
   if (on) {
@@ -23,17 +23,16 @@ void MidiStream::Send(unsigned char note, bool on) {
   }
   buf[1] = note;
   buf[2] = 127;
+
+  //Not sure if sendMessage is thread safe
+  std::lock_guard<std::mutex> lk {send_mtx};
   midiout.sendMessage(buf, msgsize);
 }
 
-void MidiStream::ChangeInstrument(unsigned char instrument) {
+void MidiStream::ChangeInstrument(unsigned char instrument, unsigned channel) {
   constexpr unsigned msgsize = 2;
   unsigned char buf[msgsize];
   buf[0] = PC_CHANGE | channel;
   buf[1] = instrument;
   midiout.sendMessage(buf, msgsize);
-}
-
-void MidiStream::ChangeChannel(unsigned char _channel) {
-  channel = _channel;
 }
