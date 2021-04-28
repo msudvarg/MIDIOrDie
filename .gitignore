@@ -50,6 +50,10 @@ fftw3/
 
 build/
 signature_extraction_model/venv3/
+signature_extraction_model/sf2/
+signature_extraction_model/training_1/
+*.npy
+*.mid
 
 # Specific to notensorflow branch
 cppflow/

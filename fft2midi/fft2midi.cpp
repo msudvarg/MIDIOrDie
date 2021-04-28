@@ -6,7 +6,7 @@
 
 bool done = false;
 
-Desynthesizer::Desynthesizer(int port, unsigned int channel, bool _all, bool _hillclimb, std::vector<float> calib) :
+Desynthesizer::Desynthesizer(MidiChannel & _channel, bool _all, bool _hillclimb, std::vector<float> calib) :
   channel (_channel),
   all (_all),
   hillclimb (_hillclimb),
@@ -23,13 +23,13 @@ void Desynthesizer::run(ModelLoader &model) {
     notes = tone.ExtractSignatures(model);
   }
 
-    /*
+    
     //Print extracted note information
     for(int n : notes) {
       std::cout << tone.GetNoteName(n) << " ";
     }
     std::cout << std::endl;
-    */
+    
 
     if (all) {
       // Play all the pitches found in the fft

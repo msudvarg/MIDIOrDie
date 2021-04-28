@@ -67,7 +67,7 @@ int main(int argc, char** argv) {
     int opt;
 
     // TODO: Replace this with a loop that asks a new player to calibrate their guitar, or 
-	cnpy::NpyArray arr = cnpy::npy_load("../signature_extraction_model/acoustic_oren_calib_row48.npy");
+	cnpy::NpyArray arr = cnpy::npy_load("calib.npy");
 	assert(arr.shape.size() == 2 && arr.shape[0] == 4 && arr.shape[1] == OUTPUT_FFT_SIZE);
     int i = 0;
     dummy_calib.resize(4 * OUTPUT_FFT_SIZE);
