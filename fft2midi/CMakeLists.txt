@@ -1,7 +1,5 @@
 Project(MidiOrDie)
 
-find_package(TensorflowCC REQUIRED)
-
 add_library(fft2midi SHARED
   channel.h
   channel.cpp
@@ -17,10 +15,7 @@ add_library(fft2midi SHARED
   sigextr.h
   )
 
-# link_libraries(tensorflow tensorflow_framework)
-
 target_link_libraries(fft2midi
   rtmidi
   portaudio
-  TensorflowCC::TensorflowCC
   protobuf)

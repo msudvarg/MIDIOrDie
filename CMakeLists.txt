@@ -16,6 +16,8 @@ add_subdirectory(rtmidi)
 add_subdirectory(socket)
 add_subdirectory(localcontroller)
 if (BUILD_SERVER)
+  include_directories("/usr/include/tensorflow")
+  link_libraries(tensorflow tensorflow_framework)
   add_subdirectory(fft2midi)
   add_subdirectory(cnpy)
 
