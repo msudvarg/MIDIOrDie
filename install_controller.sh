@@ -9,3 +9,4 @@ sudo apt-get install cmake jack libfftw3-dev librtmidi-dev portaudio19-dev
 mkdir build
 cd build
 cmake ..
+make
