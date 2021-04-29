@@ -8,5 +8,5 @@ sudo apt-get install build-essential cmake libfftw3-dev librtmidi-dev portaudio1
 
 mkdir build
 cd build
-cmake ..
+cmake .. -DBUILD_SERVER=ON
 make
