@@ -33,21 +33,8 @@ Tone::~Tone() {
 }
 */
 
-Tone::Tone(std::vector<float> calib_init)
-{
-  // First row is silence profile, next 3 are bass, mid, treble calibration ffts
-	silence.resize(OUTPUT_FFT_SIZE);
-	calib.resize(3*OUTPUT_FFT_SIZE);
-	for(int i = 0; i < OUTPUT_FFT_SIZE; i++) {
-		silence[i] = calib_init[i];
-	}
-	for(int i = 0; i < 3*OUTPUT_FFT_SIZE; i++) {
-		calib[i] = calib_init[i+OUTPUT_FFT_SIZE];
-	}
-
-  // silence = std::vector<double>(arr_vector.begin(), arr_vector.begin() + OUTPUT_FFT_SIZE);
-  // calib = std::vector<double>(arr_vector.begin() + OUTPUT_FFT_SIZE, arr_vector.end());
-}
+Tone::Tone()
+{}
 
 float Tone::NoteToFreq(int note) {
   return C0_HZ * std::pow(SEMITONE, note - C0);
@@ -240,11 +227,11 @@ NotesList Tone::ExtractSignatures(ModelLoader &model) {
   std::vector<float> temp;
   temp.resize(OUTPUT_FFT_SIZE);
   for(int i = 0; i < OUTPUT_FFT_SIZE; i++) {
-    temp[i] = interval[i] - silence[i];
+    temp[i] = interval[i];
   }
   std::vector<float> output;
 
-  model.predict(temp, calib, output);
+  model.predict(temp, output);
 
   NotesList frequencies;
   //std::cout << output[0] << std::endl;
@@ -313,8 +300,7 @@ float Tone::GetThreshold() {
 }
 
 std::string Tone::GetNoteName(int note) {
-  note += 9;
-  int octave = note / 12;
+  int octave = note / 12 - 1;
   switch (note % 12) {
     case 0:
       return "C" + std::to_string(octave);

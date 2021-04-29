@@ -41,8 +41,8 @@ class ModelLoader{
 		SessionOptions session_options;
 		RunOptions run_options;
         Tensor calib;
-		void make_prediction(std::vector<Tensor> &inputs, std::vector<float> &out_pred);
+		void make_prediction(Tensor &input, std::vector<float> &out_pred);
 	public:
 		ModelLoader(string);
-		void predict(std::vector<float> audio, std::vector<float> calib_vector, std::vector<float> &out_pred);
+		void predict(std::vector<float> audio, std::vector<float> &out_pred);
 };

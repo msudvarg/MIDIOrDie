@@ -19,12 +19,10 @@ if (BUILD_SERVER)
   include_directories("/usr/include/tensorflow")
   link_libraries(tensorflow tensorflow_framework)
   add_subdirectory(fft2midi)
-  add_subdirectory(cnpy)
 
   add_executable(server server/main.cpp)
   target_link_libraries(server
     socket
-    cnpy
     fft2midi)
 endif () ## BUILD_SERVER
 

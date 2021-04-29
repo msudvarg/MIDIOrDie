@@ -6,11 +6,10 @@
 
 bool done = false;
 
-Desynthesizer::Desynthesizer(MidiChannel & _channel, bool _all, bool _hillclimb, std::vector<float> calib) :
+Desynthesizer::Desynthesizer(MidiChannel & _channel, bool _all, bool _hillclimb) :
   channel (_channel),
   all (_all),
-  hillclimb (_hillclimb),
-  tone(calib)
+  hillclimb (_hillclimb)
 {
 }
 
