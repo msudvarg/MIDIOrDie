@@ -32,7 +32,6 @@ def play_chord(notes, sf2, program):
         MyMIDI.writeFile(output_file)
     time.sleep(0.1)
     os.system('fluidsynth --no-shell -a pulseaudio "sf2/%s" chord.mid &>/dev/null &' % (sf2))
-    time.sleep(0.3)
     print(sf2)
 
 profile_name = input("Enter name to give guitar profile: ")
@@ -74,15 +73,14 @@ frames = []
 
 soundfonts = [('1115-JazzMelodic.sf2', 0, 3), ('198-Dsix magic 20.9 MB.sf2', 0, 1), 
             ('198-VL-1 Eguitar VS 17MB.sf2', 0, 2), ('198-Voxline Session.sf2',0,2), ('336-saz.sf2',0,2), 
-            ('4043-Tholen5.sf2', 2, 5), ('459-CrujienteHevy guitar.sf2',0,1), 
-            ('459-GuitarSetPasisHeavyAndClean.sf2',2,5), ('463-Jazz Guitar.sf2',0,6),
+            ('4043-Tholen5.sf2', 2, 5), ('463-Jazz Guitar.sf2',0,6), ('Ibanez Electric Guitar.SF2', 0, 1),
             ('754-Donnys Guitar.SF2',0,1), ('Acoustic Gtr.sf2',0,6), ('FluidR3_GM.sf2',24,28), 
             ('Guitar Acoustic (963KB).sf2',0,9), ('Guitar Acoustic.SF2',0,1), ('Guitar Distortion.SF2',0,1), 
-            ('Heavy.sf2',0,5), ('Modern Guitar.sf2',0,3), ('Nylon Guitar.sf2',0,4), 
+            ('Modern Guitar.sf2',0,3), ('Nylon Guitar.sf2',0,4), ('Electric_guitar.SF2', 0, 1),
             ('Rock Gitaro.sf2',0,1), ('Studio FG460s II Pro Guitar Pack.SF2',0,6), ('The Guitar.sf2',0,1),
-            ('classical_guitar_1a.sf3',0,1)]
+            ('classical_guitar_1a.sf3',0,1), ('60s_Rock_Guitar.SF2', 0, 3)]
 
-for sf2, lower, upper in soundfonts:
+for sf2, lower, upper in soundfonts[15:]:
     for program in range(lower, upper):
 
         prompts = [("Let's start on the low E string", 0), ("Moving onto the A string", 5), ("Moving onto the D string", 10),
@@ -102,6 +100,7 @@ for sf2, lower, upper in soundfonts:
 
                 # Read for a second
                 k = 0
+                pause = 0
                 stream = pa.open(format=pyaudio.paFloat32, channels=1, rate=44100, input=True, output=False, frames_per_buffer=LEN)
                 while stream.is_active() and k < RECORD_DURATION:
                     data = stream.read(LEN)
@@ -109,6 +108,12 @@ for sf2, lower, upper in soundfonts:
                     data = np.multiply(data, signal.windows.hamming(LEN))
                     fft_arr = fft(data)[:int(LEN/2)]
                     fft_arr = [math.sqrt(x.real**2 + x.imag**2) for x in fft_arr]
+                    if 0 in fft_arr:        # If no audio, then skip for 120ms
+                        pause = 3
+                        continue
+                    if pause > 0:           # skipping...
+                        pause -= 1
+                        continue
                     fft_arr = [20 * math.log10(x) for x in fft_arr]
                     single_note_frames.append(fft_arr[:INPUTS])
                     single_note_labels.append(l)
@@ -209,6 +214,7 @@ for sf2, lower, upper in soundfonts:
             play_chord(note_list, sf2, program)
 
             j = 0
+            pause = 0
             stream = pa.open(format=pyaudio.paFloat32, channels=1, rate=44100, input=True, output=False, frames_per_buffer=LEN)
             random_sample = np.random.randint(RECORD_DURATION)
             while stream.is_active() and j < RECORD_DURATION:
@@ -221,6 +227,12 @@ for sf2, lower, upper in soundfonts:
                     data = np.multiply(data, signal.windows.hamming(LEN))
                     fft_arr = fft(data)[:int(LEN / 2)]
                     fft_arr = [math.sqrt(x.real ** 2 + x.imag ** 2) for x in fft_arr]
+                    if 0 in fft_arr:        # If no audio, then skip for 120ms
+                        pause = 3
+                        continue
+                    if pause > 0:           # skipping...
+                        pause -= 1
+                        continue
                     fft_arr = [20 * math.log10(x) for x in fft_arr]
                     frames.append(fft_arr[:INPUTS] - silence)
                     labels.append(l)
@@ -286,6 +298,7 @@ for sf2, lower, upper in soundfonts:
             play_chord(note_list, sf2, program)
 
             j = 0
+            pause = 0
             stream = pa.open(format=pyaudio.paFloat32, channels=1, rate=44100, input=True, output=False, frames_per_buffer=LEN)
             random_sample = np.random.randint(RECORD_DURATION)
             while stream.is_active() and j < RECORD_DURATION:
@@ -298,6 +311,12 @@ for sf2, lower, upper in soundfonts:
                     data = np.multiply(data, signal.windows.hamming(LEN))
                     fft_arr = fft(data)[:int(LEN / 2)]
                     fft_arr = [math.sqrt(x.real ** 2 + x.imag ** 2) for x in fft_arr]
+                    if 0 in fft_arr:        # If no audio, then skip for 120ms
+                        pause = 3
+                        continue
+                    if pause > 0:           # skipping...
+                        pause -= 1
+                        continue
                     fft_arr = [20 * math.log10(x) for x in fft_arr]
                     frames.append(fft_arr[:INPUTS] - silence)
                     labels.append(l)
