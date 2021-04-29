@@ -18,7 +18,7 @@ public:
 
     void run(ModelLoader &model);
 
-  Desynthesizer(MidiChannel & _channel, bool _all, bool _hillclimb, std::vector<float> calib);
+  Desynthesizer(MidiChannel & _channel, bool _all, bool _hillclimb);
     ~Desynthesizer() = default;
 
 };

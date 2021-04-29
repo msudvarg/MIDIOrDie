@@ -17,12 +17,10 @@ add_subdirectory(socket)
 add_subdirectory(localcontroller)
 if (BUILD_SERVER)
   add_subdirectory(fft2midi)
-  add_subdirectory(cnpy)
 
   add_executable(server server/main.cpp)
   target_link_libraries(server
     socket
-    cnpy
     fft2midi)
 endif () ## BUILD_SERVER
 

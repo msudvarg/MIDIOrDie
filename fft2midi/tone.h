@@ -63,7 +63,7 @@ public:
   Tone(int fft_size, int max_hz, float threshold);
   ~Tone();
   */
-  Tone(std::vector<float> calib_init);
+  Tone();
   ~Tone() = default;
   
   bool HasPitch(int frequency);
@@ -112,9 +112,6 @@ private:
 
   float NoteToFreq(int note);
   int FreqToNote(float freq, int round=0);
-
-  std::vector<float> calib;       // Double check if this ever gets used beyond the constructor
-  std::vector<float> silence;
 
   float threshold = 20.0;
   int harmonics_captured = HARMONICS;

@@ -19,7 +19,6 @@ bool drum = false;
 bool all = false;
 bool hillclimb = false;
 ModelLoader model("../signature_extraction_model/tf_model/");
-std::vector<float> dummy_calib;
 
 //Destructors not correctly called if program interrupted
 //Use a signal handler and quit flag instead
@@ -33,7 +32,7 @@ void socket_recv(Socket::Connection * client) {
 
     MidiChannel channel(*ms, drum);
     
-    Desynthesizer desynth {channel, all, hillclimb, dummy_calib};
+    Desynthesizer desynth {channel, all, hillclimb};
     shared_fft_t::array_type & fft_data = desynth.fft_data();
 
     //Tell client ready
@@ -65,16 +64,6 @@ int main(int argc, char** argv) {
 
     //Get command-line options
     int opt;
-
-    // TODO: Replace this with a loop that asks a new player to calibrate their guitar, or 
-	cnpy::NpyArray arr = cnpy::npy_load("calib.npy");
-	assert(arr.shape.size() == 2 && arr.shape[0] == 4 && arr.shape[1] == OUTPUT_FFT_SIZE);
-    int i = 0;
-    dummy_calib.resize(4 * OUTPUT_FFT_SIZE);
-    for(auto v : arr.as_vec<double>()) {
-        dummy_calib[i] = v;
-        i++;
-    }
 
   
     while((opt = getopt(argc, argv, "adp:c")) != -1) {
