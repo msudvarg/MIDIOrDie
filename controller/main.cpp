@@ -24,8 +24,8 @@ void socket_send(Socket::Connection * client) {
 
     shared_fft_t::array_type localArray;
 
-    TimingLog<Milliseconds,200> socket_times(TimingLogType::StartStop);
-    TimingLog<Milliseconds,200> jitter(TimingLogType::AllTimestamps);
+    TimingLog<Microseconds,200> socket_times(TimingLogType::StartStop);
+    TimingLog<Microseconds,200> jitter(TimingLogType::AllTimestamps);
 
 
     //Wait for server to be ready
