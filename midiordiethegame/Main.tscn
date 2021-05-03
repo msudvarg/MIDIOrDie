@@ -16,7 +16,8 @@ viewport_path = NodePath("Viewport")
 
 [sub_resource type="SpatialMaterial" id=3]
 resource_local_to_scene = true
-flags_transparent = true
+params_use_alpha_scissor = true
+params_alpha_scissor_threshold = 0.59
 albedo_texture = SubResource( 2 )
 
 [sub_resource type="NativeScript" id=4]
@@ -30,7 +31,6 @@ library = ExtResource( 5 )
 size = Vector2( 1024, 512 )
 transparent_bg = true
 handle_input_locally = false
-hdr = false
 usage = 0
 
 [node name="Fretboard" parent="Viewport" instance=ExtResource( 1 )]
@@ -67,4 +67,5 @@ transform = Transform( 1, 0, 0, 0, 0.928991, 0.370103, 0, -0.370103, 0.928991, 0
 current = true
 fov = 43.4
 far = 5.0
+
 [connection signal="timeout" from="Console/StartTimer" to="Console" method="start_timer_timeout"]

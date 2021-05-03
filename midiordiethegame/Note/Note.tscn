@@ -61,4 +61,5 @@ one_shot = true
 
 [node name="CollisionShape" type="CollisionShape" parent="."]
 shape = SubResource( 6 )
+
 [connection signal="timeout" from="KillTimer" to="." method="kill_timer_timeout"]
