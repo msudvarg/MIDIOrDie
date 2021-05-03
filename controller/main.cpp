@@ -8,6 +8,7 @@
 #include "../include/shared_array.h" //Thread-safe array
 #include "../include/poller.h"
 #include "../localcontroller/localcontroller.h"
+#include "../include/timing.h"
 
 LocalController lc;
 
@@ -23,6 +24,10 @@ void socket_send(Socket::Connection * client) {
 
     shared_fft_t::array_type localArray;
 
+    TimingLog<Milliseconds,200> socket_times(TimingLogType::StartStop);
+    TimingLog<Milliseconds,200> jitter(TimingLogType::AllTimestamps);
+
+
     //Wait for server to be ready
     char ready;
     client->recv(&ready, 1);
@@ -36,12 +41,21 @@ void socket_send(Socket::Connection * client) {
 
         lc.GetData(localArray.data());
 
+        socket_times.log();
+
         //Send local array over socket
         client->send(
             localArray.data(),
             sizeof(shared_fft_t::value_type) * shared_fft_t::size);
 
+        socket_times.log();
+        jitter.log();
+
     }
+
+    socket_times.print("socket_send_times.txt");
+    lc.fft_times.print("fft_times.txt");
+    jitter.print("controller_jitter.txt");
 
 }
 

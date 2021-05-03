@@ -5,6 +5,7 @@
 #include <portaudio.h>
 #include <mutex>
 #include "../include/manifest.h"
+#include "../include/timing.h"
 
 class LocalController {
 public:
@@ -14,6 +15,7 @@ public:
   void GetData(float *fft_data_out);
   float GetRefreshRate();
   ~LocalController();
+  TimingLog<Milliseconds,200> fft_times;
 private:
   int n, fft_size, sample_rate;
   float *window;

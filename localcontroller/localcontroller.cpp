@@ -14,7 +14,8 @@ LocalController::LocalController() : LocalController(WINDOW_SIZE, OUTPUT_FFT_SIZ
 LocalController::LocalController(int _n, int _fft_size, int _sample_rate) :
   n(_n),
   fft_size(_fft_size),
-  sample_rate(_sample_rate)
+  sample_rate(_sample_rate),
+  fft_times(TimingLogType::StartStop)
 {
 
   window = new float[n];
@@ -52,6 +53,7 @@ int LocalController::callback (const void* input,
 			       unsigned long frameCount,
 			       const PaStreamCallbackTimeInfo *timeInfo,
 			       PaStreamCallbackFlags statusFlags) {
+  fft_times.log();
   float *inputBuffer = (float *) input;
   float *outputBuffer = (float *) output;
   memcpy(outputBuffer, inputBuffer, n * sizeof(float));
@@ -67,6 +69,7 @@ int LocalController::callback (const void* input,
     fft_data[i] = 20 * log10f(fft_data[i]);
   }
   mtx.unlock();
+  fft_times.log();
   return 0;
 
 }
