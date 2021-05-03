@@ -40,7 +40,7 @@ func spawn(note: int):
 
 func fret(note: int):
 	if not is_playable_range(note):
-		print("Fret is out of range")
+		return
 	else:
 		var popper_inst = popper_prefab.instance()
 		var idx = Util.index(note)
