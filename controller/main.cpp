@@ -42,20 +42,19 @@ void socket_send(Socket::Connection * client) {
         lc.GetData(localArray.data());
 
         socket_times.log();
-
         //Send local array over socket
         client->send(
             localArray.data(),
             sizeof(shared_fft_t::value_type) * shared_fft_t::size);
-
         socket_times.log();
+
         jitter.log();
 
     }
 
     socket_times.print("socket_send_times.txt");
     lc.fft_times.print("fft_times.txt");
-    jitter.print("controller_jitter.txt");
+    jitter.print("controller_jitter_times.txt");
 
 }
 

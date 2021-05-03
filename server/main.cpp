@@ -12,6 +12,8 @@
 #include "../include/poller.h"
 #include "../fft2midi/fft2midi.h"
 #include "../cnpy/cnpy.h"
+#include "../include/timing.h"
+
 std::unique_ptr<MidiStream> ms;
 
 int port = 0;
@@ -34,6 +36,10 @@ void socket_recv(Socket::Connection * client) {
     
     Desynthesizer desynth {channel, all, hillclimb};
     shared_fft_t::array_type & fft_data = desynth.fft_data();
+    
+    TimingLog<Microseconds,200> desynth_times(TimingLogType::StartStop);
+    TimingLog<Microseconds,200> socket_times(TimingLogType::StartStop);
+    TimingLog<Microseconds,200> jitter(TimingLogType::AllTimestamps);
 
     //Tell client ready
     char ready = 1;
@@ -44,14 +50,24 @@ void socket_recv(Socket::Connection * client) {
         
         Poller poller(WINDOW_LATENCY_MS);
 
+        socket_times.log();
         //Read from socket into Desynth object. Contents can be found in desynth.tone.interval
         client->recv(
             fft_data.data(),
             sizeof(shared_fft_t::value_type) * shared_fft_t::size);
+        socket_times.log();
 
+        desynth_times.log();
         desynth.run(model);
+        desynth_times.log();
+        
+        jitter.log();
 
     }
+
+    desynth_times.print("desynth_times.txt");
+    socket_times.print("socket_send_times.txt");
+    jitter.print("controller_jitter_times.txt");
 
 }
 

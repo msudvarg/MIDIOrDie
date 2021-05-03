@@ -19,6 +19,11 @@ public:
 		now = clock_type::now();
 	}
 
+	unsigned long operator*() {
+		auto duration = std::chrono::duration_cast<Resolution>(now.time_since_epoch());
+		return duration.count();
+	}
+
 	friend long operator-(const Time<Resolution> & t2, const Time<Resolution> & t1) {
 		auto duration = std::chrono::duration_cast<Resolution>(t2.now-t1.now);
 		return duration.count();
@@ -51,7 +56,7 @@ public:
 
 	void log() {
 		if(position == N) return;
-		log_arr[position] = TimeType{};
+		log_arr[position].set();
 		++position;
 	}
 
@@ -62,13 +67,13 @@ public:
 
 		if(type == TimingLogType::StartStop) {
 			for (int i = 1; i < position; i+=2) {
-				os << log_arr[i] - log_arr[i-1] << "\n";
+				os << (log_arr[i] - log_arr[i-1]) << "\n";
 			}
 		}
 
 		if(type == TimingLogType::AllTimestamps) {
 			for (int i = 1; i < position; ++i) {
-				os << log_arr[i] - log_arr[i-1] << "\n";
+				os << (log_arr[i] - log_arr[i-1]) << "\n";
 			}
 		}
 
