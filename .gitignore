@@ -55,6 +55,8 @@ signature_extraction_model/training_1/
 *.npy
 *.mid
 
+midiordiethegame/godot
+
 # Specific to notensorflow branch
 cppflow/
 fft2midi/cnpy/

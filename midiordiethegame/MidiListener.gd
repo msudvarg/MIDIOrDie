@@ -9,7 +9,7 @@ func _ready():
 	fretboard = $"../Viewport/Fretboard"
 	notespawner = $"../NoteSpawner"
 	timinglog = File.new()
-	timinglog.open("user://godot_times.txt")
+	timinglog.open("user://godot_times.txt",File.WRITE)
 
 func _input(event):
 	if event is InputEventMIDI:
@@ -17,10 +17,7 @@ func _input(event):
 			fretboard.call_deferred("fret", event.pitch)
 			notespawner.call_deferred("fret", event.pitch)
 		if event.message == MIDI_MESSAGE_PITCH_BEND:
-			us = os.get_system_time_usecs()
-			id = event.pitch
-			timinglog.store_16(id)
-			timinglog.store_string(" ")
-			timinglog.store_line()
-
-
+			var id = event.pitch
+			var us = OS.get_system_time_usecs()
+			var line = str(id) + " " + str(us)
+			timinglog.store_line(line)

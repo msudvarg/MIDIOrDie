@@ -82,7 +82,7 @@ public:
 		}
 
 		if(type == TimingLogType::IndividualTimestamps) {
-			for (int i = 1; i < position; ++i) {
+			for (int i = 0; i < position; ++i) {
 				if (print_ids) os << i << " ";
 				os << *log_arr[i] << "\n";
 			}
