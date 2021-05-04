@@ -60,10 +60,11 @@ public:
 		++position;
 	}
 
-	void print(const char * filename) {
+	void reset() {
+		position = 0;
+	}
 
-		std::ofstream os {filename};
-		if(!os) return;
+	void print(std::ostream & os) {
 
 		if(type == TimingLogType::StartStop) {
 			for (int i = 1; i < position; i+=2) {
@@ -76,6 +77,14 @@ public:
 				os << (log_arr[i] - log_arr[i-1]) << "\n";
 			}
 		}
+
+	}
+
+	void print(const char * filename) {
+
+		std::ofstream os {filename};
+		if(!os) return;
+		print(os);
 
 	}
 
