@@ -11,7 +11,6 @@
 #include "../include/shared_array.h" //Thread-safe array
 #include "../include/poller.h"
 #include "../fft2midi/fft2midi.h"
-#include "../cnpy/cnpy.h"
 #include "../include/timing.h"
 
 std::unique_ptr<MidiStream> ms;

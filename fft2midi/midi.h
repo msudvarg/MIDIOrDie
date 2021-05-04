@@ -6,15 +6,18 @@
 #include "../rtmidi/RtMidi.h"
 #include "channelbroker.h"
 
+#include "../include/timing.h"
+
 class MidiStream {
 public:
-  void Send(unsigned char note, bool on, unsigned channel);
+  void Send(unsigned char note, bool on, unsigned channel, unsigned id);
   void ChangeInstrument(unsigned char instrument, unsigned channel);
 
   void freeChannel (unsigned int channel) { broker.freeChannel(channel); }
   bool getChannel(unsigned int & channel, bool drum) { return broker.getChannel(channel, drum); }
 
   MidiStream(int port = 0);
+  ~MidiStream();
 
 
 private:
@@ -22,6 +25,8 @@ private:
   ChannelBroker broker;
 
   std::mutex send_mtx;
+
+  TimingLog<Microseconds,1000> send_times {TimingLogType::IndividualTimestamps};
   
   // frequency = 440 * 2^((n-69)/12)
   // n = lg(f/440) * 12 + 69

@@ -36,7 +36,8 @@ using Seconds = Time<std::chrono::seconds>;
 
 enum class TimingLogType {
 	StartStop, //Log alternates start and stop times
-	AllTimestamps //Log keeps timestamps, and we want elapsed time between each timestamp
+	AllTimestamps, //Log keeps timestamps, and we want elapsed time between each timestamp
+	IndividualTimestamps //Log keeps timestamps, and we just want to print the timestamp values themselves
 };
 
 template <class TimeType, unsigned N>
@@ -75,6 +76,12 @@ public:
 		if(type == TimingLogType::AllTimestamps) {
 			for (int i = 1; i < position; ++i) {
 				os << (log_arr[i] - log_arr[i-1]) << "\n";
+			}
+		}
+
+		if(type == TimingLogType::IndividualTimestamps) {
+			for (int i = 1; i < position; ++i) {
+				os << *log_arr[i] << "\n";
 			}
 		}
 

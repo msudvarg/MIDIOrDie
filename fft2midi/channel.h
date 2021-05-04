@@ -9,6 +9,7 @@ class MidiChannel {
 private:
     MidiStream & ms;
     unsigned int channel;
+    unsigned int notes_sent = 0;
 
 public:
 
@@ -17,7 +18,7 @@ public:
     };    
 
     unsigned int get_channel() const { return channel; }
-    void Send(unsigned char note, bool on) { ms.Send(note, on, channel); }
+    void Send(unsigned char note, bool on) { ms.Send(note, on, channel, notes_sent++); }
     void ChangeInstrument(unsigned char instrument) { ms.ChangeInstrument(instrument, channel); }
 
     MidiChannel(MidiStream & _ms, bool _drum);
