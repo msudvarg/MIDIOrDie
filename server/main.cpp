@@ -56,6 +56,9 @@ void socket_recv(Socket::Connection * client) {
             sizeof(shared_fft_t::value_type) * shared_fft_t::size);
         socket_times.log();
 
+        //Send back to client for timing data
+        client->send(&ready, 1);
+
         desynth_times.log();
         desynth.run(model);
         desynth_times.log();
