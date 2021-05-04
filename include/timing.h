@@ -65,33 +65,36 @@ public:
 		position = 0;
 	}
 
-	void print(std::ostream & os) {
+	void print(std::ostream & os, bool print_ids = false) {
 
 		if(type == TimingLogType::StartStop) {
 			for (int i = 1; i < position; i+=2) {
+				if (print_ids) os << i/2 << " ";
 				os << (log_arr[i] - log_arr[i-1]) << "\n";
 			}
 		}
 
 		if(type == TimingLogType::AllTimestamps) {
 			for (int i = 1; i < position; ++i) {
+				if (print_ids) os << i << " ";
 				os << (log_arr[i] - log_arr[i-1]) << "\n";
 			}
 		}
 
 		if(type == TimingLogType::IndividualTimestamps) {
 			for (int i = 1; i < position; ++i) {
+				if (print_ids) os << i << " ";
 				os << *log_arr[i] << "\n";
 			}
 		}
 
 	}
 
-	void print(const char * filename) {
+	void print(const char * filename, bool print_ids = false) {
 
 		std::ofstream os {filename};
 		if(!os) return;
-		print(os);
+		print(os, print_ids);
 
 	}
 

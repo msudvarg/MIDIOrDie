@@ -56,5 +56,5 @@ void MidiStream::ChangeInstrument(unsigned char instrument, unsigned channel) {
 }
 
 MidiStream::~MidiStream() {
-  send_times.print("midi_send_times.txt");
+  send_times.print("midi_send_times.txt",true);
 }
