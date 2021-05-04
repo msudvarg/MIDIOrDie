@@ -15,7 +15,7 @@ public:
   void GetData(float *fft_data_out);
   float GetRefreshRate();
   ~LocalController();
-  TimingLog<Microseconds,200> fft_times;
+  TimingLog<Microseconds,1000> fft_times;
 private:
   int n, fft_size, sample_rate;
   float *window;
