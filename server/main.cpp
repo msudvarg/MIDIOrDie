@@ -32,7 +32,7 @@ void socket_recv(Socket::Connection * client) {
 
     MidiChannel channel(*ms, drum);
     
-    Desynthesizer desynth {channel, all, hillclimb};
+    Desynthesizer desynth {channel, all, hillclimb, model};
     shared_fft_t::array_type & fft_data = desynth.fft_data();
 
     //Tell client ready
