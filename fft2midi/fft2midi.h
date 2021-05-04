@@ -19,6 +19,7 @@ public:
     void run(ModelLoader &model);
 
   Desynthesizer(MidiChannel & _channel, bool _all, bool _hillclimb);
+  Desynthesizer(MidiChannel & _channel, bool _all, bool _hillclimb, ModelLoader &model);
     ~Desynthesizer() = default;
 
 };

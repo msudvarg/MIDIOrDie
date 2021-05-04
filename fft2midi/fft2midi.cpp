@@ -11,6 +11,17 @@ Desynthesizer::Desynthesizer(MidiChannel & _channel, bool _all, bool _hillclimb)
   all (_all),
   hillclimb (_hillclimb)
 {
+  if (hillclimb) {
+    std::cout << "Using hillclimb for note extraction" << std::endl;
+  } else {
+    std::cout << "Using TensorFlow for note extraction" << std::endl;
+  }
+}
+
+Desynthesizer::Desynthesizer(MidiChannel & _channel, bool _all, bool _hillclimb, ModelLoader &model) :
+  Desynthesizer(_channel, _all, _hillclimb)
+{
+  if(!hillclimb) run(model);
 }
 
 void Desynthesizer::run(ModelLoader &model) {
