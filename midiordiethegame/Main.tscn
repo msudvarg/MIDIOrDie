@@ -51,6 +51,7 @@ string_colors = PoolColorArray( 0.203922, 0.94902, 0.0470588, 1, 0.945098, 0.066
 script = ExtResource( 2 )
 
 [node name="Console" parent="." instance=ExtResource( 4 )]
+visible = true
 
 [node name="AudioStreamPlayer" type="AudioStreamPlayer" parent="Console"]
 stream = ExtResource( 7 )

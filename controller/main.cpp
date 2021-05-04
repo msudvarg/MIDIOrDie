@@ -46,6 +46,9 @@ void socket_send(Socket::Connection * client) {
         client->send(
             localArray.data(),
             sizeof(shared_fft_t::value_type) * shared_fft_t::size);
+        
+        //For timing data
+        client->recv(&ready, 1);
         socket_times.log();
 
         jitter.log();
