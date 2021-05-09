@@ -8,6 +8,8 @@ const xoffset = 100
 const yoffset = 50
 
 func fret(note):
+	if note < 52 or note > 81:
+		return
 	var idx = Util.index(note)
 	var dot = dot_prefab.instance()
 	note_origin.add_child(dot)
