@@ -30,7 +30,6 @@ target_link_libraries(controller
   lc)
 
 if (BUILD_TEST_PROGRAMS)
-  add_subdirectory(fft)
   add_executable(test_fft2midi testprograms/test_fft2midi.cpp)
   target_link_libraries(test_fft2midi
     socket

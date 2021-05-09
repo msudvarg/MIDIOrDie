@@ -10,3 +10,6 @@
 [submodule "fft2midi/cnpy"]
 	path = cnpy
 	url = https://github.com/rogersce/cnpy.git
+[submodule "midiordiethegame/MidiCPP/godot-cpp"]
+	path = midiordiethegame/MidiCPP/godot-cpp
+	url = https://github.com/godotengine/godot-cpp

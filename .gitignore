@@ -58,3 +58,6 @@ signature_extraction_model/training_1/
 # Specific to notensorflow branch
 cppflow/
 fft2midi/cnpy/
+
+# godot stuff, probably
+midiordiethegame/.import
