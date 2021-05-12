@@ -9,6 +9,7 @@ sudo apt-get install bazel-3.1.0
 sudo ln -s /usr/bin/bazel-3.1.0 /usr/bin/bazel
 
 # Clone a helpful repo from FloopCZ to install the API
+cd ../
 git clone https://github.com/FloopCZ/tensorflow_cc.git
 cd tensorflow_cc/tensorflow_cc
 mkdir build
