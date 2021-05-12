@@ -48,7 +48,12 @@ Acquire Tensorflow dependencies and build the server with
     make
     sudo make install
 
+With all those dependencies out of the way, build the repo with a flag to trigger building of the server
+
     # Build the server
+    cd path/to/MIDIOrDie/
+    mkdir build
+    cd build
     cmake -DBUILD_SERVER=true ..
     make
 
@@ -252,6 +257,7 @@ The tensorflow_cc api must be installed to use the AI version of signature extra
     sudo mv bazel.gpg /etc/apt/trusted.gpg.d/
     echo "deb [arch=amd64] https://storage.googleapis.com/bazel-apt stable jdk1.8" | sudo tee /etc/apt/sources.list.d/bazel.list
     sudo apt-get update && sudo apt-get install bazel-3.1.0
+    sudo ln -s /usr/bin/bazel-3.1.0 /usr/bin/bazel
 
     # Clone a helpful repo from FloopCZ to install the API
     git clone https://github.com/FloopCZ/tensorflow_cc.git
