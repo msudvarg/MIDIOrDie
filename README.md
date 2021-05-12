@@ -1,4 +1,16 @@
-# Compiliation
+# Compilation
+
+We include two compilation scripts to ease the build process.
+
+On the controller, simply run
+
+    bash install_controller.sh
+
+Similarly, on the server, run
+
+    bash install_server.sh
+
+Alternatively, you can follow these steps:
 
 Retrieve this repo with
 
@@ -26,6 +38,7 @@ Acquire Tensorflow dependencies and build the server with
     sudo mv bazel.gpg /etc/apt/trusted.gpg.d/
     echo "deb [arch=amd64] https://storage.googleapis.com/bazel-apt stable jdk1.8" | sudo tee /etc/apt/sources.list.d/bazel.list
     sudo apt-get update && sudo apt-get install bazel-3.1.0
+    sudo ln -s /usr/bin/bazel-3.1.0 /usr/bin/bazel
 
     # Clone a helpful repo from FloopCZ to install the API
     git clone https://github.com/FloopCZ/tensorflow_cc.git
@@ -121,10 +134,6 @@ The other relevant constant defined in this file is the default socket port:
 A `Shared_Array` (see below) type alias is defined here as well:
 
     using shared_fft_t = Shared_Array<float,OUTPUT_FFT_SIZE>;
-
-## Test Programs
-
-### Channelbroker
 
 # Other Modules
 
@@ -228,6 +237,11 @@ The `Channel` constructor is:
 
 ## Socket
 
+A custom library, built on top of BSD stream sockets, for network communication between the client and server. The library implements Server and Client classes, both deriving from a base Socket class. The Server implements the Acceptor as part of the Acceptor-Connector design pattern\cite{ref-designpatterns}, having a dedicated thread to listen for client connections on the socket. It constructs an object of the Connection class for each client it accepts. This class implements the Active Object pattern\cite{ref-designpatterns}, using a dedicated thread per connection to read and write across the socket. The Connector's thread function is a parameter of the Socket constructor. This allows the library to be highly flexible: custom communication protocols and functionality can be developed separately of the socket communication itself, then simply passed to a single Server object which then handles all communication.
+
+The Client class, unlike the server, only maintains a single Connection object, which is constructed upon successful connection to the server. This allows all socket communication on the client side to be handled in its own thread. 
+If the Client object cannot connect to the Server, it throws an exception, with a unique type for each cause of failure. This allows the library user to set up custom exception handling. In our case, for example, the client attempts to reconnect every second if there is no listening Server. For other errors where an attempt to reconnect would be futile (e.g. an error in the socket subsystem, an invalid IP address, etc.), the program is terminated gracefully with an appropriate error message.
+
 ## Tensorflow build
 
 The tensorflow_cc api must be installed to use the AI version of signature extraction. Perform the following:
@@ -248,3 +262,14 @@ The tensorflow_cc api must be installed to use the AI version of signature extra
     sudo make install
 
 It can now be linked into CMake projects with `find_package(TensorflowCC REQUIRED)` and `target_link_libraries(example TensorflowCC::TensorflowCC)`
+
+# Branches
+
+## master
+
+Now contains everything, except...
+
+## timing
+
+The timing branch is essentially the master branch, but with extra functionality in `include/timing.h` to perform timing measurements.
+These functions are called from server and controller code.
