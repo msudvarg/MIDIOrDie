@@ -9,15 +9,15 @@ Retrieve this repo with
 
 Acquire dependencies and build the controller with
 
-    sudo apt install -y libportaudiocpp0 libfftw3-dev
+    sudo apt install -y build-essential cmake libfftw3-dev portaudio19-dev
     mkdir build && cd build
     cmake ..
     make
 
 Acquire Tensorflow dependencies and build the server with
 
-    # Install portaudio again, if you're running on a different machine
-    sudo apt install -y libportaudiocpp0
+    # Install portaudio and co again, if you're running on a different machine
+    sudo apt install -y build-essential cmake libfftw3-dev librtmidi-dev portaudio19-dev
     mkdir build && cd build
 
     # Install prereqs and bazel
@@ -38,6 +38,38 @@ Acquire Tensorflow dependencies and build the server with
     # Build the server
     cmake -DBUILD_SERVER=true ..
     make
+
+## Build the game
+
+    # Clone custom Godot Game engine
+    git clone https://github.com/dane-johnson/godot
+    cd godot
+    git checkout origin/rtmidi
+
+    # Install pre-reqs
+    sudo apt-get install build-essential scons pkg-config libx11-dev libxcursor-dev libxinerama-dev \
+        libgl1-mesa-dev libglu-dev libasound2-dev libpulse-dev libudev-dev libxi-dev libxrandr-dev yasm
+    scons -j8 platform=x11
+
+    # Change to this repo
+    cd path/to/MIDIOrDie/midiordiethegame
+    git submodule update --init --recursive
+    
+    # Build bindings for our custom game engine
+    cd MidiCPP/godot-cpp
+    scons generate_bindings=yes -j$(nproc)
+
+    # Build the game
+    cd ..
+    mkdir bin
+    make
+
+    # Use this command to open the Godot-editor, then select "Import project", 
+    # navigate to the midiordiethegame folder and select the project.godot file.
+    cd path/to/danes/godot/bin
+    ./godot.x11.tools.64
+    
+# Open midiordiethegame/project.godot
 
 # Running
 
