@@ -1,6 +1,6 @@
 bash install_base.sh
 
-sudo apt-get install librtmidi-dev
+sudo apt-get install -y librtmidi-dev
 
 bash install_tensorflow.sh
 
