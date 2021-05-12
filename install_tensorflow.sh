@@ -1,5 +1,5 @@
 # Install prereqs and bazel
-sudo apt-get install -y cmake curl g++-7 git python3-dev python3-numpy sudo wget
+sudo apt-get install -y cmake curl g++-7 git python3 python3-dev python3-numpy sudo wget
 mkdir build
 cd build
 curl -fsSL https://bazel.build/bazel-release.pub.gpg | gpg --dearmor > bazel.gpg
@@ -17,4 +17,4 @@ cmake -DALLOW_CUDA=off ..
 make
 sudo make install
 
-cd ../../
+cd ../../../
