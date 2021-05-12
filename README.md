@@ -48,6 +48,11 @@ Acquire Tensorflow dependencies and build the server with
     make
     sudo make install
 
+Note that the TensorFlow installation will fail if `python3` does not run with the command `python`.
+To alias `python` to `python3`, run the command:
+
+    sudo ln -s /usr/bin/python3 /usr/bin/python
+
 With all those dependencies out of the way, build the repo with a flag to trigger building of the server
 
     # Build the server

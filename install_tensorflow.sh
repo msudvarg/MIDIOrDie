@@ -9,6 +9,11 @@ sudo apt-get update
 sudo apt-get install bazel-3.1.0
 sudo ln -s /usr/bin/bazel-3.1.0 /usr/bin/bazel
 
+# If python does not resolve to python3
+if ! [[ $(which python) ]]; then
+    sudo ln -s /usr/bin/python3 /usr/bin/python
+fi
+
 # Clone a helpful repo from FloopCZ to install the API
 cd ../
 git clone https://github.com/FloopCZ/tensorflow_cc.git
