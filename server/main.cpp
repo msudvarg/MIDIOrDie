@@ -12,6 +12,7 @@
 #include "../include/poller.h"
 #include "../fft2midi/fft2midi.h"
 #include "../cnpy/cnpy.h"
+
 std::unique_ptr<MidiStream> ms;
 
 int port = 0;
